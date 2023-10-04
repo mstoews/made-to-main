@@ -6,7 +6,7 @@ import {
 import {
   ImageItemSnap,
   imageItem,
-  imageItemIndex,
+  ImageItemIndex,
 } from 'app/5.models/imageItem';
 import { rawImageItem } from 'app/5.models/rawImagesList';
 import { convertSnaps } from './db-utils';
@@ -45,14 +45,14 @@ export class ImageListService {
   private smallImageCol: AngularFirestoreCollection<imageItem>;
   private largeImageCol: AngularFirestoreCollection<imageItem>;
   private imageItemCopyCol: AngularFirestoreCollection<imageItem>;
-  private imageItemIndexCol: AngularFirestoreCollection<imageItemIndex>;
+  private imageItemIndexCol: AngularFirestoreCollection<ImageItemIndex>;
 
   private updateItemsCollection: AngularFirestoreCollection<imageItem>;
   private rawImageItems: Observable<rawImageItem[]>;
   private loadImageItems: Observable<imageItem[]>;
   private imageItems: Observable<imageItem[]>;
   private imageCopy: Observable<imageItem[]>;
-  private imageItemIndex: Observable<imageItemIndex[]>;
+  private ImageItemIndex: Observable<ImageItemIndex[]>;
 
   private largeImageItems: Observable<imageItem[]>;
   private smallImageItems: Observable<imageItem[]>;
@@ -75,8 +75,8 @@ export class ImageListService {
     this.imageItemCopyCol = afs.collection<imageItem>('imageItemCopyList');
 
     this.imageItemIndexCol =
-      afs.collection<imageItemIndex>('originalImageList');
-    this.imageItemIndex = this.imageItemIndexCol.valueChanges({
+      afs.collection<ImageItemIndex>('originalImageList');
+    this.ImageItemIndex = this.imageItemIndexCol.valueChanges({
       idField: 'id',
     });
 
@@ -227,13 +227,13 @@ export class ImageListService {
   }
 
   getNotUsedOriginalImageList() {
-    return this.imageItemIndex.pipe(
+    return this.ImageItemIndex.pipe(
       map((images) => images.filter((image) => image.type === 'IN_NOT_USED'))
     );
   }
 
   getOriginalImageListByType(type: string) {
-    return this.imageItemIndex.pipe(
+    return this.ImageItemIndex.pipe(
       map((images) => images.filter((image) => image.type === type))
     );
   }

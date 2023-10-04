@@ -2,7 +2,7 @@ import { Component, Input, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Collection } from 'app/5.models/collection';
 import { ImageItemIndexService } from 'app/4.services/image-item-index.service';
-import { imageItemIndex } from 'app/5.models/imageItem';
+import { ImageItemIndex } from 'app/5.models/imageItem';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -13,7 +13,7 @@ import { Observable } from 'rxjs';
 export class ProductCardComponent implements OnInit {
   @Input() collection: Collection;
   imageListService = inject(ImageItemIndexService);
-  images$: Observable<imageItemIndex[]>;
+  images$: Observable<ImageItemIndex[]>;
 
   ngOnInit(): void {
     this.images$ = this.imageListService.getAllImages(this.collection.id);

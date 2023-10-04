@@ -9,7 +9,7 @@ import {
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Observable, Subscription, map } from 'rxjs';
 import { ImageListService } from 'app/4.services/image-list.service';
-import { imageItem, imageItemIndex } from 'app/5.models/imageItem';
+import { imageItem, ImageItemIndex } from 'app/5.models/imageItem';
 
 import {
   CdkDragDrop,
@@ -37,8 +37,8 @@ export class CollectionsImageSelectionComponent implements OnInit, OnDestroy {
   subNotUsed: Subscription;
   subCollections: Subscription;
 
-  not_usedImages: imageItemIndex[] = [];
-  collectionsImages: imageItemIndex[] = [];
+  not_usedImages: ImageItemIndex[] = [];
+  collectionsImages: ImageItemIndex[] = [];
 
   firstRun: boolean = true;
 
@@ -110,7 +110,7 @@ export class CollectionsImageSelectionComponent implements OnInit, OnDestroy {
     this.imageItemIndexService.updateImageList(image);
   }
 
-  UpdateInventoryItem(e: imageItemIndex) {
+  UpdateInventoryItem(e: ImageItemIndex) {
     e.type = this.IN_COLLECTION;
     this.imageItemIndexService.updateImageList(e);
   }

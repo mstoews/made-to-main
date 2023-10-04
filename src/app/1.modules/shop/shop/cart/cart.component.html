@@ -65,10 +65,65 @@
                           clip-rule="evenodd" />
                       </svg>
                       <span>In stock</span>
+
                     </p>
                   </div>
                 </li>
               </ul>
+              <div class="m-2 p-2 max-w-[650px] center" *ngIf="item.is_tailoring">
+                <div mat-dialog-content>
+                  <mat-card-title class="bg-gray-700 rounded-sm m-1 p-1">Measurements</mat-card-title>
+                  <form [formGroup]="measurementGroup" (ngSubmit)="onUpdate(mainpageGroup.value)">
+
+                    <section class="flex flex-col md:flex-row">
+
+                      <mat-form-field class="mt-2 m-1 grow" appearance="outline">
+                        <mat-label class="text-base">Waist</mat-label>
+                        <input matInput placeholder="Waist" type="number" formControlName="waist" />
+                      </mat-form-field>
+
+                      <mat-form-field class="mt-2 m-1 grow" appearance="outline">
+                        <mat-label class="text-base">Bust</mat-label>
+                        <input matInput placeholder="Bust" type="number" formControlName="bust" />
+                      </mat-form-field>
+
+                      <mat-form-field class="mt-2 m-1 grow" appearance="outline">
+                        <mat-label class="text-base">Height</mat-label>
+                        <input matInput placeholder="Height" type="number" formControlName="height" />
+                      </mat-form-field>
+
+                    </section>
+
+                    <section class="flex flex-col md:flex-row">
+                      <mat-form-field class="m-1 form-element grow" appearance="outline">
+                        <mat-label class="text-base">Inseam</mat-label>
+                        <input matInput placeholder="Inseam" type="number" formControlName="inseam" />
+                      </mat-form-field>
+
+
+                      <mat-form-field class="m-1 form-element grow" appearance="outline">
+                        <mat-label class="text-base">Outseam</mat-label>
+                        <input matInput placeholder="Outseam" type="number" formControlName="outseam" />
+                      </mat-form-field>
+                    </section>
+
+                    <section class="flex flex-col md:flex-row">
+
+                      <mat-form-field class="m-1 form-element grow" appearance="outline">
+                        <mat-label class="text-base">Sleeve length</mat-label>
+                        <input matInput placeholder="Sleeve length" type="number" formControlName="sleeve_length" />
+                      </mat-form-field>
+
+                      <mat-form-field class="m-1 form-element grow" appearance="outline">
+                        <mat-label class="text-base">Hip</mat-label>
+                        <input matInput placeholder="Hip" type="number" formControlName="hip" />
+                      </mat-form-field>
+
+                    </section>
+
+                  </form>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -119,9 +174,10 @@
       </div>
     </div>
 
-    <section aria-labelledby="contact-information">
-      <app-address></app-address>
-    </section>
+    <div aria-labelledby="contact-information">
+
+
+    </div>
 
   </mat-card>
 

@@ -14,7 +14,7 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Category } from 'app/5.models/category';
 import { CategoryService } from 'app/4.services/category.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { imageItemIndex } from 'app/5.models/imageItem';
+import { ImageItemIndex } from 'app/5.models/imageItem';
 import { ImageItemIndexService } from 'app/4.services/image-item-index.service';
 
 @Component({
@@ -43,7 +43,7 @@ export class CategoryGridComponent implements OnInit, OnDestroy {
 
   subNotUsed: Subscription;
 
-  not_usedImages: imageItemIndex[] = [];
+  not_usedImages: ImageItemIndex[] = [];
 
   allCategories$ = this.categoryService.getAll();
 
@@ -100,7 +100,7 @@ export class CategoryGridComponent implements OnInit, OnDestroy {
     });
   }
 
-  UpdateCategoryURL(e: imageItemIndex) {
+  UpdateCategoryURL(e: ImageItemIndex) {
     this.categoryGroup.patchValue({
       image: e.imageSrc200,
     });

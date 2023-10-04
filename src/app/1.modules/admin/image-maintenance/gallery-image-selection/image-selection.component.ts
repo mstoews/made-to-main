@@ -13,7 +13,7 @@ import {
 } from '@angular/cdk/drag-drop';
 import { ProductsService } from 'app/4.services/products.service';
 import { DeleteDuplicateService } from 'app/4.services/delete-duplicate.service';
-import { imageItemIndex } from 'app/5.models/imageItem';
+import { ImageItemIndex } from 'app/5.models/imageItem';
 
 @Component({
   selector: 'gallery-img-selection',
@@ -23,7 +23,7 @@ import { imageItemIndex } from 'app/5.models/imageItem';
 export class GalleryImageSelectionComponent implements OnInit, OnDestroy {
   @Input() productId: string;
 
-  currentImage: imageItemIndex;
+  currentImage: ImageItemIndex;
 
   _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -31,10 +31,10 @@ export class GalleryImageSelectionComponent implements OnInit, OnDestroy {
   IN_DELETED = 'IN_DELETED';
   IN_COLLECTION = 'IN_COLLECTION';
 
-  not_usedImages: imageItemIndex[] = [];
-  deletedImages: imageItemIndex[] = [];
-  collectionsImages: imageItemIndex[] = [];
-  inventoryImages$: Observable<imageItemIndex[]>;
+  not_usedImages: ImageItemIndex[] = [];
+  deletedImages: ImageItemIndex[] = [];
+  collectionsImages: ImageItemIndex[] = [];
+  inventoryImages$: Observable<ImageItemIndex[]>;
   firstRun: boolean = true;
 
   constructor(
@@ -57,7 +57,7 @@ export class GalleryImageSelectionComponent implements OnInit, OnDestroy {
     this.imageItemIndexService.updateImageList(image);
   }
 
-  UpdateInventoryItem(e: imageItemIndex) {
+  UpdateInventoryItem(e: ImageItemIndex) {
     e.type = this.productId;
     this.imageItemIndexService.updateImageList(e);
   }
@@ -91,7 +91,7 @@ export class GalleryImageSelectionComponent implements OnInit, OnDestroy {
     this.Refresh();
   }
 
-  drop(event: CdkDragDrop<imageItemIndex[]>) {
+  drop(event: CdkDragDrop<ImageItemIndex[]>) {
     if (event.previousContainer === event.container) {
       moveItemInArray(
         event.container.data,
@@ -120,13 +120,13 @@ export class GalleryImageSelectionComponent implements OnInit, OnDestroy {
   }
 
   private updateRanking(
-    imageItemIndex: any,
+    ImageItemIndex: any,
     currentIndex: number,
     newContainerId: string
   ) {
     if (newContainerId !== this.IN_NOT_USED) {
-      imageItemIndex.forEach((element: any) => {
-        element.ranking = imageItemIndex.indexOf(element);
+      ImageItemIndex.forEach((element: any) => {
+        element.ranking = ImageItemIndex.indexOf(element);
         this.imageItemIndexService.updateImageList(element);
       });
     }

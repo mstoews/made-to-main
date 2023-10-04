@@ -7,7 +7,7 @@ import {
   ViewChild,
 } from '@angular/core';
 
-import { imageItem, imageItemIndex } from 'app/5.models/imageItem';
+import { imageItem, ImageItemIndex } from 'app/5.models/imageItem';
 import { Collection } from 'app/5.models/collection';
 import { Subject, takeUntil } from 'rxjs';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -32,7 +32,7 @@ export class CollectionPreviewComponent implements OnInit, OnDestroy {
   imageListService = inject(ImageItemIndexService);
   fb = inject(FormBuilder);
 
-  collectionsImages: imageItemIndex[] = [];
+  collectionsImages: ImageItemIndex[] = [];
   subCollections: any;
   item: imageItem = null;
   id: string;
@@ -46,7 +46,7 @@ export class CollectionPreviewComponent implements OnInit, OnDestroy {
     this.Refresh(this.collection.id);
   }
 
-  onUpdate(imgItem: imageItemIndex) {
+  onUpdate(imgItem: ImageItemIndex) {
     this.imageListService.updateCollectionDescription(imgItem);
   }
 
@@ -90,7 +90,7 @@ export class CollectionPreviewComponent implements OnInit, OnDestroy {
     }
   }
 
-  createForm(item: imageItemIndex) {
+  createForm(item: ImageItemIndex) {
     if (item !== undefined || item !== null) {
       this.collectionGroup = this.fb.group({
         URL: [item.imageSrc200, Validators.required],

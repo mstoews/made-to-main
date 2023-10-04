@@ -1,57 +1,67 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, OnDestroy, inject } from '@angular/core';
 import {
   AngularFirestore,
   AngularFirestoreCollection,
 } from '@angular/fire/compat/firestore';
 import { Observable, Subscription, map } from 'rxjs';
 import { Category } from 'app/5.models/category';
-
-import { Product } from 'app/5.models/products';
 import { ProductsService } from './products.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class CategoryService {
-  private categoryCollection: AngularFirestoreCollection<Category>;
-  private categoryItems: Observable<Category[]>;
+export class CategoryService implements OnDestroy{
   private sub: Subscription;
+  private hashSub: Subscription
+  private catSub: Subscription
 
-  constructor(public afs: AngularFirestore,
-    private productsService: ProductsService) {
-    this.categoryCollection = afs.collection<Category>('category');
-    this.categoryItems = this.categoryCollection.valueChanges({
-      idField: 'id',
-    });
+  productsService = inject(ProductsService);
+  afs = inject(AngularFirestore);
 
-    // this.updateIsUsedCategoryList();
+  categoryCollection = this.afs.collection<Category>('category');
+  categoryItems = this.categoryCollection.valueChanges({ idField: 'id', });
 
+  ngOnDestroy(): void {
+    if (this.sub !== undefined)
+      this.sub.unsubscribe();
+    if (this.hashSub !== undefined)
+    this.hashSub.unsubscribe();
+    if (this.catSub !== undefined)
+      this.catSub.unsubscribe();
   }
 
   auth = inject(AngularFirestore);
 
   hashUsedCategoryMap = new Map<string, string>();
 
-  // use this function ot limit the category list to only those that have products.
-  getAll() {
-    return this.categoryItems;
-  }
 
+  // use this function ot limit the category list to only those that have products.
   updateIsUsedCategoryList() {
+
+    // load all the current categories into a map
+    this.hashSub = this.getCategoryList().subscribe((category) => {
+      category.forEach((doc) => {
+        this.hashUsedCategoryMap.set(doc.name, doc.name);
+      });
+    });
+
+    // load all the current products into a map
     this.sub = this.productsService.getAvailableInventory().subscribe((inventory) => {
       inventory.forEach((item) => {
         if (item.category !== undefined) {
-          this.hashUsedCategoryMap.set(item.category, item.category);
+          if(this.hashUsedCategoryMap.has(item.category) === false)
+              this.hashUsedCategoryMap.set(item.category, item.category);
         }
-      } );
+     });
 
-      this.hashUsedCategoryMap.set('All Categories', 'All Categories');
+    // Add all categories item if it does not exist
+    if (this.hashUsedCategoryMap.has('All Categories') === false) {
+        this.hashUsedCategoryMap.set('All Categories', 'All Categories');
+    }
 
-      this.hashUsedCategoryMap.forEach((value, key) => {
-         this.categoryCollection.doc(key).update({ isUsed: true });
-      });
 
-      this.categoryCollection.get().subscribe((category) => {
+    // Update valid, used categories
+    this.catSub = this.categoryCollection.get().subscribe((category) => {
         category.docs.forEach((doc) => {
           const categoryItem = doc.data() as Category;
           if (this.hashUsedCategoryMap.has(categoryItem.name)) {
@@ -64,6 +74,10 @@ export class CategoryService {
         });
       });
     });
+  }
+
+  getAll() {
+    return this.categoryItems;
   }
 
   getCategoryList() {
@@ -84,7 +98,5 @@ export class CategoryService {
     this.categoryCollection.doc(id).delete();
   }
 
-  onDestroy() {
-    this.sub.unsubscribe();
-  }
+
 }

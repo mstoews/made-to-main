@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
-import { imageItemIndex } from 'app/5.models/imageItem';
+import { ImageItemIndex } from 'app/5.models/imageItem';
 import { openViewComponentDialog } from './view-image-item/view-image-item.component';
 import { filter } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
@@ -29,7 +29,7 @@ export class InventoryImageCardComponent {
     openViewComponentDialog(this.dialog, image, this.productId);
   }
 
-  @Input() image: imageItemIndex;
+  @Input() image: ImageItemIndex;
   @Input() productId: string;
-  @Output() imageSelected: EventEmitter<imageItemIndex> = new EventEmitter();
+  @Output() imageSelected: EventEmitter<ImageItemIndex> = new EventEmitter();
 }

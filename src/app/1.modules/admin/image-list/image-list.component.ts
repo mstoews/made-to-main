@@ -1,6 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ImageItemIndexService } from 'app/4.services/image-item-index.service';
-import { imageItemIndex } from '../../../5.models/imageItem';
+import { ImageItemIndex } from '../../../5.models/imageItem';
 import { Subject, Subscription, takeUntil } from 'rxjs';
 import { FormBuilder } from '@angular/forms';
 import {
@@ -22,11 +22,11 @@ export class ImageListComponent implements OnDestroy {
   IN_CREATION = 'IN_CREATION';
   IN_GALLERY = 'IN_GALLERY';
 
-  not_usedImages: imageItemIndex[] = [];
-  featuredImages: imageItemIndex[] = [];
-  collectionsImages: imageItemIndex[] = [];
-  creationsImages: imageItemIndex[] = [];
-  galleryImages: imageItemIndex[] = [];
+  not_usedImages: ImageItemIndex[] = [];
+  featuredImages: ImageItemIndex[] = [];
+  collectionsImages: ImageItemIndex[] = [];
+  creationsImages: ImageItemIndex[] = [];
+  galleryImages: ImageItemIndex[] = [];
 
   constructor(
     public imageItemIndexService: ImageItemIndexService,
@@ -65,7 +65,7 @@ export class ImageListComponent implements OnDestroy {
     this.Refresh();
   }
 
-  drop(event: CdkDragDrop<imageItemIndex[]>) {
+  drop(event: CdkDragDrop<ImageItemIndex[]>) {
     if (event.previousContainer === event.container) {
       moveItemInArray(
         event.container.data,

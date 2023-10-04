@@ -203,7 +203,7 @@ export class InventoryComponent implements OnInit, OnDestroy {
     brand: '',
     price: '',
     category: '',
-    rating: '',
+    comments: '',
     is_featured: '',
     user_updated: '',
     date_created: '',
@@ -221,11 +221,12 @@ export class InventoryComponent implements OnInit, OnDestroy {
       brand: [''],
       price: [''],
       category: [''],
-      rating: [''],
+      comments: [''],
       is_featured: [''],
       user_updated: [''],
       date_created: [''],
       date_updated: [''],
+      is_tailoring: [''],
     });
   }
 
@@ -241,8 +242,9 @@ export class InventoryComponent implements OnInit, OnDestroy {
       brand: [prd.brand],
       price: [prd.price],
       category: [prd.category],
-      rating: [prd.rating],
+      comments: [prd.comments],
       is_featured: [prd.is_featured],
+      is_tailoring: [prd.is_tailoring],
       user_updated: [prd.user_updated],
       date_created: [prd.date_created],
       date_updated: [prd.date_updated],

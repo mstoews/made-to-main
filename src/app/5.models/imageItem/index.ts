@@ -16,7 +16,7 @@ export interface imageItem {
   size?: string;
 }
 
-export interface imageItemIndex {
+export interface ImageItemIndex {
   id: string;
   fullPath: string;
   size: string;
@@ -37,7 +37,7 @@ export interface imageItemIndex {
 
 
 export interface imageItemIndexMap {
-  [key: string]: imageItemIndex;
+  [key: string]: ImageItemIndex;
 }
 
 export interface imageItemPartial {

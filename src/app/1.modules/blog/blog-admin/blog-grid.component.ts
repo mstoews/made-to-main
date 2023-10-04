@@ -138,7 +138,7 @@ export class BlogAdminComponent implements OnInit {
   }
 
   valueChangedEvent(e: any) {
-    // console.debug(`blog grid value changed ${e}`)
+     console.debug(`blog grid value changed ${e}`)
   }
 
   createForm(blog: Blog) {

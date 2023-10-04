@@ -20,7 +20,7 @@ import { MaterialModule } from '../../material.module';
 import { ProgressComponent } from '../progress/progress.component';
 import { DndDirective } from './dnd.directive';
 import { ReactiveFormsModule } from '@angular/forms';
-import { imageItemIndex } from 'app/5.models/imageItem';
+import { ImageItemIndex } from 'app/5.models/imageItem';
 import { DeleteDuplicateService } from 'app/4.services/delete-duplicate.service';
 
 @Component({
@@ -61,9 +61,9 @@ export class DndComponent implements OnDestroy {
   fileData: any;
   VERSION_NO = 1;
   percentageChange$: Observable<number | undefined>;
-  public imageItemIndex!: imageItemIndex;
-  allImages: imageItemIndex[] = [];
-  hashOriginalIndexMap = new Map<string, imageItemIndex>();
+  public ImageItemIndex!: ImageItemIndex;
+  allImages: ImageItemIndex[] = [];
+  hashOriginalIndexMap = new Map<string, ImageItemIndex>();
   deleteDuplicateService = inject(DeleteDuplicateService);
 
 

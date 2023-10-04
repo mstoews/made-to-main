@@ -4,12 +4,12 @@ import { ImageItemIndexService } from 'app/4.services/image-item-index.service';
 import { Observable, combineLatest } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { Collection } from 'app/5.models/collection';
-import { imageItemIndex } from 'app/5.models/imageItem';
+import { ImageItemIndex } from 'app/5.models/imageItem';
 import { ActivatedRoute } from '@angular/router';
 
 interface collectionData {
   collection: Collection;
-  imageItemIndex: imageItemIndex[];
+  ImageItemIndex: ImageItemIndex[];
 }
 
 @Component({
@@ -25,7 +25,7 @@ export class CollectionMainComponent implements OnInit {
   allCollections$ = this.collectionService.getAll();
   collection: Collection;
   data$: Observable<collectionData>;
-  collectionImages$: Observable<imageItemIndex[]>;
+  collectionImages$: Observable<ImageItemIndex[]>;
   collectionId: string;
 
   // this.products$ = this.productService.getInventoryByCategory(this.category);

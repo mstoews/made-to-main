@@ -11,7 +11,7 @@ export interface Product {
   image200?:  string;
   brand?:        string;
   price?:        number;
-  rating?:       string;
+  comments?:       string;
   is_featured?:  string;
   user_updated?: string;
   date_updated?: string;
@@ -22,7 +22,15 @@ export interface Product {
   quantity?: number;
   quantity_increment?: number;
   is_completed?: boolean;
+  is_tailoring: boolean;
   user_purchased?: string;
   date_sold?: string;
+  waist?: number;
+  bust?: number;
+  height?: number;
+  inseam?: number;
+  outseam?: number;
+  sleeve_length?: number;
+  hip?: number;
 }
 

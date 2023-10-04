@@ -12,7 +12,7 @@ import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { fadeInOut } from '../../landing-page/animations';
 import { ImageItemIndexService } from 'app/4.services/image-item-index.service';
-import { imageItemIndex } from 'app/5.models/imageItem';
+import { ImageItemIndex } from 'app/5.models/imageItem';
 
 
 @Component({

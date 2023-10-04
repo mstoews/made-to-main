@@ -10,7 +10,7 @@ import { Blog } from 'app/5.models/blog';
 import { Router } from '@angular/router';
 import { BlogService } from 'app/4.services/blog.service';
 import { ImageItemIndexService } from 'app/4.services/image-item-index.service';
-import { imageItemIndex } from 'app/5.models/imageItem';
+import { ImageItemIndex } from 'app/5.models/imageItem';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -21,7 +21,7 @@ import { Observable } from 'rxjs';
 })
 export class FashionComponent implements OnInit {
   @Input() blog: Blog;
-  blogImages$: Observable<(imageItemIndex & {id: string} )[]>;
+  blogImages$: Observable<(ImageItemIndex & {id: string} )[]>;
   imageList = inject(ImageItemIndexService);
   router = inject(Router);
   

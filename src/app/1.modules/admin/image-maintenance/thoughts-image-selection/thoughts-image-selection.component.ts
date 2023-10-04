@@ -9,7 +9,7 @@ import {
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Observable, Subscription, map } from 'rxjs';
 import { ImageListService } from 'app/4.services/image-list.service';
-import { imageItemIndex } from 'app/5.models/imageItem';
+import { ImageItemIndex } from 'app/5.models/imageItem';
 
 import {
   CdkDragDrop,
@@ -37,7 +37,7 @@ export class ThoughtsImageSelectionComponent implements OnInit, OnDestroy {
 
 
 
-  currentImage: imageItemIndex;
+  currentImage: ImageItemIndex;
 
   IN_NOT_USED = 'IN_NOT_USED';
   IN_DELETED = 'IN_DELETED';
@@ -47,9 +47,9 @@ export class ThoughtsImageSelectionComponent implements OnInit, OnDestroy {
 
   subCollections: Subscription;
 
-  not_usedImages: imageItemIndex[] = [];
+  not_usedImages: ImageItemIndex[] = [];
 
-  collectionsImages: imageItemIndex[] = [];
+  collectionsImages: ImageItemIndex[] = [];
   firstRun: boolean = true;
 
   createImageOnce() {
@@ -65,7 +65,7 @@ export class ThoughtsImageSelectionComponent implements OnInit, OnDestroy {
     this.imageListService.updateImageList(image);
   }
 
-  UpdateInventoryItem(e: imageItemIndex) {
+  UpdateInventoryItem(e: ImageItemIndex) {
     e.type = this.productId;
     this.imageListService.updateImageList(e);
   }
@@ -104,7 +104,7 @@ export class ThoughtsImageSelectionComponent implements OnInit, OnDestroy {
     //this.Refresh();
   }
 
-  drop(event: CdkDragDrop<imageItemIndex[]>) {
+  drop(event: CdkDragDrop<ImageItemIndex[]>) {
     if (event.previousContainer === event.container) {
       moveItemInArray(
         event.container.data,

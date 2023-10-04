@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Input, OnInit, inject } from '@angu
 import { Router } from '@angular/router';
 import { Blog } from 'app/5.models/blog';
 import { Observable } from 'rxjs';
-import { imageItemIndex } from '../../../5.models/imageItem';
+import { ImageItemIndex } from '../../../5.models/imageItem';
 import { ImageItemIndexService } from 'app/4.services/image-item-index.service';
 
 @Component({
@@ -12,7 +12,7 @@ import { ImageItemIndexService } from 'app/4.services/image-item-index.service';
 })
 export class BlogCardComponent implements OnInit {
   @Input() blog: Blog;
-  blogImages$: Observable<(imageItemIndex & { id: string;})[]>;
+  blogImages$: Observable<(ImageItemIndex & { id: string;})[]>;
   route = inject(Router);
   imageItemIndexService = inject(ImageItemIndexService);
 

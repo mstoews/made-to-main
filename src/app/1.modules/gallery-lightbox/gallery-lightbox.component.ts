@@ -6,7 +6,7 @@ import {
   AnimationEvent,
 } from '@angular/animations';
 import { Component, Input, OnInit } from '@angular/core';
-import { imageItemIndex } from 'app/5.models/imageItem'; 
+import { ImageItemIndex } from 'app/5.models/imageItem'; 
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 interface Item {
@@ -43,12 +43,12 @@ export class GalleryLightboxComponent implements OnInit {
     moveItemInArray(this.galleryData, event.previousIndex, event.currentIndex);
   }
 
-  @Input() galleryData: imageItemIndex[] = [];
+  @Input() galleryData: ImageItemIndex[] = [];
   @Input() showCount = false;
 
   previewImage = false;
   showMask = false;
-  currentLightboxImage: imageItemIndex = this.galleryData[0];
+  currentLightboxImage: ImageItemIndex = this.galleryData[0];
   currentIndex = 0;
   controls = true;
   totalImageCount = 0;

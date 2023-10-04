@@ -3,6 +3,7 @@ import {
   OnInit,
   OnDestroy,
   ChangeDetectionStrategy,
+  inject,
 } from '@angular/core';
 import { Product } from 'app/5.models/products';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -14,12 +15,13 @@ import { AuthService } from 'app/4.services/auth/auth.service';
 import { CategoryService } from 'app/4.services/category.service';
 import { Category } from 'app/5.models/category';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { imageItemIndex } from 'app/5.models/imageItem';
+import { ImageItemIndex } from 'app/5.models/imageItem';
 import { ImageItemIndexService } from 'app/4.services/image-item-index.service';
 import { Cart } from 'app/5.models/cart';
 import { MenuToggleService } from 'app/4.services/menu-toggle.service';
 import { UserService } from 'app/4.services/auth/user.service';
 import { Lightbox, initTE } from 'tw-elements';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-product-details-five',
@@ -37,7 +39,7 @@ export class ProductDetailsFiveComponent implements OnInit, OnDestroy {
   product: Product;
   isLoggedIn$: Observable<boolean>;
 
-  inventoryImages$: Observable<imageItemIndex[]>;
+  inventoryImages$: Observable<ImageItemIndex[]>;
   imagesList: string[];
   cart: Observable<Cart[]>;
 
@@ -66,6 +68,21 @@ export class ProductDetailsFiveComponent implements OnInit, OnDestroy {
   private _unsubscribeAll: Subject<any> = new Subject<any>();
   userData: any;
   userId: String;
+  fb = inject(FormBuilder);
+  measurementGroup: FormGroup;
+
+  createEmptyForm() {
+    this.measurementGroup = this.fb.group({
+      bust: [''],
+      waist: [''],
+      hips: [''],
+      height: [''],
+      inseam: [''],
+      outseam: [''],
+      sleeve_length: [''],
+    });
+  }
+
 
    ngOnInit(): void {
 
@@ -110,9 +127,10 @@ export class ProductDetailsFiveComponent implements OnInit, OnDestroy {
     this.inventoryImages$ = this.imageItemIndexService.getAllImages( this.product.id);
     this.menuToggleService.setCartListCount(this.productIds.length);
     this.menuToggleService.setWishListCount(this.wishListIds.length);
+    this.createEmptyForm();
   }
 
-  setImage(e: imageItemIndex) {
+  setImage(e: ImageItemIndex) {
     this.mainImage = e.imageSrc400;
   }
 
@@ -182,6 +200,22 @@ export class ProductDetailsFiveComponent implements OnInit, OnDestroy {
   }
 
   existsInCart(): boolean {
+    let found = this.productIds.find((item) => {
+      return item === this.product.id
+    });
+    if (found) {
+      this.snackBar.open('The item already exists in your cart ... ', 'OK', {
+        verticalPosition: 'top',
+        horizontalPosition: 'right',
+        panelClass: 'bg-danger',
+        duration: 3000,
+      });
+      return true;
+    }
+    return false;
+  }
+
+  existsInCartByItem(): boolean {
     let found = this.productIds.find((item) => {
       return item === this.product.id
     });

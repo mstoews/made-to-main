@@ -25,6 +25,14 @@ export class WishListService {
   private userId: string;
   public cartService = inject(CartService);
 
+  private waist: number = 0;
+  private bust: number = 0;
+  private height: number = 0;
+  private inseam: number = 0;
+  private outseam: number = 0;
+  private sleeve_length: number = 0;
+  private hip: number = 0;
+
   constructor(
     private afs: AngularFirestore,
     private snack: MatSnackBar,
@@ -70,7 +78,7 @@ export class WishListService {
           verticalPosition: 'top',
           horizontalPosition: 'right',
           panelClass: 'bg-danger',
-          duration: 3000,
+          duration: 2000,
         });
       })
       .catch((error) => {
@@ -273,9 +281,9 @@ export class WishListService {
 
       if (prod) {
         prod.subscribe((result) => {
-          if (result.quantity_required === true) {
-            this.route.navigate(['/shop/product', productId]);
-          } else {
+          // if (result.quantity_required === true) {
+          //   this.route.navigate(['/shop/product', productId]);
+          // } else {
             const dDate = new Date();
             const updateDate = dDate.toISOString().split('T')[0];
             if (prod) {
@@ -290,6 +298,13 @@ export class WishListService {
                   date_updated: updateDate,
                   quantity: quantity,
                   status: 'open',
+                  waist: this.waist,
+                  bust: this.bust,
+                  height: this.height,
+                  inseam: this.inseam,
+                  outseam: this.outseam,
+                  sleeve_length: this.sleeve_length,
+                  hip: this.hip,
                 };
                 // create the cart item from the list item
                 this.createCart(wish);
@@ -300,8 +315,8 @@ export class WishListService {
                 );
               });
             }
-          }
-        });
+          })
+        // });
       }
     }
     return true;

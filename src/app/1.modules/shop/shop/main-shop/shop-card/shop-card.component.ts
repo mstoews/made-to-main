@@ -9,7 +9,7 @@ import {
 import { Product } from 'app/5.models/products';
 import { Router } from '@angular/router';
 import { Observable, Subject, Subscription, takeUntil } from 'rxjs';
-import { imageItemIndex } from 'app/5.models/imageItem';
+import { ImageItemIndex } from 'app/5.models/imageItem';
 import { ImageItemIndexService } from 'app/4.services/image-item-index.service';
 
 @Component({

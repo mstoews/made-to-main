@@ -57,6 +57,9 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 
 
   ngOnDestroy(): void {
+    if (this.isFormDirty) {
+      this.onUpdate(this.prdGroup.getRawValue());
+    }
     this._unsubscribeAll.next(null);
     this._unsubscribeAll.complete();
   }
@@ -75,6 +78,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
             .subscribe((prd) => {
               if (prd !== undefined) {
                 this.rich_description = prd.rich_description;
+                this.updated_category = prd.category;
                 this.createForm(prd);
               }
             });
@@ -114,7 +118,19 @@ export class ProductEditComponent implements OnInit, OnDestroy {
         product.quantity_increment = 1;
       }
 
-      const quantity_in = product.quantity_increment;
+      if (product.price === undefined || product.price === null) {
+        product.price = 1;
+      }
+
+      if (product.brand === undefined || product.brand === null) {
+        product.brand = 'Generic';
+      }
+
+      if (product.category === undefined || product.category === null) {
+        product.category = 'Generic';
+      }
+
+      product.category = this.updated_category;
 
       const dDate = new Date();
       const updateDate = dDate.toISOString().split('T')[0];
@@ -166,7 +182,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       brand: ['', Validators.required],
       price: ['', Validators.required],
       category: ['', Validators.required],
-      rating: [''],
+      comments: [''],
       user_updated: [''],
       date_created: [new Date(), Validators.required],
       date_updated: [new Date(), Validators.required],
@@ -176,6 +192,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       is_active: [true, Validators.required],
       is_featured: [true, Validators.required],
       purchases_allowed: ['', Validators.requiredTrue],
+      is_tailoring: [false, Validators.required],
     });
   }
 
@@ -192,7 +209,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       price: [prd.price, Validators.required],
       quantity_increment: [prd.quantity_increment, Validators.required],
       category: [prd.category, Validators.required],
-      rating: [prd.rating, Validators.required],
+      comments: [prd.comments, Validators.required],
       quantity: [prd.quantity, Validators.required],
       quantity_required: [prd.quantity_required, Validators.required],
       user_updated: [prd.user_updated, Validators.required],
@@ -201,6 +218,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       purchases_allowed: [prd.purchases_allowed, Validators.required],
       is_active: [prd.is_active, Validators.required],
       is_featured: [prd.is_featured],
+      is_tailoring: [prd.is_tailoring],
     });
 
     this.prdGroup.valueChanges
@@ -212,7 +230,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 
   onValueChange() {
     this.isFormDirty = true;
-    //console.debug('Value changed in text editor');
+    console.debug('Value changed in text editor');
   }
 
   onBackToInventory() {

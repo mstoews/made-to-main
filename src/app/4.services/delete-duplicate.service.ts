@@ -5,7 +5,7 @@ import {
 } from '@angular/fire/compat/firestore';
 import { AngularFireStorage, AngularFireStorageReference } from '@angular/fire/compat/storage';
 import { collection, collectionData } from '@angular/fire/firestore';
-import { imageItem, imageItemIndex, imageItemIndexMap } from 'app/5.models/imageItem';
+import { imageItem, ImageItemIndex, imageItemIndexMap } from 'app/5.models/imageItem';
 import { Observable, Subject, Subscription, filter, map, shareReplay, takeUntil } from 'rxjs';
 import { rawImageItem } from 'app/5.models/rawImagesList';
 
@@ -33,10 +33,10 @@ export class DeleteDuplicateService implements OnDestroy {
   storage = inject(AngularFireStorage);
 
   // local variables
-  imageIndexArray: imageItemIndex[] = [];
+  imageIndexArray: ImageItemIndex[] = [];
   rawIndexArray: imageItem[] = [];
 
-  hashOriginalIndexMap = new Map<string, imageItemIndex>();
+  hashOriginalIndexMap = new Map<string, ImageItemIndex>();
   hashImageItemMap = new Map<string, imageItem>();
 
   sub: Subscription
@@ -45,17 +45,17 @@ export class DeleteDuplicateService implements OnDestroy {
 
   private rawImageItems: Observable<rawImageItem[]>;
 
-  imageIndexCollections = this.afs.collection<imageItemIndex>('originalImageList');
+  imageIndexCollections = this.afs.collection<ImageItemIndex>('originalImageList');
   imageIndexItems = this.imageIndexCollections.valueChanges({ idField: 'id', });
 
-  createOriginalItem(image: imageItemIndex) {
+  createOriginalItem(image: ImageItemIndex) {
     this.imageIndexCollections.add(image).then((imgIndex) => {
       this.imageIndexCollections.doc(imgIndex.id).update(imgIndex);
     });
   }
 
 
-  async onUpdateImageList(allImages: imageItemIndex[]) {
+  async onUpdateImageList(allImages: ImageItemIndex[]) {
     if (allImages.length > 0) {
       allImages.forEach((item) => {
         this.hashOriginalIndexMap.set(item.fileName, item);
@@ -73,7 +73,7 @@ export class DeleteDuplicateService implements OnDestroy {
               meta.contentType;
 
               const imageUrl = downloadURL;
-              const imageData: imageItemIndex = {
+              const imageData: ImageItemIndex = {
                 parentId: '',
                 caption: imageRef.fullPath,
                 type: 'IN_NOT_USED',
@@ -98,7 +98,7 @@ export class DeleteDuplicateService implements OnDestroy {
       });
   }
 
-  async createImageItem(image: imageItemIndex) {
+  async createImageItem(image: ImageItemIndex) {
     await this.imageIndexCollections.add(image).then((imgItem) => {
       image.id = imgItem.id;
       this.imageIndexCollections.doc(imgItem.id).update(image);
@@ -144,7 +144,7 @@ export class DeleteDuplicateService implements OnDestroy {
         const typeId = imageDt.parent;
         if (downloadUrl !== undefined && updated === false) {
            downloadUrl.subscribe((dw) => {
-             const imageItemIndex = {
+             const ImageItemIndex = {
               parentId: '',
               caption: imageDt.caption,
               fileName: file.name,
@@ -159,7 +159,7 @@ export class DeleteDuplicateService implements OnDestroy {
               id: '',
               contentType: file.type,
             };
-            this.createImageItem(imageItemIndex);
+            this.createImageItem(ImageItemIndex);
             updated = true;
           });
         }
@@ -173,7 +173,7 @@ export class DeleteDuplicateService implements OnDestroy {
         .subscribe((files) => {
           files.items.forEach((imageRef) => {
             imageRef.getMetadata().then((meta) => {
-              const imageData: imageItemIndex = {
+              const imageData: ImageItemIndex = {
                 id: '',
                 fullPath: meta.fullPath,
                 size: 'original',
@@ -192,7 +192,7 @@ export class DeleteDuplicateService implements OnDestroy {
 
   getAllImages(type: string) {
     if (type === null || type === undefined || type === '') {
-      let imageIndexCollections = this.afs.collection<imageItemIndex>(
+      let imageIndexCollections = this.afs.collection<ImageItemIndex>(
         'originalImageList',
         (ref) => ref.orderBy('ranking')
       );
@@ -201,7 +201,7 @@ export class DeleteDuplicateService implements OnDestroy {
       });
       return imageIndexItems;
     } else {
-      let imageIndexCollections = this.afs.collection<imageItemIndex>(
+      let imageIndexCollections = this.afs.collection<ImageItemIndex>(
         'originalImageList',
         (ref) => ref.orderBy('ranking')
       );
@@ -212,7 +212,7 @@ export class DeleteDuplicateService implements OnDestroy {
     }
   }
 
-  async updateImageBySize(image: imageItemIndex, size: string): Promise<void> {
+  async updateImageBySize(image: ImageItemIndex, size: string): Promise<void> {
     var fileExt = image.fileName.split('.').pop();
     var fileName = image.fileName.replace(/\.[^/.]+$/, "");
     fileName = fileName.replace(`/${size}`,'').replace(`_${size}x${size}`,'');
@@ -395,7 +395,7 @@ export class DeleteDuplicateService implements OnDestroy {
   //   );
   // }
 
-  updateIndexItem(imageData: imageItemIndex) {
+  updateIndexItem(imageData: ImageItemIndex) {
     this.imageIndexCollections.add(imageData).then((img) => {
       imageData.id = img.id;
       this.imageIndexCollections.doc(imageData.id).update(imageData);
@@ -476,7 +476,7 @@ export class DeleteDuplicateService implements OnDestroy {
   // Create and retrieve the original index image collection
 
 
-  ImagesIndexArray: imageItemIndex[];
+  ImagesIndexArray: ImageItemIndex[];
 
 
 }

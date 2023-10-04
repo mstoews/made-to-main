@@ -3,7 +3,7 @@ import {
   inject,
 } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
-import { imageItemIndex } from 'app/5.models/imageItem';
+import { ImageItemIndex } from 'app/5.models/imageItem';
 
 import { ImageListService } from 'app/4.services/image-list.service';
 import { CollectionsService } from 'app/4.services/collections.service';
@@ -16,7 +16,7 @@ import { CollectionsService } from 'app/4.services/collections.service';
 export class CollectionPage {
 
   imageListService = inject(ImageListService);
-  images$: Observable<imageItemIndex[]>;
+  images$: Observable<ImageItemIndex[]>;
 
   collectionService = inject(CollectionsService);
   collection$ = this.collectionService.getAll();

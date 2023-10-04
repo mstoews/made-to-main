@@ -10,7 +10,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { Observable, Subject, Subscription, map, pipe, takeUntil } from 'rxjs';
 import { ImageListService } from 'app/4.services/image-list.service';
 import { ImageItemIndexService } from 'app/4.services/image-item-index.service';
-import { imageItemIndex } from 'app/5.models/imageItem';
+import { ImageItemIndex } from 'app/5.models/imageItem';
 
 import {
   CdkDragDrop,
@@ -28,7 +28,7 @@ import { DeleteDuplicateService } from 'app/4.services/delete-duplicate.service'
 export class ImageSelectionComponent implements OnInit, OnDestroy {
   @Input() productId: string;
 
-  currentImage: imageItemIndex;
+  currentImage: ImageItemIndex;
 
   IN_NOT_USED = 'IN_NOT_USED';
   IN_DELETED = 'IN_DELETED';
@@ -39,10 +39,10 @@ export class ImageSelectionComponent implements OnInit, OnDestroy {
   subMain: Subscription;
   subCollections: Subscription;
 
-  not_usedImages: imageItemIndex[] = [];
-  deletedImages: imageItemIndex[] = [];
-  collectionsImages: imageItemIndex[] = [];
-  inventoryImages$: Observable<imageItemIndex[]>;
+  not_usedImages: ImageItemIndex[] = [];
+  deletedImages: ImageItemIndex[] = [];
+  collectionsImages: ImageItemIndex[] = [];
+  inventoryImages$: Observable<ImageItemIndex[]>;
   firstRun: boolean = true;
 
   constructor(
@@ -62,7 +62,7 @@ export class ImageSelectionComponent implements OnInit, OnDestroy {
     this.imageListService.updateImageList(image);
   }
 
-  UpdateInventoryItem(e: imageItemIndex) {
+  UpdateInventoryItem(e: ImageItemIndex) {
     e.type = this.productId;
     this.imageListService.updateImageList(e);
   }
@@ -98,7 +98,7 @@ export class ImageSelectionComponent implements OnInit, OnDestroy {
     this.Refresh();
   }
 
-  drop(event: CdkDragDrop<imageItemIndex[]>) {
+  drop(event: CdkDragDrop<ImageItemIndex[]>) {
     if (event.previousContainer === event.container) {
       moveItemInArray(
         event.container.data,

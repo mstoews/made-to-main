@@ -9,7 +9,7 @@ import {
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Observable, Subject, Subscription, map } from 'rxjs';
 // import { ImageListService } from 'app/4.services/image-list.service';
-import { imageItemIndex } from 'app/5.models/imageItem';
+import { ImageItemIndex } from 'app/5.models/imageItem';
 
 import {
   CdkDragDrop,
@@ -29,7 +29,7 @@ import { MatDrawer } from '@angular/material/sidenav';
 export class CollectionImageSelectionComponent implements OnInit, OnDestroy {
   @Input() productId: string;
 
-  currentImage: imageItemIndex;
+  currentImage: ImageItemIndex;
 
   IN_NOT_USED = 'IN_NOT_USED';
   IN_COLLECTION = 'IN_COLLECTION';
@@ -43,10 +43,10 @@ export class CollectionImageSelectionComponent implements OnInit, OnDestroy {
 
   private _unsubscribeAll: Subject<any> = new Subject<any>();
 
-  not_usedImages: imageItemIndex[] = [];
-  collectionsImages: imageItemIndex[] = [];
-  productsImages: imageItemIndex[] = [];
-  galleryImages: imageItemIndex[] = [];
+  not_usedImages: ImageItemIndex[] = [];
+  collectionsImages: ImageItemIndex[] = [];
+  productsImages: ImageItemIndex[] = [];
+  galleryImages: ImageItemIndex[] = [];
 
   firstRun: boolean = true;
 
@@ -116,7 +116,7 @@ export class CollectionImageSelectionComponent implements OnInit, OnDestroy {
     this.imageItemIndexService.updateImageList(image);
   }
 
-  UpdateInventoryItem(e: imageItemIndex) {
+  UpdateInventoryItem(e: ImageItemIndex) {
     // e.type = this.IN_COLLECTION;
     this.imageItemIndexService.updateImageList(e);
   }
@@ -172,7 +172,7 @@ export class CollectionImageSelectionComponent implements OnInit, OnDestroy {
     this.Refresh();
   }
 
-  drop(event: CdkDragDrop<imageItemIndex[]>) {
+  drop(event: CdkDragDrop<ImageItemIndex[]>) {
     if (event.previousContainer === event.container) {
       moveItemInArray(
         event.container.data,

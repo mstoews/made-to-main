@@ -1,7 +1,7 @@
 import {Component, OnInit, OnDestroy, Input, inject } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Subject, map, shareReplay, takeUntil } from 'rxjs';
-import { imageItemIndex } from 'app/5.models/imageItem';
+import { ImageItemIndex } from 'app/5.models/imageItem';
 import { CdkDragDrop, moveItemInArray, transferArrayItem }  from '@angular/cdk/drag-drop';
 import { ProductsService } from 'app/4.services/products.service';
 import { DeleteDuplicateService } from 'app/4.services/delete-duplicate.service';
@@ -20,12 +20,12 @@ export class InventoryImageSelectionComponent implements OnInit, OnDestroy {
 
   _unsubscribeAll: Subject<any> = new Subject<any>();
 
-  currentImage: imageItemIndex;
+  currentImage: ImageItemIndex;
   IN_NOT_USED = 'IN_NOT_USED';
 
 
-  not_usedImages: imageItemIndex[] = [];
-  collectionsImages: imageItemIndex[] = [];
+  not_usedImages: ImageItemIndex[] = [];
+  collectionsImages: ImageItemIndex[] = [];
 
   imageToolbarService = inject(ImageToolbarService);
   filterSig = this.imageToolbarService.filterSig;
@@ -57,7 +57,7 @@ export class InventoryImageSelectionComponent implements OnInit, OnDestroy {
 
   }
 
-  UpdateInventoryItem(e: imageItemIndex) {
+  UpdateInventoryItem(e: ImageItemIndex) {
     e.type = this.productId;
     this.imageItemIndexService.updateImageList(e);
   }
@@ -107,7 +107,7 @@ export class InventoryImageSelectionComponent implements OnInit, OnDestroy {
     this._unsubscribeAll.complete();
   }
 
-  drop(event: CdkDragDrop<imageItemIndex[]>) {
+  drop(event: CdkDragDrop<ImageItemIndex[]>) {
     if (event.previousContainer === event.container) {
       moveItemInArray(
         event.container.data,
@@ -136,13 +136,13 @@ export class InventoryImageSelectionComponent implements OnInit, OnDestroy {
   }
 
   private updateRanking(
-    imageItemIndex: any,
+    ImageItemIndex: any,
     currentIndex: number,
     newContainerId: string
   ) {
     if (newContainerId !== this.IN_NOT_USED) {
-      imageItemIndex.forEach((element: any) => {
-        element.ranking = imageItemIndex.indexOf(element);
+      ImageItemIndex.forEach((element: any) => {
+        element.ranking = ImageItemIndex.indexOf(element);
         this.imageItemIndexService.updateImageList(element);
       });
     }

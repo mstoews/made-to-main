@@ -1,16 +1,16 @@
 import { Component, Input, OnInit, signal } from '@angular/core';
 import { initTE, Lightbox } from 'tw-elements';
-import { imageItemIndex } from 'app/5.models/imageItem';
+import { ImageItemIndex } from 'app/5.models/imageItem';
 
 @Component({
   selector: 'collection-gallery',
   templateUrl: './gallery.component.html',
 })
 export class CollectionGalleryComponent implements OnInit {
-  @Input() public imageCollection: imageItemIndex[] = [];
+  @Input() public imageCollection: ImageItemIndex[] = [];
 
   imageCount = signal<number>(0);
-  imageItems = <imageItemIndex[]>([]);
+  imageItems = <ImageItemIndex[]>([]);
   image1: string;
   image2: string;
   image3: string;

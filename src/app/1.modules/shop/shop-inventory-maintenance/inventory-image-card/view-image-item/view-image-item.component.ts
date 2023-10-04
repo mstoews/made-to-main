@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { imageItemPartial, imageItemIndex } from 'app/5.models/imageItem';
+import { imageItemPartial, ImageItemIndex } from 'app/5.models/imageItem';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
@@ -31,7 +31,7 @@ export class ViewImageItemComponent {
   constructor(
     private fb: FormBuilder,
     private imageListService: ImageItemIndexService,
-    @Inject(MAT_DIALOG_DATA) private item: imageItemIndex,
+    @Inject(MAT_DIALOG_DATA) private item: ImageItemIndex,
     private dialogRef: MatDialogRef<ViewImageItemComponent>
   ) {
     this.title = item.caption;

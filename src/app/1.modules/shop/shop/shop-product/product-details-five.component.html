@@ -64,16 +64,48 @@
 
         <div class="w-full md:w-auto text-base leading-normal text-gray-600 sm:mt-10"
           [innerHTML]="product.rich_description | safe : 'html'"> </div>
+          <div *ngIf="!product.quantity_required">
+            <p class="mt-3 text-lg leading-5 text-gray-600 font-garamond md:text-xl"> Price ${{ product.price }} </p>
+          </div>
 
-        <div *ngIf="!product.quantity_required">
-          <p class="mt-3 text-lg leading-5 text-gray-600 font-garamond md:text-xl"> Price ${{ product.price }} </p>
-        </div>
-        <div *ngIf="product.quantity_required" class="justify-between w-full mt-8 ">
-          <p class="mt-3 text-lg leading-5 text-gray-600 font-garamond md:text-xl"> Cost per Quantity : ${{product.price
-            }} </p>
-          <p class="mt-3 text-lg leading-5 text-gray-600 font-garamond md:text-xl"> Purchase Total : ${{total_cost |
-            number: '1.0-0' }} </p>
-        </div>
+
+          <div *ngIf="product.quantity_required" class="justify-between w-full mt-8 ">
+            <div class="mt-3 text-lg leading-5 text-gray-800 font-garamond md:text-xl"> Cost per Quantity : ${{
+              product.price }} </div>
+
+              <div class="mt-3 text-lg leading-5 text-gray-800 font-garamond md:text-xl">Quantity : {{quantity | number: '1.1-1'}} </div>
+
+            <div class="mt-3 text-lg leading-5 text-gray-800 font-garamond md:text-xl"> Purchase Total : ${{ total_cost
+              | number: '1.0-0' }} </div>
+          </div>
+
+
+          <!-- Right here put the measurements stuff
+            waist?: number;
+            bust?: number;
+            height?: number;
+            inseam?: number;
+            outseam?: number;
+            sleeve_length?: number;
+            hip?: number;
+          -->
+          
+
+
+          <div *ngIf="product.quantity_required"
+            class="flex items-center justify-between w-full mb-4 border border-gray-200 xl:mt-6 h-11">
+
+            <button mat-flat-button (click)="subtract()"
+              class="flex items-center justify-center h-full border-r w-11 xl:w-16 broder-gray-200">
+              <mat-icon class="text-gray-800" [svgIcon]="'heroicons_solid:minus'"></mat-icon>
+            </button>
+            <p id="num" class="mt-2 leading-tight text-gray-600 text-medium">{{quantity | number: '1.1-1'}}</p>
+            <button mat-flat-button (click)="add()"
+              class="flex items-center justify-center h-full border-l w-11 xl:w-16 broder-gray-200">
+              <mat-icon class="text-gray-800" [svgIcon]="'mat_solid:add'"></mat-icon>
+            </button>
+          </div>
+
       </div>
     </div>
   </div>

@@ -7,7 +7,6 @@ export interface Cart {
   image:        string;
   price:        number;
   category:     string;
-  rating:       string;
   is_completed:  boolean;
   user_purchased: string;
   date_sold: FieldValue;

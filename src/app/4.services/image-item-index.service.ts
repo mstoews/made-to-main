@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy, inject } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
-import { imageItemIndex } from 'app/5.models/imageItem';
+import { ImageItemIndex } from 'app/5.models/imageItem';
 import { Subscription, map } from 'rxjs';
 import { DeleteDuplicateService } from './delete-duplicate.service';
 import { ProductsService } from './products.service';
@@ -17,24 +17,24 @@ export class ImageItemIndexService implements OnDestroy{
   inventory = inject(ProductsService);
   private sub: Subscription;
 
-  hashUsedImagesMap = new Map<string, imageItemIndex>();
-  hashOriginalIndexMap = new Map<string, imageItemIndex>();
-  hashImageItemMap = new Map<string, imageItemIndex>();
+  hashUsedImagesMap = new Map<string, ImageItemIndex>();
+  hashOriginalIndexMap = new Map<string, ImageItemIndex>();
+  hashImageItemMap = new Map<string, ImageItemIndex>();
 
-  itemsCollection = this.afs.collection<imageItemIndex[]>('originalImageList',
+  itemsCollection = this.afs.collection<ImageItemIndex[]>('originalImageList',
     (ref) => ref.orderBy('ranking')
   );
 
   imageItems = this.itemsCollection.valueChanges({ idField: 'id' });
 
-  imageIndexCollections = this.afs.collection<imageItemIndex>(
+  imageIndexCollections = this.afs.collection<ImageItemIndex>(
     'originalImageList',
     (ref) => ref.orderBy('ranking')
   );
 
   imageIndexItems = this.imageIndexCollections.valueChanges({ idField: 'id' });
 
-  createOriginalItem(image: imageItemIndex) {
+  createOriginalItem(image: ImageItemIndex) {
     this.imageIndexCollections.add(image).then((imgIndex) => {
       this.imageIndexCollections.doc(imgIndex.id).update(imgIndex);
     });
@@ -114,11 +114,11 @@ export class ImageItemIndexService implements OnDestroy{
     return this.getImageByType(productId);
   }
 
-  updateCollectionDescription(imgItem: imageItemIndex) {
+  updateCollectionDescription(imgItem: ImageItemIndex) {
     this.imageIndexCollections.doc(imgItem.id).update(imgItem);
   }
 
-  setCollectionDescription(imgItem: imageItemIndex) {
+  setCollectionDescription(imgItem: ImageItemIndex) {
     this.imageIndexCollections.doc(imgItem.id).set(imgItem);
   }
 
@@ -139,7 +139,7 @@ export class ImageItemIndexService implements OnDestroy{
 
   getAllImages(type: string) {
     if (type === null || type === undefined || type === '') {
-      let imageIndexCollections = this.afs.collection<imageItemIndex>(
+      let imageIndexCollections = this.afs.collection<ImageItemIndex>(
         'originalImageList',
         (ref) => ref.orderBy('ranking')
       );
@@ -148,7 +148,7 @@ export class ImageItemIndexService implements OnDestroy{
       });
       return imageIndexItems;
     } else {
-      let imageIndexCollections = this.afs.collection<imageItemIndex>(
+      let imageIndexCollections = this.afs.collection<ImageItemIndex>(
         'originalImageList',
         (ref) => ref.orderBy('ranking')
       );
@@ -198,7 +198,7 @@ export class ImageItemIndexService implements OnDestroy{
     );
   }
 
-  updateImageList(item: imageItemIndex) {
+  updateImageList(item: ImageItemIndex) {
     this.imageIndexCollections.doc(item.id).update(item);
   }
 
@@ -238,7 +238,7 @@ export class ImageItemIndexService implements OnDestroy{
               meta.contentType;
 
               const imageUrl = downloadURL;
-              const imageData: imageItemIndex = {
+              const imageData: ImageItemIndex = {
                 parentId: '',
                 caption: imageRef.fullPath,
                 type: 'IN_NOT_USED',
