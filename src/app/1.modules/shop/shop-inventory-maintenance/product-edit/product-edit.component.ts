@@ -10,8 +10,14 @@ import { ProductsService } from 'app/4.services/products.service';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { DndComponent } from 'app/3.components/loaddnd/dnd.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { InventoryImageSelectionComponent } from '../inventory-image-selection/inventory-image-selection.component';
-import { FilterEnum, ImageToolbarService } from 'app/4.services/image-toolbar.service';
+import { ImageToolbarService } from 'app/4.services/image-toolbar.service';
+
+export enum ToggleEnum {
+  is_clothing,
+  is_tailoring,
+  is_trousers,
+  is_coats_tops
+}
 
 @Component({
   selector: 'app-product-edit',
@@ -26,7 +32,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   product: Product;
   productId: string;
   updated_category: string;
-
+  toggleEnum = ToggleEnum;
+  selectedState = ToggleEnum.is_clothing;
   categories: Category[];
   imageQuery: 'not_used' | 'all' = 'all';
   isFormDirty = false;
@@ -35,26 +42,17 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   prd: any;
   sub: any;
   productItem$: Observable<Product>;
-
   _unsubscribeAll: Subject<any> = new Subject<any>();
 
-  constructor(
-    private matDialog: MatDialog,
-    private activateRoute: ActivatedRoute,
-    private route: Router,
-    private afs: AngularFirestore,
-    private readonly categoryService: CategoryService,
-    private readonly productService: ProductsService,
-    public dialog: MatDialog,
-    private fb: FormBuilder,
-    public snackBar: MatSnackBar
-  ) {
-    this.createEmptyForm();
-  }
-
-
   imageToolbarService = inject(ImageToolbarService);
-
+  matDialog = inject(MatDialog);
+  activateRoute = inject( ActivatedRoute);
+  route = inject( Router);
+  afs = inject( AngularFirestore);
+  categoryService = inject( CategoryService);
+  productService = inject( ProductsService);
+  fb  = inject( FormBuilder);
+  snackBar  = inject( MatSnackBar);
 
   ngOnDestroy(): void {
     if (this.isFormDirty) {
@@ -65,6 +63,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.createEmptyForm();
     this.sTitle = 'Product Inventory and Images';
     this.activateRoute.params
       .pipe(takeUntil(this._unsubscribeAll))
@@ -84,9 +83,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
             });
         }
       });
-
-    this.category$ = this.categoryService.getAll();
-    this.category$.pipe(takeUntil(this._unsubscribeAll)).subscribe((result) => {
+      this.category$ = this.categoryService.getAll();
+      this.category$.pipe(takeUntil(this._unsubscribeAll)).subscribe((result) => {
       this.categories = result;
     });
   }
@@ -105,7 +103,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 
   onUpdate(product: Product) {
-    if (this.isFormDirty) {
+
       product.rich_description = this.rich_description;
       if (product.quantity === undefined || product.quantity === null) {
         product.quantity = 1;
@@ -127,7 +125,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       }
 
       if (product.category === undefined || product.category === null) {
-        product.category = 'Generic';
+        product.category = 'All Categories';
       }
 
       product.category = this.updated_category;
@@ -142,8 +140,38 @@ export class ProductEditComponent implements OnInit, OnDestroy {
         horizontalPosition: 'right',
         verticalPosition: 'top',
       });
-    }
+
     this.isFormDirty = false;
+  }
+
+  onChange($event) {
+    this.selectedState = $event.value;
+    switch ($event.value) {
+      case ToggleEnum.is_clothing:
+        this.prdGroup.controls.is_clothing.setValue(true);
+        this.prdGroup.controls.is_tailoring.setValue(false);
+        this.prdGroup.controls.is_trousers.setValue(false);
+        this.prdGroup.controls.is_coats_tops.setValue(false);
+        break;
+      case ToggleEnum.is_tailoring:
+        this.prdGroup.controls.is_clothing.setValue(false);
+        this.prdGroup.controls.is_tailoring.setValue(true);
+        this.prdGroup.controls.is_trousers.setValue(false);
+        this.prdGroup.controls.is_coats_tops.setValue(false);
+        break;
+      case ToggleEnum.is_trousers:
+        this.prdGroup.controls.is_clothing.setValue(false);
+        this.prdGroup.controls.is_tailoring.setValue(false);
+        this.prdGroup.controls.is_trousers.setValue(true);
+        this.prdGroup.controls.is_coats_tops.setValue(false);
+        break;
+      case ToggleEnum.is_coats_tops:
+        this.prdGroup.controls.is_clothing.setValue(false);
+        this.prdGroup.controls.is_tailoring.setValue(false);
+        this.prdGroup.controls.is_trousers.setValue(false);
+        this.prdGroup.controls.is_coats_tops.setValue(true);
+        break;
+    }
   }
 
   createProduct(results: any) {
@@ -162,15 +190,9 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.updated_category = category;
   }
 
-  onAllImages() {
-    this.imageToolbarService.changeFilter(FilterEnum.all);
-
+  onClassification(prd: Product) {
+    console.debug ('onClassification', JSON.stringify(prd));
   }
-
-  onNotUsedImages() {
-    this.imageToolbarService.changeFilter(FilterEnum.not_used);
-  }
-
 
   createEmptyForm() {
     this.prdGroup = this.fb.group({
@@ -192,6 +214,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       is_active: [true, Validators.required],
       is_featured: [true, Validators.required],
       purchases_allowed: ['', Validators.requiredTrue],
+      is_clothing: [true, Validators.required],
       is_tailoring: [false, Validators.required],
       is_coats_tops: [false, Validators.required],
       is_trousers: [false, Validators.required],
@@ -200,6 +223,19 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 
   createForm(prd: Product) {
     this.sTitle = 'Inventory - ' + prd.description;
+
+    if (prd.is_clothing) {
+      this.selectedState = ToggleEnum.is_clothing;
+    }
+    if (prd.is_tailoring) {
+      this.selectedState = ToggleEnum.is_tailoring;
+    }
+    if (prd.is_trousers) {
+      this.selectedState = ToggleEnum.is_trousers;
+    }
+    if (prd.is_coats_tops) {
+      this.selectedState = ToggleEnum.is_coats_tops;
+    }
 
     this.prdGroup = this.fb.group({
       id: [prd.id],
@@ -218,12 +254,12 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       date_created: [prd.date_created, Validators.required],
       date_updated: [prd.date_updated, Validators.required],
       purchases_allowed: [prd.purchases_allowed, Validators.required],
-      is_active: [prd.is_active],
       is_featured: [prd.is_featured],
+      is_active: [prd.is_active],
+      is_clothing: [prd.is_clothing],
       is_tailoring: [prd.is_tailoring],
       is_coats_tops: [prd.is_coats_tops],
       is_trousers: [prd.is_trousers],
-
     });
 
     this.prdGroup.valueChanges

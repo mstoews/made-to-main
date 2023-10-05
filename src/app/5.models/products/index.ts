@@ -22,6 +22,7 @@ export interface Product {
   quantity?: number;
   quantity_increment?: number;
   is_completed?: boolean;
+  is_clothing?: boolean;
   is_tailoring?: boolean;
   is_coats_tops?: boolean;
   is_trousers?: boolean;

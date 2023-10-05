@@ -84,39 +84,29 @@
                     </div>
                   </div>
 
-                  <div class="flex flex-col grow">
-                    <mat-form-field class="m-1 form-element" appearance="outline">
-                      <mat-label class="ml-2 text-base">Collection</mat-label>
-                      <input matInput placeholder="Featured" formControlName="is_featured" />
-                    </mat-form-field>
-                  
-                    <mat-form-field class="m-1 form-element" appearance="outline">
+                <div class="flex flex-col md:flex-row grow">
+                  <div class="flex flex-col">
+                    <mat-form-field class="m-1 form-element grow" appearance="outline">
                       <mat-label class="ml-2 text-base">User</mat-label>
                       <input matInput placeholder="User" formControlName="user_updated" />
                     </mat-form-field>
                   </div>
+                  <mat-checkbox class="mt-2" color="primary" formControlName="purchases_allowed">
+                    Purchases Allowed
+                  </mat-checkbox>
+                  <mat-checkbox class="mt-2"  color="primary" formControlName="quantity_required">
+                    Quantity Required
+                  </mat-checkbox>
+
                 </div>
-                <mat-checkbox color="primary" formControlName="purchases_allowed">
-                  Purchases Allowed
-                </mat-checkbox>
-                <mat-checkbox color="primary" formControlName="quantity_required">
-                  Quantity Required
-                </mat-checkbox>
-                <!-- <mat-checkbox color="primary" formControlName="is_tailoring">
-                  Tailoring
-                </mat-checkbox>
-                <mat-checkbox color="primary" formControlName="is_trousers">
-                  Trousers
-                </mat-checkbox>
-                <mat-checkbox color="primary" formControlName="is_coats_tops">
-                  Coats & Tops
-                </mat-checkbox> -->
+                </div>
+
                 <div class="text-sm m-2 text-gray-800">Products Classification</div>
-                      <mat-button-toggle-group name="tailoring" aria-label="Tailoring">
-                      <mat-button-toggle class="text-sm" value="is_clothing">Clothing</mat-button-toggle>
-                      <mat-button-toggle class="text-sm" value="is_tailoring">Tailoring</mat-button-toggle>
-                      <mat-button-toggle class="text-sm" value="is_trousers">Trousers</mat-button-toggle>
-                      <mat-button-toggle class="text-sm" value="is_coats_tops">Coats & Tops</mat-button-toggle>
+                <mat-button-toggle-group [value]="selectedState" (change)="onChange($event)" name="tailoring" aria-label="Tailoring">
+                      <mat-button-toggle [value]="toggleEnum.is_clothing" class="text-sm" value="is_clothing">Clothing</mat-button-toggle>
+                      <mat-button-toggle [value]="toggleEnum.is_tailoring" class="text-sm" value="is_tailoring">Tailoring</mat-button-toggle>
+                      <mat-button-toggle [value]="toggleEnum.is_trousers" class="text-sm" value="is_trousers">Trousers</mat-button-toggle>
+                      <mat-button-toggle [value]="toggleEnum.is_coats_tops" class="text-sm" value="is_coats_tops">Coats & Tops</mat-button-toggle>
                  </mat-button-toggle-group>
               </form>
             </div>
