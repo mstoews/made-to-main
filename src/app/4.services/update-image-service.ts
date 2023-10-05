@@ -2,7 +2,8 @@ import { Injectable, OnDestroy, inject } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { ImageItemIndex } from 'app/5.models/imageItem';
-import { map, Subject, takeUntil } from 'rxjs';
+import { first, map, Observable, Subject, takeUntil } from 'rxjs';
+import { convertSnaps } from './db-utils';
 
 @Injectable({
   providedIn: 'root',
@@ -37,15 +38,28 @@ export class UpdateImageService implements OnDestroy{
     if( this.hashOriginalIndexMap.size > 0) {
 
       this.hashOriginalIndexMap.forEach((value, key) => {
+        let imageSrc200 = value.imageSrc200;
+        let imageSrc400 = value.imageSrc400;
+        let imageSrc800 = value.imageSrc800;
+
+
         var fileExt = value.fileName.split('.').pop();
         let fileName = value.fileName.replace(/\.[^/.]+$/, '');
+
         fileName = fileName
           .replace(`/${size}`, '')
           .replace(`_${size}x${size}`, '');
 
         switch (size) {
           case '200':
-            fileName = `/200/${fileName}_${size}x${size}.${fileExt}`;
+            if (imageSrc200 === undefined || imageSrc200 === null) {
+              imageSrc200 = '';
+            }
+            else {
+              break;
+            }
+            fileName = `/thumbnails/${fileName}_${size}x${size}.${fileExt}`;
+
             this.storage
               .ref(fileName)
               .getDownloadURL()
@@ -57,6 +71,12 @@ export class UpdateImageService implements OnDestroy{
             break;
 
           case '400':
+            if (imageSrc400 === undefined || imageSrc400 === null) {
+              imageSrc400 = '';
+            }
+            else {
+              break;
+            }
             fileName = `/${size}/${fileName}_${size}x${size}.${fileExt}`;
             this.storage
               .ref(fileName)
@@ -64,29 +84,28 @@ export class UpdateImageService implements OnDestroy{
               .subscribe((mediumSrc) => {
                 value.imageSrc400 = mediumSrc;
                 this.imageIndexCollections.doc(value.id).update(value);
-                //this.imageItemCopyCol.doc(imgItem.id).update(imgItem);
+
               });
             break;
 
           case '800':
+            if (imageSrc800 === undefined || imageSrc800 === null) {
+              imageSrc800 = '';
+            }
+            else {
+              break;
+            }
             fileName = `/${size}/${fileName}_${size}x${size}.${fileExt}`;
             this.storage
               .ref(fileName)
               .getDownloadURL()
-              .subscribe((smallSrc) => {
-                console.debug(smallSrc);
-                value.imageSrc800 = smallSrc;
+              .subscribe((largeSrc) => {
+                console.debug(largeSrc);
+                value.imageSrc800 = largeSrc;
                 this.imageIndexCollections.doc(value.id).update(value);
               });
             break;
           default:
-            let fileNameDefault = `/${value.fileName}`;
-            this.storage
-              .ref(fileNameDefault)
-              .getDownloadURL()
-              .subscribe((data) => {
-                console.debug(data);
-              });
             break;
         }
       });
@@ -137,11 +156,32 @@ export class UpdateImageService implements OnDestroy{
       });
   }
 
-  addOriginalImageList(imageData: ImageItemIndex) {
-    this.imageIndexCollections.add(imageData).then((img) => {
-      imageData.id = img.id;
-      this.imageIndexCollections.doc(imageData.id).update(imageData);
+  addOriginalImageList(imageData: ImageItemIndex): boolean {
+    let added = false;
+    this.findProductByUrl(imageData.fileName).subscribe((image) => {
+      if (image === undefined) {
+        this.imageIndexCollections.add(imageData).then((img) => {
+          imageData.id = img.id;
+          this.imageIndexCollections.doc(imageData.id).update(imageData);
+        });
+        added = true;
+      }
     });
+    return added;
+  }
+
+
+  findProductByUrl(fileName: string): Observable<ImageItemIndex> {
+    return this.afs
+      .collection('originalImageList', (ref) => ref.where('fileName', '==', fileName))
+      .snapshotChanges()
+      .pipe(
+        map((snaps) => {
+          const product = convertSnaps<ImageItemIndex>(snaps);
+          return product.length == 1 ? product[0] : undefined;
+        }),
+        first()
+      );
   }
 
 

@@ -1,4 +1,4 @@
-<div class="bg-white h-full">
+<div class="bg-white h-screen">
   <div *ngIf="productItem$ | async as product">
     <app-header [title]="product.description"></app-header>
     <div [class.mat-elevation-z8]="true"
@@ -26,7 +26,7 @@
       </mat-toolbar>
 
       <mat-tab-group class="m-2 items-centered" mat-stretch-tabs="false" (selectedTabChange)="onTabClick($event)">
-        <mat-tab class="m-1 text-bold" label="Details">
+        <mat-tab class="m-2 text-bold" label="Details">
           <ng-template matTabContent>
             <div mat-dialog-content>
               <form [formGroup]="prdGroup" class="m-2" (onValueChangedEvent)="valueChanged($event)">
@@ -89,9 +89,7 @@
                       <mat-label class="ml-2 text-base">Collection</mat-label>
                       <input matInput placeholder="Featured" formControlName="is_featured" />
                     </mat-form-field>
-                  </div>
-
-                  <div class="flex flex-col grow">
+                  
                     <mat-form-field class="m-1 form-element" appearance="outline">
                       <mat-label class="ml-2 text-base">User</mat-label>
                       <input matInput placeholder="User" formControlName="user_updated" />
@@ -104,9 +102,22 @@
                 <mat-checkbox color="primary" formControlName="quantity_required">
                   Quantity Required
                 </mat-checkbox>
-                <mat-checkbox color="primary" formControlName="is_tailoring">
+                <!-- <mat-checkbox color="primary" formControlName="is_tailoring">
                   Tailoring
                 </mat-checkbox>
+                <mat-checkbox color="primary" formControlName="is_trousers">
+                  Trousers
+                </mat-checkbox>
+                <mat-checkbox color="primary" formControlName="is_coats_tops">
+                  Coats & Tops
+                </mat-checkbox> -->
+                <div class="text-sm m-2 text-gray-800">Products Classification</div>
+                      <mat-button-toggle-group name="tailoring" aria-label="Tailoring">
+                      <mat-button-toggle class="text-sm" value="is_clothing">Clothing</mat-button-toggle>
+                      <mat-button-toggle class="text-sm" value="is_tailoring">Tailoring</mat-button-toggle>
+                      <mat-button-toggle class="text-sm" value="is_trousers">Trousers</mat-button-toggle>
+                      <mat-button-toggle class="text-sm" value="is_coats_tops">Coats & Tops</mat-button-toggle>
+                 </mat-button-toggle-group>
               </form>
             </div>
             <!-- <div mat-dialog-actions>

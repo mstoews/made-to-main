@@ -9,20 +9,22 @@
 
   <span class="flex-1"></span>
 
-  <button (click)="onClickRefresh()" mat-icon-button matTooltip="Refresh Grid" aria-label="refresh">
-    <mat-icon class="side-nav__icon" [svgIcon]="'heroicons_outline:refresh'"></mat-icon>
-  </button>
-
-  <button (click)="onClickAdd()" mat-icon-button matTooltip="Add" aria-label="Add">
+  <button (click)="onClickAdd()" mat-icon-button matTooltip="Add New Image" aria-label="Add">
     <mat-icon class="side-nav__icon" [svgIcon]="'mat_outline:note_add'"></mat-icon>
   </button>
 
-  <button (click)="onClickDelete()" mat-icon-button matTooltip="Delete Dupes" aria-label="Delete">
-    <mat-icon class="side-nav__icon" [svgIcon]="'heroicons_outline:trash'"></mat-icon>
-  </button>
-
-  <button (click)="onClickRefreshImage()" mat-icon-button matTooltip="Refresh Images" aria-label="Add">
+  <button (click)="onClickRefreshImage()" mat-icon-button matTooltip="Refresh Image List (1)" aria-label="Add">
     <mat-icon class="side-nav__icon" [svgIcon]="'mat_outline:image'"></mat-icon>
   </button>
+
+  <button (click)="onClickRefresh()" mat-icon-button matTooltip="Refresh Images Sizes (2)" aria-label="refresh">
+    <mat-icon class="side-nav__icon" [svgIcon]="'heroicons_outline:refresh'"></mat-icon>
+  </button>
+
+
+  <!-- <button (click)="onClickDelete()" mat-icon-button matTooltip="Delete Dupes" aria-label="Delete">
+    <mat-icon class="side-nav__icon" [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+  </button> -->
+
 
 </mat-toolbar>

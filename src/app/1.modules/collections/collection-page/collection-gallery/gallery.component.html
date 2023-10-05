@@ -2,38 +2,37 @@
   <div data-te-lightbox-init class="flex flex-col max-w-6xl mx-auto text-gray-900 md:flex-row md:px-0">
       <div class="flex flex-wrap -m-1 md:-m-2">
         <div class="flex flex-wrap w-1/3 h-1/2 data-[te-lightbox-disabled]:cursor-auto">
-          <div class="w-full p-1 md:p-2" *ngIf="imageCount() > 6">
+          <div class="w-full p-1 md:p-2" *ngIf="imageCount() > 0">
             <img [alt]="caption1"
             class="block object-cover object-center w-full h-full rounded-lg"
             [src]="image1">
-
           </div>
-          <div class="w-1/2 p-1 md:p-2 h-45 cursor-zoom-in data-[te-lightbox-disabled]:cursor-auto" *ngIf="imageCount() > 7">
+          <div class="w-1/2 p-1 md:p-2 h-45 cursor-zoom-in data-[te-lightbox-disabled]:cursor-auto" *ngIf="imageCount() > 1">
             <img [alt]="caption2"
             class="block object-cover object-center w-full h-full rounded-lg"
             [src]="image2">
           </div>
-          <div class="w-1/2 p-1 md:p-2 h-45 cursor-zoom-in data-[te-lightbox-disabled]:cursor-auto" *ngIf="imageCount() > 8">
+          <div class="w-1/2 p-1 md:p-2 h-45 cursor-zoom-in data-[te-lightbox-disabled]:cursor-auto" *ngIf="imageCount() > 2">
             <img [alt]="caption3"
             class="block object-cover object-center w-full h-full rounded-lg"
             [src]="image3">
           </div>
         </div>
         <div class="flex flex-wrap w-1/3 h-76 cursor-zoom-in data-[te-lightbox-disabled]:cursor-auto">
-          <div class="w-1/2 p-1 md:p-2 h-45 cursor-zoom-in data-[te-lightbox-disabled]:cursor-auto" *ngIf="imageCount() > 5">
-            <img [alt]="capion5"
+          <div class="w-1/2 p-1 md:p-2 h-45 cursor-zoom-in data-[te-lightbox-disabled]:cursor-auto" *ngIf="imageCount() > 3">
+            <img [alt]="capion4"
+            class="block object-cover object-center w-full h-full rounded-lg"
+            [src]="image4">
+          </div>
+          <div class="w-1/2 p-1 md:p-2 h-45 cursor-zoom-in data-[te-lightbox-disabled]:cursor-auto" *ngIf="imageCount() > 4">
+            <img [alt]="caption5"
             class="block object-cover object-center w-full h-full rounded-lg"
             [src]="image5">
           </div>
-          <div class="w-1/2 p-1 md:p-2 h-45 cursor-zoom-in data-[te-lightbox-disabled]:cursor-auto" *ngIf="imageCount() > 6">
+          <div class="w-full p-1 md:p-2" *ngIf="imageCount() > 5">
             <img [alt]="caption6"
             class="block object-cover object-center w-full h-full rounded-lg"
             [src]="image6">
-          </div>
-          <div class="w-full p-1 md:p-2" *ngIf="imageCount() > 3">
-            <img [alt]="caption4"
-            class="block object-cover object-center w-full h-full rounded-lg"
-            [src]="image4">
           </div>
         </div>
         <div class="flex flex-wrap w-1/3 h-76 cursor-zoom-in data-[te-lightbox-disabled]:cursor-auto">
@@ -43,12 +42,12 @@
             [src]="image7">
 
           </div>
-          <div class="w-1/2 p-1 md:p-2 h-45 cursor-zoom-in data-[te-lightbox-disabled]:cursor-auto" *ngIf="imageCount() > 7">
+          <div class="w-1/2 p-1 md:p-2 h-45 cursor-zoom-in data-[te-lightbox-disabled]:cursor-auto" *ngIf="imageCount() > 6">
             <img [alt]="caption8"
             class="block object-cover object-center w-full h-full rounded-lg"
             [src]="image8">
           </div>
-          <div class="w-1/2 p-1 md:p-2 h-45 cursor-zoom-in data-[te-lightbox-disabled]:cursor-auto" *ngIf="imageCount() > 8">
+          <div class="w-1/2 p-1 md:p-2 h-45 cursor-zoom-in data-[te-lightbox-disabled]:cursor-auto" *ngIf="imageCount() > 7">
             <img [alt]="caption9"
             class="block object-cover object-center w-full h-full rounded-lg"
             [src]="image9">

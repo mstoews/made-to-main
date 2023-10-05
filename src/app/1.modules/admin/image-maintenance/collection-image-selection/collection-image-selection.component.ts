@@ -20,6 +20,9 @@ import { ProductsService } from 'app/4.services/products.service';
 import { DeleteDuplicateService } from 'app/4.services/delete-duplicate.service';
 import { ImageItemIndexService } from 'app/4.services/image-item-index.service';
 import { MatDrawer } from '@angular/material/sidenav';
+import { UpdateImageService } from 'app/4.services/update-image-service';
+import { DndComponent } from 'app/3.components/loaddnd/dnd.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'collection-img-selection',
@@ -52,13 +55,33 @@ export class CollectionImageSelectionComponent implements OnInit, OnDestroy {
 
   deleteDupes = inject(DeleteDuplicateService);
   imageItemIndexService = inject(ImageItemIndexService);
+  updateImageService = inject(UpdateImageService);
   productService = inject(ProductsService);
   fb = inject(FormBuilder);
+  matDialog = inject(MatDialog)
 
 
-  RefreshList() {
-    //this.deleteDupes.updateImages();
+
+  async RefreshList() {
+    if (confirm("RefreshList - Update URS to originalList")) {
+      this.updateImageService.updateImageList();
+    }
   }
+
+  RefreshImages() {
+    if (confirm('RefreshImages - Update Images from storage'  )) {
+      this.updateImageService.updateOriginalImageList();
+    }
+  }
+
+  createImageOnce() {
+    this.onImages();
+  }
+
+  deleteDuplicateImages() {
+    alert('deleteDuplicateImages');
+  }
+
 
   @ViewChild('drawer') drawer: MatDrawer;
   drawOpen: 'open' | 'close' = 'open';
@@ -81,6 +104,30 @@ export class CollectionImageSelectionComponent implements OnInit, OnDestroy {
   // DeleteDupes() {
   //   throw new Error('Method not implemented.');
   // }
+
+  onImages() {
+    // const parentId = this.blogGroup.getRawValue();
+    const dialogRef = this.matDialog.open(DndComponent, {
+      width: '500px',
+      data: {
+        parent: 'IN_NOT_USED',
+        location: 'blog',
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result === undefined) {
+        result = { event: 'Cancel' };
+      }
+      switch (result.event) {
+        case 'Create':
+          //this.create(result.data);
+          break;
+        case 'Cancel':
+          break;
+      }
+    });
+  }
 
   openDrawer() {
     const opened = this.drawer.opened;

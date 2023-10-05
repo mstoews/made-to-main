@@ -1,13 +1,13 @@
 <div class="h-screen">
   <app-header [title]="'Image Maintenance'"> </app-header>
 
-  <!-- <app-image-menubar
+  <app-image-menubar
     (notifyParentRefresh)="RefreshList()"
     (notifyParentAdd)="createImageOnce()"
-    (notifyParentDelete)="DeleteDupes()"
+    (notifyParentDelete)="deleteDuplicateImages()"
     (notifyParentRefreshImage)="RefreshImages()"
-    [title]="'Image Management Selection'">
-  </app-image-menubar> -->
+    [title]="">
+  </app-image-menubar>
 
   <mat-drawer-container>
     <mat-drawer class="lg:w-1/4 sm:h-full sm:w-full bg-white-100" #drawer [opened]="false" mode="side"

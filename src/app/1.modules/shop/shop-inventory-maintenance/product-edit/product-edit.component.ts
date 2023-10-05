@@ -193,6 +193,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       is_featured: [true, Validators.required],
       purchases_allowed: ['', Validators.requiredTrue],
       is_tailoring: [false, Validators.required],
+      is_coats_tops: [false, Validators.required],
+      is_trousers: [false, Validators.required],
     });
   }
 
@@ -216,9 +218,12 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       date_created: [prd.date_created, Validators.required],
       date_updated: [prd.date_updated, Validators.required],
       purchases_allowed: [prd.purchases_allowed, Validators.required],
-      is_active: [prd.is_active, Validators.required],
+      is_active: [prd.is_active],
       is_featured: [prd.is_featured],
       is_tailoring: [prd.is_tailoring],
+      is_coats_tops: [prd.is_coats_tops],
+      is_trousers: [prd.is_trousers],
+
     });
 
     this.prdGroup.valueChanges

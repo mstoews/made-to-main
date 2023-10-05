@@ -4,7 +4,7 @@
         <form class="w-10/12" #blogForm="ngForm" [formGroup]="blogGroup" (ngSubmit)="onUpdate(blogGroup.value)" >
           <mat-toolbar class=" bg-slate-300">
             <span></span>
-            
+
             <span class="flex-auto"></span>
             <mat-checkbox color="primary" formControlName="published">
               Published
@@ -15,6 +15,7 @@
             <mat-checkbox color="primary" formControlName="tailoring">
               Tailoring
             </mat-checkbox>
+            
             <button mat-icon-button (click)="onUpdate(blog)" color="primary" aria-label="Add"   matTooltip="Update Item">
               <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
             </button>
