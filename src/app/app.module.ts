@@ -7,7 +7,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from './1.modules/shared-module/shared.module';
 import { ScrollService } from './4.services/scroll.service';
-import { SwiperModule } from 'swiper/angular';
+
 import { ProductResolver } from './4.services/product.resolver';
 import { BlogResolver, CalendarResolver } from './4.services/blog.resolver';
 import "firebase/compat/performance";
@@ -47,7 +47,6 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     BrowserAnimationsModule,
     CommonModule,
     SharedModule,
-    SwiperModule,
     HeadingModule,
     AngularFireAuthModule,
     AngularFirestoreModule,

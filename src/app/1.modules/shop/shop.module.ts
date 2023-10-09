@@ -37,10 +37,12 @@ import { ProductsService } from 'app/4.services/products.service';
 import { ShopCategoryCardComponent } from './shop/main-shop/shop-category-card/shop-category-card.component';
 import { LightboxModule } from '../lightbox';
 import { StripHtmlPipe } from './striphtml.pipe';
+import { ElementsComponent } from './shop/cart/elements/elements.component';
 
 export const ProductFuncResolver: ResolveFn<Product[]> = (
   route: ActivatedRouteSnapshot,
-  state: RouterStateSnapshot) => {
+  state: RouterStateSnapshot
+) => {
   return inject(ProductsService).getInventoryByCategory(
     route.paramMap.get('id')
   );
@@ -146,6 +148,7 @@ const routes: Routes = [
     ShopLandingComponent,
     ShopLandingCardComponent,
     ShopCategoryCardComponent,
+    ElementsComponent,
     StripHtmlPipe,
   ],
   imports: [
