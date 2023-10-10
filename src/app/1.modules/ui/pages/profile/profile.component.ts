@@ -6,12 +6,13 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'app/4.services/auth/auth.service';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'environments/environment.prod';
 import { catchError, first, throwError } from 'rxjs';
 import { UserService } from 'app/4.services/auth/user.service';
+import { Auth } from '@angular/fire/auth';
+
 
 @Component({
   selector: 'profile',
@@ -26,20 +27,17 @@ export class ProfileComponent implements OnInit {
 
   constructor(
     private router: Router,
+    private auth: Auth,
     public authService: AuthService,
-    public afAuth: AngularFireAuth,
     public afs: AngularFirestore,
     public userService: UserService,
     private http: HttpClient
-  ) {
-    this.afAuth.currentUser.then((user) => {
-      if (user !== null || user !== undefined) {
-        if (user) {
-          this.userId = user.uid;
-        }
-      }
-    });
-  }
+  )
+  {
+        this.authService.getUserId().then ( (userId) => {
+          this.userId = userId;
+        });
+   };
 
   addAdminUser(email: string, password: string) {
     const api = environment.api.baseUrl + '/api/addAdminToRole';
@@ -82,8 +80,7 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit() {
     this.loggedIn = false;
-    this.afAuth.currentUser
-      .then((user) => {
+    this.auth.onAuthStateChanged((user) => {
         if (user !== null) {
           this.loggedIn = true;
           // console.debug( `this user : ${this.userId} is registered ? : ${this.loggedIn}`);
@@ -91,9 +88,6 @@ export class ProfileComponent implements OnInit {
           this.loggedIn = false;
         }
       })
-      .catch((error) => {
-        // console.debug('unable to get correct user ');
-      });
   }
 
   backToHome() {

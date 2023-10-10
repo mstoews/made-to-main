@@ -8,7 +8,6 @@ import {
 } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Observable, Subject, Subscription, map, pipe, takeUntil } from 'rxjs';
-import { ImageListService } from 'app/4.services/image-list.service';
 import { ImageItemIndexService } from 'app/4.services/image-item-index.service';
 import { ImageItemIndex } from 'app/5.models/imageItem';
 
@@ -46,7 +45,7 @@ export class ImageSelectionComponent implements OnInit, OnDestroy {
   firstRun: boolean = true;
 
   constructor(
-    private imageListService: ImageItemIndexService,
+    private imageItemIndexService: ImageItemIndexService,
   ) { }
 
   createImageOnce() {
@@ -59,16 +58,16 @@ export class ImageSelectionComponent implements OnInit, OnDestroy {
   addImageToItemList(image: any) {
     image.parentId = this.productId;
     // search for the image in the list 400 size and add it to the list
-    this.imageListService.updateImageList(image);
+    this.imageItemIndexService.updateImageList(image);
   }
 
   UpdateInventoryItem(e: ImageItemIndex) {
     e.type = this.productId;
-    this.imageListService.updateImageList(e);
+    this.imageItemIndexService.updateImageList(e);
   }
 
   async sortNotUsed() {
-    return (await this.imageListService.getImageIndexList()).pipe(
+    return (await this.imageItemIndexService.getImageIndexList()).pipe(
       map((data) => {
         data.sort((a, b) => {
           return a.caption < b.caption ? -1 : 1;
@@ -86,7 +85,7 @@ export class ImageSelectionComponent implements OnInit, OnDestroy {
       this.not_usedImages = item;
     });
 
-    this.subCollections = (await this.imageListService
+    this.subCollections = (await this.imageItemIndexService
       .getImagesByType(this.productId)).pipe(takeUntil(this._unsubscribeAll)).subscribe((item) => {
         this.collectionsImages = item;
       });
@@ -134,7 +133,7 @@ export class ImageSelectionComponent implements OnInit, OnDestroy {
     if (newContainerId !== this.IN_NOT_USED) {
       imageItem.forEach((element: any) => {
         element.ranking = imageItem.indexOf(element);
-        this.imageListService.updateImageList(element);
+        this.imageItemIndexService.updateImageList(element);
       });
     }
   }
@@ -149,7 +148,7 @@ export class ImageSelectionComponent implements OnInit, OnDestroy {
     image.ranking = 0;
     image.type = newContainerId;
     console.debug('Update Image Type', image);
-    this.imageListService.updateImageList(image);
+    this.imageItemIndexService.updateImageList(image);
   }
 
   ngOnDestroy() {

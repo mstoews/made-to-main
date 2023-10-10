@@ -7,10 +7,10 @@ import {
 import { Blog } from 'app/5.models/blog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { imageItem } from 'app/5.models/imageItem';
-import { ImageListService } from 'app/4.services/image-list.service';
+import { ImageItemIndex } from 'app/5.models/imageItem';
 import { AuthService } from 'app/4.services/auth/auth.service';
 import { ScrollService } from 'app/4.services/scroll.service';
+import { ImageItemIndexService } from 'app/4.services/image-item-index.service';
 
 @Component({
   selector: 'app-detail',
@@ -22,7 +22,7 @@ export class DetailComponent implements OnInit, OnDestroy {
   blogId: string;
   blogItem: Observable<Blog>;
   allBlogs$: Observable<Blog[]>;
-  blogImages$: Observable<imageItem[]>;
+  blogImages$: Observable<ImageItemIndex[]>;
   public blog!: Blog;
   public userName: string;
   public blog_id: string;
@@ -33,19 +33,19 @@ export class DetailComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private scrollTo: ScrollService,
     private route: Router,
-    private imageListService: ImageListService
+    private imageItemIndexService : ImageItemIndexService
   ) {}
 
   ngOnInit(): void {
     let id: string;
-  
+
     // console.debug('User Name from blog details : ', this.userName);
     this.blog = this.activateRoute.snapshot.data['blog'];
 
     if (this.blog.id) {
       this.blog_id = this.blog.id;
       // console.debug('Blog ID: ' , this.blog_id);
-      this.blogImages$ = this.imageListService.getImagesByType(this.blog.id);
+      this.blogImages$ = this.imageItemIndexService.getImagesByTypeId(this.blog.id);
     }
   }
 

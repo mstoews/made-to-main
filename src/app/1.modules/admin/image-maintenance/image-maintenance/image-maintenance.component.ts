@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { MatDrawer } from '@angular/material/sidenav';
-import { ImageListService } from 'app/4.services/image-list.service';
 import { ImageItemIndex } from 'app/5.models/imageItem';
 
 import {
@@ -14,6 +13,7 @@ import {
 import { MatDialog } from '@angular/material/dialog';
 import { DeleteDuplicateService } from 'app/4.services/delete-duplicate.service';
 import { DndComponent } from 'app/3.components/loaddnd/dnd.component';
+import { ImageItemIndexService } from 'app/4.services/image-item-index.service';
 
 @Component({
   selector: 'image-maintenance',
@@ -48,7 +48,7 @@ export class ImageMaintenanceComponent implements OnInit, OnDestroy {
   productsImages: ImageItemIndex[] = [];
 
   constructor(
-    public imageItemIndexService: ImageListService,
+    public imageItemIndexService: ImageItemIndexService,
     public duplicateService: DeleteDuplicateService,
     private matDialog: MatDialog,
     private fb: FormBuilder
@@ -61,16 +61,16 @@ export class ImageMaintenanceComponent implements OnInit, OnDestroy {
   }
 
   RefreshImageList() {
-    // this.imageListService.createRawImagesList();
+
     alert('RefreshImageList');
   }
   DeleteDupes() {
-    // this.duplicateService.deleteDuplicateImages();
+
     alert('DeleteDupes');
   }
 
   RefreshImages() {
-    // this.duplicateService.updateImages();
+
     alert('RefreshImages');
   }
 

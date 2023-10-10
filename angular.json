@@ -1,142 +1,139 @@
 {
-	"$schema": "./node_modules/@angular/cli/lib/config/schema.json",
-	"version": 1,
-	"newProjectRoot": "projects",
-	"projects": {
-		"made-to": {
-			"projectType": "application",
-			"schematics": {},
-			"root": "",
-			"sourceRoot": "src",
-			"prefix": "app",
-			"architect": {
-				"build": {
-					"builder": "@angular-devkit/build-angular:browser",
-					"options": {
-						"outputPath": "dist",
-						"index": "src/index.html",
-						"main": "src/main.ts",
-						"polyfills": "src/polyfills.ts",
-						"tsConfig": "tsconfig.app.json",
-						"assets": [
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "made-to": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist",
+            "index": "src/index.html",
+            "main": "src/main.ts",
+            "polyfills": "src/polyfills.ts",
+            "tsConfig": "tsconfig.app.json",
+            "assets": [
               "src/favicon.ico",
               "src/assets",
               "src/manifest.webmanifest",
               "src/manifest.webmanifest"
             ],
-						"allowedCommonJsDependencies": [
-							"lodash",
-							"graphql-tag",
-							"zen-observable",
-							"highlight.js",
-							"apexcharts",
-							"ng-apexcharts",
-							"fast-xml-parser",
-							"devextreme-quill",
-							"devexpress-diagram",
-							"devexpress-gantt",
-							"file-saver",
-							"jszip",
-							"dialog-polyfill",
-							"luxon",
+            "allowedCommonJsDependencies": [
+              "lodash",
+              "graphql-tag",
+              "zen-observable",
+              "highlight.js",
+              "apexcharts",
+              "ng-apexcharts",
+              "fast-xml-parser",
+              "devextreme-quill",
+              "devexpress-diagram",
+              "devexpress-gantt",
+              "file-saver",
+              "jszip",
+              "dialog-polyfill",
+              "luxon",
               "exceljs"
-						],
-						"styles": [
+            ],
+            "styles": [
               "node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
-							"node_modules/devextreme/dist/css/dx.material.blue.light.css",
-							"node_modules/ngx-spinner/animations/ball-scale-multiple.css",
-							"src/styles.css"
+              "node_modules/devextreme/dist/css/dx.material.blue.light.css",
+              "node_modules/ngx-spinner/animations/ball-scale-multiple.css",
+              "src/styles.css"
             ],
             "serviceWorker": true,
             "ngswConfigPath": "ngsw-config.json"
-					},
-					"configurations": {
-						"production": {
-							"budgets": [
-								{
-									"type": "initial",
-									"maximumWarning": "6mb",
-									"maximumError": "8mb"
-								},
-								{
-									"type": "anyComponentStyle",
-									"maximumWarning": "60kb",
-									"maximumError": "80kb"
-								}
-							],
-							"fileReplacements": [
-								{
-									"replace": "src/environments/environment.ts",
-									"with": "src/environments/environment.prod.ts"
-								}
-							],
-							"outputHashing": "all"
-						},
-						"development": {
-							"buildOptimizer": false,
-							"optimization": false,
-							"vendorChunk": true,
-							"extractLicenses": false,
-							"sourceMap": true,
-							"namedChunks": true
-						}
-					},
-					"defaultConfiguration": "production"
-				},
-				"serve": {
-					"builder": "@angular-devkit/build-angular:dev-server",
-					"configurations": {
-						"production": {
-							"browserTarget": "made-to:build:production"
-						},
-						"development": {
-							"browserTarget": "made-to:build:development",
-							"port": 43220
-						}
-					},
-					"defaultConfiguration": "development"
-				},
-				"extract-i18n": {
-					"builder": "@angular-devkit/build-angular:extract-i18n",
-					"options": {
-						"browserTarget": "made-to:build"
-					}
-				},
-				"test": {
-					"builder": "@angular-devkit/build-angular:karma",
-					"options": {
-						"main": "src/test.ts",
-						"polyfills": "src/polyfills.ts",
-						"tsConfig": "tsconfig.spec.json",
-						"karmaConfig": "karma.conf.js",
-						"assets": [
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "6mb",
+                  "maximumError": "8mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "60kb",
+                  "maximumError": "80kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": {
+              "browserTarget": "made-to:build:production"
+            },
+            "development": {
+              "browserTarget": "made-to:build:development",
+              "port": 43220
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "made-to:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "src/test.ts",
+            "polyfills": "src/polyfills.ts",
+            "tsConfig": "tsconfig.spec.json",
+            "karmaConfig": "karma.conf.js",
+            "assets": [
               "src/favicon.ico",
               "src/assets",
               "src/manifest.webmanifest",
               "src/manifest.webmanifest"
             ],
-						"styles": [
-							"node_modules/devextreme/dist/css/dx.light.css",
-							"/src/styles.css",
-							"node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css"
-						],
-						"scripts": []
-					}
-				},
-				"deploy": {
-					"builder": "@angular/fire:deploy",
-					"options": {
-						"prerender": false,
-						"ssr": false,
-						"browserTarget": "made-to:build:production",
-						"firebaseProject": "made-to-cassie",
-						"firebaseHostingSite": "made-to-cassie"
-					}
-				}
-			}
-		}
-	},
-	"cli": {
-		"analytics": "a1b2d527-e366-44af-a841-e3ccc058f4ac"
-	}
+            "styles": [
+              "node_modules/devextreme/dist/css/dx.light.css",
+              "/src/styles.css",
+              "node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css"
+            ],
+            "scripts": []
+          }
+        },
+        "deploy": {
+          "builder": "@angular/fire:deploy",
+          "options": {
+            "version": 2,
+            "browserTarget": "made-to:build:production"
+          }
+        }
+      }
+    }
+  },
+  "cli": {
+    "analytics": "a1b2d527-e366-44af-a841-e3ccc058f4ac"
+  }
 }

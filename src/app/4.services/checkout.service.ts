@@ -1,26 +1,38 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CheckoutSession } from 'app/5.models/checkout';
-import { filter, first } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment.prod';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
 
-declare const Stripe: any;
+
+import { Auth } from '@angular/fire/auth';
+import { collectionData, docData, Firestore, doc, collection } from '@angular/fire/firestore';
+
+interface purchaseSessions {
+  id: string;
+  status: string;
+}
+
+declare var Stripe: any;
 
 @Injectable({
   providedIn: 'root',
 })
 export class CheckoutService {
   private jwtAuth: string | null;
+  private auth: Auth = inject(Auth);
 
   constructor(
     private http: HttpClient,
-    private afAuth: AngularFireAuth,
-    private afs: AngularFirestore
+    private firestore: Firestore,
+
   ) {
-    afAuth.idToken.subscribe((jwt) => (this.jwtAuth = jwt));
+    this.auth.onIdTokenChanged((user) => {
+      if (user) {
+        user.getIdToken().then((jwt) => (this.jwtAuth = jwt));
+      }
+    });
   }
 
   startPaymentIntent(cartId: any): Observable<CheckoutSession> {
@@ -100,12 +112,11 @@ export class CheckoutService {
   }
 
   waitForPurchaseCompleted(ongoingPurchaseSessionId: string): Observable<any> {
-    return this.afs
-      .doc<any>(`purchaseSessions/${ongoingPurchaseSessionId}`)
-      .valueChanges()
-      .pipe(
-        filter((purchase) => purchase.status == 'completed'),
-        first()
-      );
+    const sessionsRef = collection(this.firestore,`purchaseSessions/${ongoingPurchaseSessionId}`)
+    const col = collectionData(sessionsRef, { idField: 'id' }) as Observable<purchaseSessions[]>;
+    return col.pipe(map((sessions) => sessions[0]),
+      filter((purchase) => purchase.status == 'completed'),
+    );
   }
+
 }

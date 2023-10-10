@@ -117,7 +117,10 @@ export class BlogEditComponent implements OnInit {
   }
 
   onPublish(blog: Blog) {
-    this.blogService.setToPublish(blog);
+    const dDate = new Date();
+    const updateDate = dDate.toISOString().split('T')[0];
+    blog.published = true;
+    this.blogService.update(blog);
   }
 
   onDelete(data: Blog) {

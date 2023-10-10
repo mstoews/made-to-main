@@ -1,38 +1,32 @@
 import { Injectable } from '@angular/core';
-import {
-  AngularFirestore,
-  AngularFirestoreCollection,
-} from '@angular/fire/compat/firestore';
+
 import { Observable } from 'rxjs';
 import { Services } from 'app/5.models/services';
+import { Firestore, addDoc, collection, collectionData, updateDoc, deleteDoc, doc, DocumentReference } from '@angular/fire/firestore';
+
 
 @Injectable({
   providedIn: 'root',
 })
 export class ServicesService {
-  private servicesCollection: AngularFirestoreCollection<Services>;
-  private servicesItems: Observable<Services[]>;
+  constructor(public afs: Firestore) {
 
-  constructor(public afs: AngularFirestore) {
-    this.servicesCollection = afs.collection<Services>('services');
-    this.servicesItems = this.servicesCollection.valueChanges({
-      idField: 'id',
-    });
   }
 
   getAll() {
-    return this.servicesItems;
+    return collectionData(collection(this.afs, 'services'), {idField:  'id'}) as  Observable<Services[]>
   }
 
   create(services: Services) {
-    this.servicesCollection.add(services);
+    return addDoc(collection(this.afs, 'services'), services);
   }
 
   update(services: Services) {
-    this.servicesCollection.doc(services.id.toString()).update(services);
+    const ref = doc(this.afs, 'services', services.id.toString()) as DocumentReference<Services>;
+    return updateDoc(ref, services);
   }
 
-  delete(name: string) {
-    this.servicesCollection.doc(name).delete();
+  delete(id: string) {
+    return deleteDoc(doc(this.afs, 'services', id));
   }
 }

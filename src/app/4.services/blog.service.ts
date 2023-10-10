@@ -1,12 +1,23 @@
 import { Injectable, inject } from '@angular/core';
 import {
-  AngularFirestore,
-  AngularFirestoreCollection,
-} from '@angular/fire/compat/firestore';
-import { first, map, Observable, tap } from 'rxjs';
+  doc,
+  docData,
+  DocumentReference,
+  Firestore,
+  getDoc,
+  setDoc,
+  updateDoc,
+  collection,
+  addDoc,
+  deleteDoc,
+  collectionData,
+  Timestamp,
+} from '@angular/fire/firestore';
+import { Auth, authState, GoogleAuthProvider, signInWithPopup, signOut, user } from  '@angular/fire/auth';
+
+import { filter, first, map, Observable, tap } from 'rxjs';
 import { Blog, BlogPartial, Comments } from 'app/5.models/blog';
 import { convertSnaps } from './db-utils';
-import { ImageListService } from './image-list.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ImageItemIndexService } from './image-item-index.service';
 
@@ -15,32 +26,32 @@ import { ImageItemIndexService } from './image-item-index.service';
 })
 export class BlogService {
 
-  private blogCollection: AngularFirestoreCollection<Blog>;
-  private blogPartialCollection: AngularFirestoreCollection<BlogPartial>;
   private blogItems: Observable<Blog[]>;
   private commentItems: Observable<Comments[]>;
-  private commentCollection: AngularFirestoreCollection<Comments>;
 
-  constructor(private afs: AngularFirestore, private snack: MatSnackBar) {
-    this.blogCollection = afs.collection('blog', (ref) =>
-      ref.orderBy('date_created', 'desc')
-    );
-    this.blogItems = this.blogCollection.valueChanges({ idField: 'id' });
-    this.blogPartialCollection = afs.collection<BlogPartial>('blog');
+  constructor(private snack: MatSnackBar) {
+    // this.blogCollection = afs.collection('blog', (ref) =>
+    //   ref.orderBy('date_created', 'desc')
+    // );
+    // this.blogItems = this.blogCollection.valueChanges({ idField: 'id' });
+    // this.blogPartialCollection = afs.collection<BlogPartial>('blog');
   }
 
-
+  firestore: Firestore = inject(Firestore);
+  auth: Auth = inject(Auth);
+  user$ = authState(this.auth).pipe(filter(user  =>  user !== null), map(user  =>  user!));
 
   imageItemIndexService = inject(ImageItemIndexService);
 
+  getBlogData(path: string) {
+    return  collectionData(collection(this.firestore, path), {idField:  'id'}) as  Observable<Blog[]>
+  }
+0
   createComment(comment: Comments) {
-    const collectionRef = this.afs.collection(
-      `/blog/${comment.blog_id}/comment`
-    );
 
-    collectionRef
-      .add(comment)
-      .then((newComment) => {
+    const collectionRef = collection(this.firestore, `blog/${comment.blog_id}/comment`);
+
+    addDoc(collectionRef, comment).then((newComment) => {
         comment.id = newComment.id;
         this.updateComment(comment);
         this.snack.open('Comment added to the thoughts ... ', 'OK', {
@@ -57,43 +68,46 @@ export class BlogService {
   }
 
   addCommentReply(blog_id: string, commentId: string, reply: string) {
-    const collectionRef = this.afs.collection(
-      `blog/${blog_id}/comment/`,
-      (ref) => ref.orderBy('date_created', 'desc')
-    );
+
     const dDate = new Date();
     const updateDate = dDate.toISOString();
     const comment = { reply: reply, reply_date: updateDate };
-    collectionRef.doc(commentId).update(comment);
+    // collectionRef.updateDoc(commentId).update(comment);
+    const collectionRef = collection(this.firestore, `blog/${blog_id}/comment/`);
+    const ref = doc(collectionRef, commentId);
+    updateDoc(ref, comment);
   }
 
   deleteComment(blog_id: string, comment_id: string) {
-    const collectionRef = this.afs.collection(
-      `blog/${blog_id}/comment/`,
-      (ref) => ref.orderBy('created_date', 'desc')
-    );
-    collectionRef.doc(comment_id).delete();
+    const collectionRef = collection(this.firestore, `blog/${blog_id}/comment/`);
+    deleteDoc(doc(collectionRef, comment_id));
+    // const collectionRef = this.afs.collection(
+    //   `blog/${blog_id}/comment/`,
+    //   (ref) => ref.orderBy('created_date', 'desc')
+    // );
+    // collectionRef.doc(comment_id).delete();
   }
 
   updateComment(comment: Comments) {
-    const collectionRef = this.afs.collection(
-      `blog/${comment.blog_id}/comment/`
-    );
-    collectionRef.doc(comment.id).update(comment);
+    // const collectionRef = collection(this.firestore, `blog/${comment.blog_id}/comment/` );
+    // updateDoc(collectionRef,  comment);
+    const collectionRef = collection(this.firestore, `blog/${comment.blog_id}/comment/`);
+    const ref = doc(collectionRef, comment.id);
+    // updateDoc(ref, comment);
+
+    // updateDoc(collectionRef, comment)
   }
 
-  getComments(blog_id: string): any {
-    const collectionRef = this.afs.collection(
-      `blog/${blog_id}/comment/`,
-      (ref) => ref.orderBy('created_date', 'desc')
-    );
-    const commentItems = collectionRef.valueChanges({ idField: 'id' });
+  getComments(blog_id: string): Observable<Comments[]> {
+    const collectionRef = collection(this.firestore, `blog/${blog_id}/comment/`);
+    const commentItems = collectionData(collectionRef, {idField:  'id'}) as  Observable<Comments[]>;
+
+    // const collectionRef = this.afs.collection(
+    //   `blog/${blog_id}/comment/`,
+    //   (ref) => ref.orderBy('created_date', 'desc')
+    // );
+    // const commentItems = collectionRef.valueChanges({ idField: 'id' });
     return commentItems;
-  }
-
-  setToPublish(blog: Blog) {
-    blog.published = true;
-    this.blogCollection.doc(blog.id).update(blog);
   }
 
   getBlogImage(parentId: string): any {
@@ -102,52 +116,56 @@ export class BlogService {
 
   getAllPublishedBlog() {
     return this.blogItems.pipe(
-      map((blogs) => blogs.filter((pub) => pub.published === true && pub.calendar === false && pub.tailoring === false || pub.tailoring === undefined
-      ))
+      map((blogs) =>
+        blogs.filter(
+          (pub) =>
+            (pub.published === true &&
+              pub.calendar === false &&
+              pub.tailoring === false) ||
+            pub.tailoring === undefined
+        )
+      )
     );
   }
 
   getTailoringBlog() {
     return this.blogItems.pipe(
-      map((blogs) => blogs.filter((pub) => pub.tailoring === true && pub.published === true && pub.calendar !== true))
+      map((blogs) =>
+        blogs.filter(
+          (pub) =>
+            pub.tailoring === true &&
+            pub.published === true &&
+            pub.calendar !== true
+        )
+      )
     );
   }
 
   getCalendarBlog() {
     return this.blogItems.pipe(
-      map((blogs) => blogs.filter((pub) => pub.calendar === true && pub.published === true))
+      map((blogs) =>
+        blogs.filter((pub) => pub.calendar === true && pub.published === true)
+      )
     );
   }
 
-
-  getAll(): any {
-    return this.blogItems;
+  getAll(): Observable<Blog[]> {
+    // query must be set to order descending
+     const collectionRef = collection(this.firestore, 'blog');
+     return collectionData(collectionRef, {idField:  'id'}) as  Observable<Blog[]>
   }
 
   getBlog(id: string) {
-    const ref = this.afs
-      .collection<Blog>('blog', (ref) => ref.where('id', '==', id).limit(1))
-      .snapshotChanges()
-      .pipe(
-        map((blog) =>
-          blog.map((a) => {
-            // console.debug(a.payload.doc.id);
-          })
-        )
-      );
+
+    const collectionRef = collection(this.firestore, 'blog');
+    const blog = doc(collectionRef, id);
+    return docData(blog) as Observable<Blog>;
   }
 
   findBlogByUrl(id: string): Observable<Blog | undefined> {
-    return this.afs
-      .collection('blog', (ref) => ref.where('id', '==', id))
-      .snapshotChanges()
-      .pipe(
-        map((snaps) => {
-          const blog = convertSnaps<Blog>(snaps);
-          return blog.length == 1 ? blog[0] : undefined;
-        }),
-        first()
-      );
+    const collectionRef = collection(this.firestore, 'blog');
+    const blog = doc(collectionRef, id);
+    return docData(blog) as Observable<Blog>;
   }
 
   retrieveBlogs() {
@@ -155,23 +173,33 @@ export class BlogService {
   }
 
   createBlog(blog: Blog) {
+    // this.blogCollection.add(blog);
     blog.published = false;
-    return this.blogCollection.add(blog);
+    blog.date_updated = new Date().toISOString();
+    blog.date_created = new Date().toISOString();
+    return addDoc(collection(this.firestore, 'blog'), blog);
   }
 
   update(blog: Blog) {
-    this.blogCollection.doc(blog.id).update(blog);
+    blog.date_updated = new Date().toISOString();
+    const ref = doc(this.firestore, 'blog', blog.id) as DocumentReference<Blog>; ;
+    updateDoc(ref, blog);
   }
 
-  updatePartial(blog: BlogPartial) {
-    return this.blogCollection.doc(blog.id).update(blog);
+  updatePartial(blog: Blog) {
+    blog.date_updated = new Date().toISOString();
+    const ref = doc(this.firestore, 'blog', blog.id) as DocumentReference<Blog>; ;
+    return updateDoc(ref, blog);
   }
 
   createPartial(blog: BlogPartial) {
-    return this.blogPartialCollection.add(blog);
+    blog.published = false;
+    blog.date_created = new Date().toISOString();
+    return addDoc(collection(this.firestore, 'blog'), blog);
   }
 
   delete(id: string) {
-    this.blogCollection.doc(id).delete();
+    const ref = doc(this.firestore, 'blog', id);
+    deleteDoc(ref);
   }
 }

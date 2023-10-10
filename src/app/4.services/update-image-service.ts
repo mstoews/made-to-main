@@ -1,9 +1,8 @@
 import { Injectable, OnDestroy, inject } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { ImageItemIndex } from 'app/5.models/imageItem';
 import { first, map, Observable, Subject, takeUntil } from 'rxjs';
 import { convertSnaps } from './db-utils';
+import { DocumentReference, Firestore, addDoc, collection, collectionData, doc, orderBy, query, updateDoc, where } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root',
@@ -15,18 +14,13 @@ export class UpdateImageService implements OnDestroy{
     this.createOriginalIndexMaps();
   }
 
-  afs = inject(AngularFirestore);
-  storage = inject(AngularFireStorage);
-
-  imageIndexCollections = this.afs.collection<ImageItemIndex>('originalImageList');
-  imageIndexItems = this.imageIndexCollections.valueChanges({ idField: 'id' });
+  firestore = inject(Firestore);
+  storage = inject(Storage);
 
   hashOriginalIndexMap = new Map<string, ImageItemIndex>();
   private _unsubscribeAll: Subject<any> = new Subject<any>();
 
-
   updateImageList(): void {
-
     this.updateImageIndexList('200');
     this.updateImageIndexList('400');
     this.updateImageIndexList('800');
@@ -66,7 +60,7 @@ export class UpdateImageService implements OnDestroy{
               .subscribe((smallSrc) => {
                 console.debug(smallSrc);
                 value.imageSrc200 = smallSrc;
-                this.imageIndexCollections.doc(value.id).update(value);
+                this.update(value);
               });
             break;
 
@@ -83,8 +77,7 @@ export class UpdateImageService implements OnDestroy{
               .getDownloadURL()
               .subscribe((mediumSrc) => {
                 value.imageSrc400 = mediumSrc;
-                this.imageIndexCollections.doc(value.id).update(value);
-
+                this.update(value);
               });
             break;
 
@@ -102,7 +95,7 @@ export class UpdateImageService implements OnDestroy{
               .subscribe((largeSrc) => {
                 console.debug(largeSrc);
                 value.imageSrc800 = largeSrc;
-                this.imageIndexCollections.doc(value.id).update(value);
+                this.update(value);
               });
             break;
           default:
@@ -160,46 +153,38 @@ export class UpdateImageService implements OnDestroy{
     let added = false;
     this.findProductByUrl(imageData.fileName).subscribe((image) => {
       if (image === undefined) {
-        this.imageIndexCollections.add(imageData).then((img) => {
-          imageData.id = img.id;
-          this.imageIndexCollections.doc(imageData.id).update(imageData);
-        });
+        this.add(imageData)
         added = true;
       }
     });
     return added;
   }
 
-
-  findProductByUrl(fileName: string): Observable<ImageItemIndex> {
-    return this.afs
-      .collection('originalImageList', (ref) => ref.where('fileName', '==', fileName))
-      .snapshotChanges()
-      .pipe(
-        map((snaps) => {
-          const product = convertSnaps<ImageItemIndex>(snaps);
-          return product.length == 1 ? product[0] : undefined;
-        }),
-        first()
-      );
+  getAll() : Observable<ImageItemIndex[]> {
+    const collectionRef = collection(this.firestore, 'originalImageList');
+    const q = query(collectionRef, orderBy('ranking'));
+    return collectionData(q, { idField: 'id' }) as Observable<ImageItemIndex[]>;
   }
 
-
-  test() {
-    this.imageIndexItems
-    .pipe(takeUntil(this._unsubscribeAll))
-    .subscribe((images) => {
-      images.forEach((image) => {
-         console.debug(image);
-      });
-    });
+  add(imageItemIndex: ImageItemIndex) {
+    return addDoc(collection(this.firestore, 'category'), imageItemIndex);
   }
+
+  update(imageItemIndex: ImageItemIndex) {
+    const ref = doc( this.firestore,'originalImageList', imageItemIndex.id) as DocumentReference<ImageItemIndex>;
+    return updateDoc(ref, imageItemIndex);
+  }
+
+  findProductByUrl(fileName: string): Observable<ImageItemIndex[]> {
+    const collectionRef = collection(this.firestore, 'originalImageList');
+    const q = query(collectionRef, where('fileName', '==', fileName));
+    return collectionData(q, { idField: 'id' }) as Observable<ImageItemIndex[]>;
+  }
+
 
   createOriginalIndexMaps(): void {
     this.hashOriginalIndexMap.clear();
-    this.imageIndexItems
-      .pipe(takeUntil(this._unsubscribeAll))
-      .subscribe((images) => {
+    this.getAll().pipe(takeUntil(this._unsubscribeAll)).subscribe((images) => {
         images.forEach((image) => {
           this.hashOriginalIndexMap.set(image.fileName, image);
         });

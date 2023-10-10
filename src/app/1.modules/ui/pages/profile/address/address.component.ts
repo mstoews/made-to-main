@@ -66,9 +66,10 @@ export class AddressComponent implements OnInit {
 
   ngOnInit() {
     this.profileExists = false;
-    this.authService.afAuth.authState.subscribe((user) => {
-      this.userId = user?.uid;
-      this.email = user?.email;
+    this.authService.getUserId().then((userId) => {
+      this.userId = userId;
+      this.email = this.authService.email;
+    });
 
       let collection = this.afs.collection<ProfileModel>(
         `users/${this.userId}/profile`
@@ -89,15 +90,14 @@ export class AddressComponent implements OnInit {
           });
         }
       });
-    });
-  }
-
+    }
+  
   onUpdateProfile() {
     let data = this.formGroup.getRawValue();
     this.updateBtnState = true;
 
     if (this.profileExists === false) {
-      this.authService.afAuth.currentUser
+      this.authService.getUserId()
         .then((user) => {
           //const collectionRef = this.afs.collection(`users/${user.uid}/profile/`);
           this.profileCollection
@@ -113,28 +113,24 @@ export class AddressComponent implements OnInit {
             horizontalPosition: 'right',
             panelClass: 'bg-danger',
           });
-          console.debug('user doc', this.updateStripeCustomerId(user.uid));
         })
         .then()
         .catch((error) => {
           console.error('Error writing document: ', error);
         });
     } else {
-      this.authService.afAuth.currentUser
-        .then((user) => {
+      this.authService.getUserId()
+        .then((userId) => {
           const collectionRef = this.afs.collection(
-            `users/${user.uid}/profile/`
+            `users/${userId}/profile/`
           );
           data.id = this.profileId;
           collectionRef.doc(this.profileId).update(data);
           this.snack.open('Profile has been updated ...', 'OK', {
             duration: 3000,
           });
-          this.updateStripeCustomerId(user.uid);
-          console.debug('user doc', this.updateStripeCustomerId(user.uid));
-        })
-        .then(() => {
-          // console.debug('Document successfully written!');
+          this.updateStripeCustomerId(userId);
+          console.debug('user doc', this.updateStripeCustomerId(userId));
         })
         .catch((error) => {
           console.error('Error writing document: ', error);

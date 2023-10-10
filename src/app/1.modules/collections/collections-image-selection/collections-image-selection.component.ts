@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Observable, Subscription, map } from 'rxjs';
-import { ImageListService } from 'app/4.services/image-list.service';
+
 import { imageItem, ImageItemIndex } from 'app/5.models/imageItem';
 
 import {

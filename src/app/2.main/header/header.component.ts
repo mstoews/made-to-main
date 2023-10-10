@@ -12,19 +12,14 @@ import {
 } from '@angular/core';
 
 import { Router, RouterLink, RouterModule } from '@angular/router';
-
 import { onMainContentChange } from '../animations';
 import { Location } from '@angular/common';
-
 import { MenuToggleService } from 'app/4.services/menu-toggle.service';
 import { AuthService } from 'app/4.services/auth/auth.service';
-
 import { CartService } from 'app/4.services/cart.service';
 import { WishListService } from 'app/4.services/wishlist.service';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { ProfileService } from 'app/4.services/profile.service';
 import { ProfileModel } from 'app/5.models/profile';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { UserService } from 'app/4.services/auth/user.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, Subject, Subscription, first, takeUntil } from 'rxjs';
@@ -43,12 +38,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private _router = inject(Router);
   private menuToggle = inject(MenuToggleService);
   private authService = inject(AuthService);
-  private afAuth = inject(AngularFireAuth);
   public userService = inject(UserService);
   public cartService = inject(CartService);
   public wishListService = inject(WishListService);
   private profile = inject(ProfileService);
-  private afs = inject(AngularFirestore);
   private snackBar = inject(MatSnackBar);
   private _location = inject(Location);
 
@@ -72,14 +65,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.menuToggle.setDrawerState(false);
     this.emailName = 'Guest';
-    
+
     this.userService.isLoggedIn$.pipe(takeUntil(this._unsubscribeAll)).subscribe((res) => {
       if (res === true) {
         this.isLoggedIn = true;
 
-        this.authService.afAuth.authState.pipe(takeUntil(this._unsubscribeAll)).subscribe((user) => {
-          this.userId = user?.uid;
-        });
+        this.userId = this.authService.userId
 
         // this.cartService.updateCartCounter(this.userId);
 
@@ -96,6 +87,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.isLoggedIn = false;
       }
     });
+
+    /*
 
      this.authService.afAuth.authState.pipe(takeUntil(this._unsubscribeAll)).subscribe((user) => {
       if (user) {
@@ -128,6 +121,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.authService.setUserName('');
       }
     });
+    */
   }
 
   public onToggleSideNav() {

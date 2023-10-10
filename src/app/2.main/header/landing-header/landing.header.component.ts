@@ -15,9 +15,8 @@ import { MenuToggleService } from 'app/4.services/menu-toggle.service';
 import { AuthService } from 'app/4.services/auth/auth.service';
 import { CartService } from 'app/4.services/cart.service';
 import { WishListService } from 'app/4.services/wishlist.service';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { UserService } from 'app/4.services/auth/user.service';
 import { Subject, takeUntil } from 'rxjs';
+import { UserService } from 'app/4.services/auth/user.service';
 
 @Component({
   selector: 'land-header',
@@ -31,9 +30,8 @@ export class LandingHeaderComponent implements OnInit, OnDestroy {
     private _location: Location,
     private _router: Router,
     private menuToggle: MenuToggleService,
-    private afAuth: AngularFireAuth,
-    public userService: UserService,
     private authService: AuthService,
+    public userService: UserService,
     private cartService: CartService,
     private wishListService: WishListService
   ) {
@@ -46,6 +44,7 @@ export class LandingHeaderComponent implements OnInit, OnDestroy {
   @Input() back = true;
   @Input() home: boolean;
   @Input() userName: string;
+
   headerEmail: string;
   isClicked = false;
   doAnimation = false;
@@ -61,14 +60,12 @@ export class LandingHeaderComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
-    this.userService.isLoggedIn$.pipe(takeUntil(this._unsubscribeAll)).subscribe((res) => {
-      if (res === true) {
-        this.authService.afAuth.authState.pipe(takeUntil(this._unsubscribeAll)).subscribe((user) => {
-          this.userId = user?.uid;
-          this.cartCounter.set(this.cartService.cartCountByUserId(this.userId));
-          this.wishCounter.set(this.wishListService.wishCountByUserId(this.userId));
-        });
-      }
+    this.authService.getUserId().then((id) => {
+      this.userId = id;
+      this.cartCounter.set(this.cartService.cartCountByUserId(this.userId));
+      this.wishCounter.set(this.wishListService.wishCountByUserId(this.userId));
+    }).catch((error) => {
+        console.log('Error getting user id: ', error);
     });
   }
 

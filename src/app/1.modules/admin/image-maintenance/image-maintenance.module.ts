@@ -27,9 +27,9 @@ import { AdminRouteModule } from '../admin-route.module';
 import { ViewImageItemComponent } from '../../shop/shop-inventory-maintenance/inventory-image-card/view-image-item/view-image-item.component';
 import { RouterModule, Routes } from '@angular/router';
 import {
-  AngularFireAuthGuard,
+  AuthGuard,
   hasCustomClaim,
-} from '@angular/fire/compat/auth-guard';
+} from '@angular/fire/auth-guard';
 import { ImageMaintenanceRoutingModule } from './image-maintenance-routing.module';
 
 const adminOnly = () => hasCustomClaim('admin');
@@ -39,7 +39,7 @@ const routes: Routes = [
     path: '',
     pathMatch: 'full',
     title: 'Image Maintenance',
-    canActivate: [AngularFireAuthGuard],
+    canActivate: [AuthGuard],
     data: { authGuardPipe: adminOnly },
     component: ImageMgtEditComponent,
   },

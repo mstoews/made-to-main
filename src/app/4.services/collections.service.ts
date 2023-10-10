@@ -7,7 +7,7 @@ import { first, map, Observable, tap } from 'rxjs';
 import { Collection, CollectionsPartial } from 'app/5.models/collection';
 import { CollectionsComments } from 'app/5.models/collection';
 import { convertSnaps } from './db-utils';
-import { ImageListService } from './image-list.service';
+import { ImageItemIndexService } from './image-item-index.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Injectable({
@@ -23,7 +23,7 @@ export class CollectionsService {
   constructor(
     private afs: AngularFirestore,
     private snack: MatSnackBar,
-    private imageListService: ImageListService
+    private imageItemIndexService: ImageItemIndexService
   ) {
     this.colCollection = afs.collection('collection', (ref) =>
       ref.orderBy('date_created', 'desc')
@@ -96,7 +96,7 @@ export class CollectionsService {
   }
 
   getCollectionsImage(parentId: string): any {
-    return this.imageListService.getImagesByProductId(parentId);
+    return this.imageItemIndexService.getImagesByTypeId(parentId);
   }
 
   getAllPublishedBlog() {

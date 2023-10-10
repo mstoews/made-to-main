@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { DeleteDuplicateService } from 'app/4.services/delete-duplicate.service';
-import { ImageListService } from 'app/4.services/image-list.service';
+
 
 @Component({
   selector: 'app-image-mgt-edit',

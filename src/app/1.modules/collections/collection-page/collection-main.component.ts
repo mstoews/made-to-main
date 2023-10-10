@@ -19,7 +19,7 @@ interface collectionData {
 export class CollectionMainComponent implements OnInit {
   Title = '';
   Description = '';
-  imageListService = inject(ImageItemIndexService);
+  imageItemIndexService = inject(ImageItemIndexService);
   collectionService = inject(CollectionsService);
   activateRoute = inject(ActivatedRoute);
   allCollections$ = this.collectionService.getAll();
@@ -34,7 +34,7 @@ export class CollectionMainComponent implements OnInit {
     var id: string;
     this.collection = this.activateRoute.snapshot.data['collection'];
     console.debug("Collection", this.collection);
-    this.collectionImages$ = this.imageListService.getAllImages(this.collection.id);
+    this.collectionImages$ = this.imageItemIndexService.getAllImages(this.collection.id);
   }
 
 }

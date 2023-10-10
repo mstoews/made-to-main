@@ -52,10 +52,9 @@ export class CartComponent implements OnInit, OnDestroy {
     private ngxSpinner: NgxSpinnerService,
     public afs: AngularFirestore,
   ) {
-    this.authService.afAuth.authState.subscribe((user) => {
-      this.userId = user?.uid;
+    this.authService.getUserId().then ((userId) => {
+      this.userId = userId
     });
-
   }
 
   async ngAfterViewInit(){

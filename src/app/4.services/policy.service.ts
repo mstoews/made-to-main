@@ -6,7 +6,6 @@ import {
 import { first, from, map, Observable } from 'rxjs';
 import { PolicyDocuments } from 'app/5.models/policy-documents';
 import { convertSnaps } from './db-utils';
-import { ImageListService } from './image-list.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Injectable({

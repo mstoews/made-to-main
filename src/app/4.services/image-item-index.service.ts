@@ -1,19 +1,35 @@
 import { Injectable, OnDestroy, inject } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { ImageItemIndex } from 'app/5.models/imageItem';
-import { Subscription, map } from 'rxjs';
+import { Observable, Subscription, map } from 'rxjs';
 import { DeleteDuplicateService } from './delete-duplicate.service';
 import { ProductsService } from './products.service';
+import { Storage, StorageReference, getDownloadURL, getMetadata, listAll, ref } from '@angular/fire/storage';
+
+import {
+  doc,
+  docData,
+  DocumentReference,
+  Firestore,
+  getDoc,
+  setDoc,
+  updateDoc,
+  collection,
+  addDoc,
+  deleteDoc,
+  collectionData,
+  Timestamp,
+} from '@angular/fire/firestore';
+
+
 
 @Injectable({
   providedIn: 'root',
 })
 export class ImageItemIndexService implements OnDestroy{
 
-  afs = inject(AngularFirestore);
-  storage = inject(AngularFireStorage);
-  dup = inject(DeleteDuplicateService)
+  firestore = inject(Firestore);
+  storage = inject(Storage);
+  duplicates = inject(DeleteDuplicateService)
   inventory = inject(ProductsService);
   private sub: Subscription;
 
@@ -21,23 +37,216 @@ export class ImageItemIndexService implements OnDestroy{
   hashOriginalIndexMap = new Map<string, ImageItemIndex>();
   hashImageItemMap = new Map<string, ImageItemIndex>();
 
-  itemsCollection = this.afs.collection<ImageItemIndex[]>('originalImageList',
-    (ref) => ref.orderBy('ranking')
-  );
 
-  imageItems = this.itemsCollection.valueChanges({ idField: 'id' });
 
-  imageIndexCollections = this.afs.collection<ImageItemIndex>(
-    'originalImageList',
-    (ref) => ref.orderBy('ranking')
-  );
+    //Query
 
-  imageIndexItems = this.imageIndexCollections.valueChanges({ idField: 'id' });
+    getAll() {
+      const collectionRef = collection(this.firestore, 'originalImageList');
+      return collectionData(collectionRef, { idField: 'id' }) as Observable<ImageItemIndex[]>;
+    }
 
-  createOriginalItem(image: ImageItemIndex) {
-    this.imageIndexCollections.add(image).then((imgIndex) => {
-      this.imageIndexCollections.doc(imgIndex.id).update(imgIndex);
+    getById(id: string) {
+      const collectionRef = collection(this.firestore, 'originalImageList');
+      const blog = doc(collectionRef, id);
+      return docData(blog) as Observable<ImageItemIndex>;
+    }
+
+    // Add
+    add(imageItemIndex: ImageItemIndex) {
+      return addDoc(collection(this.firestore, 'originalImageList'), imageItemIndex);
+    }
+
+    createOriginalItem(image: ImageItemIndex) {
+      this.add(image);
+    }
+
+
+    // Update
+
+    update(imageItemIndex: ImageItemIndex) {
+      const ref = doc(this.firestore, 'originalImageList', imageItemIndex.id
+      ) as DocumentReference<ImageItemIndex>;
+      return updateDoc(ref, imageItemIndex);
+    }
+
+    updateImageList(item: ImageItemIndex) {
+      this.update(item);
+    }
+
+    // Delete
+    delete(id: string) {
+      const ref = doc(this.firestore, 'originalImageList', id);
+      return deleteDoc(ref);
+    }
+
+
+  reNumber(type: string) {
+    let ranking = 0;
+    this.sub = this.getAllImages(type).subscribe((images) => {
+      images.forEach((image) => {
+        image.ranking = ranking;
+        ranking++;
+        this.update(image);
+      });
     });
+  }
+
+  ngOnDestroy(): void {
+    if(this.sub !== undefined){
+      this.sub.unsubscribe();
+    }
+  }
+
+  async getImagesByType(productId: string) {
+    return this.getImageByType(productId);
+  }
+
+  updateCollectionDescription(imgItem: ImageItemIndex) {
+    this.update(imgItem)
+  }
+
+  setCollectionDescription(imgItem: ImageItemIndex) {
+    this.update(imgItem)
+  }
+
+  async getImageIndexList() {
+    return this.getAll();
+  }
+
+  async sortNotUsed() {
+    return (await this.getOriginalImageListByType('IN_NOT_USED')).pipe(
+      map((data) => {
+        data.sort((a, b) => {
+          return a.caption < b.caption ? -1 : 1;
+        });
+        return data;
+      })
+    );
+  }
+
+  getAllImages(type: string) {
+    if (type === null || type === undefined || type === '') {
+      return this.getAll();
+    } else {
+      return  this.getAll().pipe(map((images) => images.filter((types) => types.type === type)));
+    }
+  }
+
+  getImagesByTypeId(id: string) {
+    return this.getAll().pipe( map((images) => images.filter((filter) => filter.id === id)));
+  }
+
+  async getImageByType(type: string) {
+    return this.getAll().pipe( map((images) => images.filter((filter) => filter.type === type)));
+  }
+
+  async getImagesByCategory(category: string) {
+    return this.getAll().pipe( map((images) => images.filter((filter) => filter.category === category)));
+  }
+
+  async getOriginalImageListByType(type: string) {
+    return this.getAll().pipe( map((images) => images.filter((filter) => filter.type === type)));
+  }
+
+  async createOriginalIndexMaps(): Promise<void> {
+    this.hashOriginalIndexMap.clear();
+    this.getAllImages('').subscribe((images) => {
+      images.forEach((image) => {
+        this.hashOriginalIndexMap.set(image.fileName, image);
+      });
+    });
+  }
+
+  getUsedImagesList() {
+    return this.getAll().pipe( map((images) => images.filter((filter) => filter.type !== 'IN_NOT_USED')));
+  }
+
+  async getImageURL(ref: StorageReference, imageDt: any, file: File, path: string){
+    let updated = false;
+    let downloadUrl = getDownloadURL(ref);
+    const typeId = imageDt.parent;
+    if (downloadUrl !== undefined && updated === false) {
+       downloadUrl.then((dw) => {
+         const ImageItemIndex = {
+          parentId: '',
+          caption: imageDt.caption,
+          fileName: file.name,
+          fullPath: path,
+          imageSrc: dw,
+          imageSrc200: dw,
+          imageSrc400: dw,
+          imageSrc800: dw,
+          ranking: 0,
+          size: 'original',
+          type: typeId,
+          id: '',
+          contentType: file.type,
+        };
+        this.createOriginalItem(ImageItemIndex);
+        updated = true;
+      }).catch((error) => {
+        console.error('Error getting download URL', error);
+      });
+    }
+  };
+
+
+
+  async updateUsedImageList(): Promise<void> {
+    this.hashUsedImagesMap.forEach((value, key) => {
+      var fileExt = value.imageAlt.split('.').pop();
+      let fileName = value.imageAlt.replace(/\.[^/.]+$/, '');
+      fileName = fileName.replace(`thumbnails/`, '').replace(`_200x200`, '');
+      fileName = fileName.replace(`400/`, '').replace(`_400x400`, '');
+      fileName = fileName.replace(`800/`, '').replace(`_800x800`, '');
+      fileName = `${fileName}.${fileExt}`;
+      let usedItem = this.hashOriginalIndexMap.get(fileName);
+      if (usedItem !== undefined) {
+        usedItem.type = value.type;
+        usedItem.caption = value.caption;
+        usedItem.ranking = value.ranking;
+        usedItem.parentId = value.parentId;
+        usedItem.imageSrc = value.imageSrc;
+        this.update(usedItem);
+      }
+    });
+  }
+
+  async updateMainImageList(): Promise<void> {
+    let ranking = 0;
+    const listRef = ref(this.storage, '/');
+    listAll(listRef).then((files) => {
+      files.items.forEach((imageRef) => {
+        getDownloadURL(imageRef).then((downloadURL) => {
+          getMetadata(imageRef).then((meta) => {
+            meta.contentType;
+              const imageUrl = downloadURL;
+              const imageData: ImageItemIndex = {
+                parentId: '',
+                caption: imageRef.fullPath,
+                type: 'IN_NOT_USED',
+                imageSrc: imageUrl,
+                fullPath: imageRef.fullPath,
+                fileName: imageRef.name,
+                size: 'original',
+                imageAlt: imageRef.name,
+                ranking: ranking,
+                contentType: meta.contentType,
+                id: '',
+              };
+              console.debug('Map Size', this.hashImageItemMap.size);
+
+              const file = this.hashImageItemMap.get(imageData.fileName);
+              if (file === undefined || file === null) {
+                //this.setCollectionDescription(imageData);
+                console.debug(`Added ${imageData.fileName}`);
+              }
+            });
+          });
+          console.debug('createRawImagesList_200 completed');
+        });
+      });
   }
 
   updateProductItems() {
@@ -92,176 +301,4 @@ export class ImageItemIndexService implements OnDestroy{
 
   }
 
-
-  reNumber(type: string) {
-    let ranking = 0;
-    this.sub = this.getAllImages(type).subscribe((images) => {
-      images.forEach((image) => {
-        image.ranking = ranking;
-        ranking++;
-        this.imageIndexCollections.doc(image.id).update(image);
-      });
-    });
-  }
-
-  ngOnDestroy(): void {
-    if(this.sub !== undefined){
-      this.sub.unsubscribe();
-    }
-  }
-
-  async getImagesByType(productId: string) {
-    return this.getImageByType(productId);
-  }
-
-  updateCollectionDescription(imgItem: ImageItemIndex) {
-    this.imageIndexCollections.doc(imgItem.id).update(imgItem);
-  }
-
-  setCollectionDescription(imgItem: ImageItemIndex) {
-    this.imageIndexCollections.doc(imgItem.id).set(imgItem);
-  }
-
-  async getImageIndexList() {
-    return this.imageIndexItems;
-  }
-
-  async sortNotUsed() {
-    return (await this.getOriginalImageListByType('IN_NOT_USED')).pipe(
-      map((data) => {
-        data.sort((a, b) => {
-          return a.caption < b.caption ? -1 : 1;
-        });
-        return data;
-      })
-    );
-  }
-
-  getAllImages(type: string) {
-    if (type === null || type === undefined || type === '') {
-      let imageIndexCollections = this.afs.collection<ImageItemIndex>(
-        'originalImageList',
-        (ref) => ref.orderBy('ranking')
-      );
-      let imageIndexItems = imageIndexCollections.valueChanges({
-        idField: 'id',
-      });
-      return imageIndexItems;
-    } else {
-      let imageIndexCollections = this.afs.collection<ImageItemIndex>(
-        'originalImageList',
-        (ref) => ref.orderBy('ranking')
-      );
-      let imageIndexItems = imageIndexCollections
-        .valueChanges({ idField: 'id' })
-        .pipe(map((images) => images.filter((types) => types.type === type)));
-      return imageIndexItems;
-    }
-  }
-
-  getImagesByTypeId(id: string) {
-    this.imageIndexItems.pipe( map((images) => images.filter((type) => type.type === id)));
-  }
-
-
-  async getImageByType(type: string) {
-    return (await this.getImageIndexList()).pipe(
-      map((images) => images.filter((image) => image.type === type))
-    );
-  }
-
-  async getImagesByCategory(category: string) {
-    return (await this.getImageIndexList()).pipe(
-      map((images) => images.filter((image) => image.category === category))
-    );
-  }
-
-
-  async getOriginalImageListByType(type: string) {
-    return (await this.getImageIndexList()).pipe(
-      map((images) => images.filter((image) => image.type === type))
-    );
-  }
-
-  async createOriginalIndexMaps(): Promise<void> {
-    this.hashOriginalIndexMap.clear();
-    this.getAllImages('').subscribe((images) => {
-      images.forEach((image) => {
-        this.hashOriginalIndexMap.set(image.fileName, image);
-      });
-    });
-  }
-
-  getUsedImagesList() {
-    return this.imageIndexItems.pipe(
-      map((images) => images.filter((type) => type.type !== 'IN_NOT_USED'))
-    );
-  }
-
-  updateImageList(item: ImageItemIndex) {
-    this.imageIndexCollections.doc(item.id).update(item);
-  }
-
-  delete(id: string) {
-    this.imageIndexCollections.doc(id).delete();
-  }
-
-  async updateUsedImageList(): Promise<void> {
-    this.hashUsedImagesMap.forEach((value, key) => {
-      var fileExt = value.imageAlt.split('.').pop();
-      let fileName = value.imageAlt.replace(/\.[^/.]+$/, '');
-      fileName = fileName.replace(`thumbnails/`, '').replace(`_200x200`, '');
-      fileName = fileName.replace(`400/`, '').replace(`_400x400`, '');
-      fileName = fileName.replace(`800/`, '').replace(`_800x800`, '');
-      fileName = `${fileName}.${fileExt}`;
-      let usedItem = this.hashOriginalIndexMap.get(fileName);
-      if (usedItem !== undefined) {
-        usedItem.type = value.type;
-        usedItem.caption = value.caption;
-        usedItem.ranking = value.ranking;
-        usedItem.parentId = value.parentId;
-        usedItem.imageSrc = value.imageSrc;
-        this.imageIndexCollections.doc(usedItem.id).update(usedItem);
-      }
-    });
-  }
-
-  async updateMainImageList(): Promise<void> {
-    let ranking = 0;
-    this.storage
-      .ref('/')
-      .listAll()
-      .subscribe((files) => {
-        files.items.forEach((imageRef) => {
-          imageRef.getDownloadURL().then((downloadURL) => {
-            imageRef.getMetadata().then((meta) => {
-              meta.contentType;
-
-              const imageUrl = downloadURL;
-              const imageData: ImageItemIndex = {
-                parentId: '',
-                caption: imageRef.fullPath,
-                type: 'IN_NOT_USED',
-                imageSrc: imageUrl,
-                fullPath: imageRef.fullPath,
-                fileName: imageRef.name,
-                size: 'original',
-                imageAlt: imageRef.name,
-                ranking: ranking,
-                contentType: meta.contentType,
-                id: '',
-              };
-              console.debug('Map Size', this.hashImageItemMap.size);
-
-              const file = this.hashImageItemMap.get(imageData.fileName);
-              if (file === undefined || file === null) {
-                //this.setCollectionDescription(imageData);
-                console.debug(`Added ${imageData.fileName}`);
-              }
-            });
-          });
-          console.debug('createRawImagesList_200 completed');
-        });
-      });
-  }
 }

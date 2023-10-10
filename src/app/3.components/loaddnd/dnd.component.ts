@@ -14,14 +14,15 @@ import {
   MatDialogRef,
   MAT_DIALOG_DATA,
 } from '@angular/material/dialog';
-import { AngularFireStorage } from '@angular/fire/compat/storage';
-import { Observable, Subject, map, shareReplay, take, takeUntil } from 'rxjs';
+import { Storage, getDownloadURL, getStorage, ref, uploadBytes, uploadBytesResumable } from '@angular/fire/storage';
+import { Observable, Subject, map, of, shareReplay, take, takeUntil } from 'rxjs';
 import { MaterialModule } from '../../material.module';
 import { ProgressComponent } from '../progress/progress.component';
 import { DndDirective } from './dnd.directive';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ImageItemIndex } from 'app/5.models/imageItem';
-import { DeleteDuplicateService } from 'app/4.services/delete-duplicate.service';
+// import { DeleteDuplicateService } from 'app/4.services/delete-duplicate.service';
+import { ImageItemIndexService } from 'app/4.services/image-item-index.service';
 
 @Component({
   standalone: true,
@@ -42,7 +43,7 @@ export class DndComponent implements OnDestroy {
   constructor(
     private fb: UntypedFormBuilder,
     public dialogRef: MatDialogRef<DndComponent>,
-    public storage: AngularFireStorage,
+    public storage: Storage,
 
     @Optional() @Inject(MAT_DIALOG_DATA) public imageData: any
   ) {
@@ -64,11 +65,10 @@ export class DndComponent implements OnDestroy {
   public ImageItemIndex!: ImageItemIndex;
   allImages: ImageItemIndex[] = [];
   hashOriginalIndexMap = new Map<string, ImageItemIndex>();
-  deleteDuplicateService = inject(DeleteDuplicateService);
-
+  imageItemIndexService = inject(ImageItemIndexService);
 
   async sortAllImages() {
-    return (await this.deleteDuplicateService.getAllImages('')).pipe(
+    return (await this.imageItemIndexService.getAllImages('')).pipe(
       map((data) => {
         data.sort((a, b) => {
           return a.ranking < b.ranking ? -1 : 1;
@@ -78,16 +78,16 @@ export class DndComponent implements OnDestroy {
     );
   }
 
-  async onCheckList() {
-    let spinner = true;
-    this.subAllImages = (await this.sortAllImages()).subscribe((item) => {
-      this.allImages = item;
-      if (this.allImages.length > 0) {
-        this.deleteDuplicateService.onUpdateImageList(this.allImages);
-      }
-      spinner = false;
-    });
-  }
+  // async onCheckList() {
+  //   let spinner = true;
+  //   this.subAllImages = (await this.sortAllImages()).subscribe((item) => {
+  //     this.allImages = item;
+  //     if (this.allImages.length > 0) {
+  //       this.imageItemIndexService.updateImageList(this.allImages);
+  //     }
+  //     spinner = false;
+  //   });
+  // }
 
   createForm() {
     this.formGroup = this.fb.group({});
@@ -156,22 +156,50 @@ export class DndComponent implements OnDestroy {
   async startUpload(file: File, imageDt: any) {
     const location = '/';
     const path = `${location}/${file.name}`;
-    const fileRef = this.storage.ref(path);
-    const task = this.storage.upload(path, file, {
-      cacheControl: 'max-age=2592000, public',
-    });
-    let complete = true;
+    const storage = getStorage();
+    const storageRef = ref(storage, location);
 
-    this.percentageChange$ = task.percentageChanges();
-    this.percentageChange$.pipe(takeUntil(this._unsubscribeAll), shareReplay()).subscribe(async (data) => {
+    const uploadTask = uploadBytesResumable(storageRef, file);
 
-      if (data === 100 && complete === true ) {
-        complete = false; // make sure this is only called once
-        console.debug(`complete: ${complete}`);
-        await this.deleteDuplicateService.getImageURL(fileRef, imageDt, file, path);
-      }
+    uploadTask.on('state_changed',  (snapshot) => {
+    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+    this.percentageChange$ = of(progress)
+    console.log('Upload is ' + progress + '% done');
+    switch (snapshot.state) {
+      case 'paused':
+        console.log('Upload is paused');
+        break;
+      case 'running':
+        console.log('Upload is running');
+        break;
+    }
+  },
+  (error) => {
+    // Handle unsuccessful uploads
+  },
+  () => {
+    // Handle successful uploads on complete
+    // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+      getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+      console.log('File available at', downloadURL);
+      // await this.imageItemIndexService.getImageURL(downloadURL, imageDt, file, path);
+      });
     });
   }
+
+
+    // let complete = true;
+
+    // this.percentageChange$ = task.percentageChanges();
+    // this.percentageChange$.pipe(takeUntil(this._unsubscribeAll), shareReplay()).subscribe(async (data) => {
+
+    //   if (data === 100 && complete === true ) {
+    //     complete = false; // make sure this is only called once
+    //     console.debug(`complete: ${complete}`);
+    //     await this.imageItemIndexService.getImageURL(fileRef, imageDt, file, path);
+    //   }
+    // });
+
 
   async onCreate() {
     let data = this.imageData;

@@ -1,9 +1,6 @@
 {
   "projects": {
-    "default": "made-to-cassie",
-    "production": "made-to-cassie",
-    "staging": "made-to-dev",
-    "production ": "made-to-cassie"
+    "default": "made-to-cassie"
   },
   "targets": {
     "made-to-cassie": {

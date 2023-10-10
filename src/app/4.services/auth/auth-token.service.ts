@@ -1,20 +1,17 @@
 import {Injectable} from "@angular/core";
-import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { Auth } from '@angular/fire/auth';
 
 
 @Injectable({
     providedIn: "root"
 })
 export class AuthTokenService {
-
     authJwtToken:string | null;
-
-    constructor(private afAuth: AngularFireAuth) {
-        afAuth.idToken.subscribe(jwt => {
-          this.authJwtToken = jwt;
-        })
-
-    }
-
-
+    constructor(private afAuth: Auth) {
+        afAuth.onIdTokenChanged((user) => {
+            if (user) {
+                user.getIdToken().then((jwt) => (this.authJwtToken = jwt));
+            }
+        });
+      }
 }

@@ -35,43 +35,46 @@ export class SignInClassicComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // Create the form
-    let anonymousUser = this.authService.afAuth.currentUser;
+    // let anonymousUser = this.authService.afAuth.currentUser;
 
-    this.authService.afAuth.app.then((app) => {
-      const uiConfig = {
-        //autoUpgradeAnonymousUsers: true,
-        signInOptions: [
-          EmailAuthProvider.PROVIDER_ID,
-          // GoogleAuthProvider.PROVIDER_ID,
-        ],
-        callbacks: {
-          signInSuccessWithAuthResult: this.onLoginSuccess.bind(this),
-        },
-      };
+    // this.authService.afAuth.app.then((app) => {
+    //   const uiConfig = {
+    //     //autoUpgradeAnonymousUsers: true,
+    //     signInOptions: [
+    //       EmailAuthProvider.PROVIDER_ID,
+    //       // GoogleAuthProvider.PROVIDER_ID,
+    //     ],
+    //     callbacks: {
+    //       signInSuccessWithAuthResult: this.onLoginSuccess.bind(this),
+    //     },
+    //   };
 
-      this.ui = new firebaseui.auth.AuthUI(app.auth());
+    //   this.ui = new firebaseui.auth.AuthUI(app.auth());
 
-      this.ui.start('#firebaseui-auth-container', uiConfig);
+    //   this.ui.start('#firebaseui-auth-container', uiConfig);
 
-      this.ui.disableAutoSignIn();
-    });
+    //   this.ui.disableAutoSignIn();
+    // });
   }
 
   onLoginSuccess(result) {
-    const user = this.authService.afAuth.currentUser;
-    user
-      .then((sendEmail) => {
-        console.debug('Verification mail ', sendEmail.emailVerified);
-        if (sendEmail.emailVerified == false) {
-          sendEmail.sendEmailVerification();
-        }
+    // const user = this.authService.getUserId().then((id) => {
+    //   console.debug('User ID: ', id);
+    // }
 
-        this.router.navigate(['/home']);
-      })
-      .catch((error) => {
-        console.debug('Verification email not sent', error.message);
-      })
-      .finally();
+    // user
+    //   .then((sendEmail) => {
+    //     console.debug('Verification mail ', sendEmail.emailVerified);
+    //     if (sendEmail.emailVerified == false) {
+    //       sendEmail.sendEmailVerification();
+    //     }
+
+    //     this.router.navigate(['/home']);
+    //   })
+    //   .catch((error) => {
+    //     console.debug('Verification email not sent', error.message);
+    //   })
+    //   .finally();
   }
 
   // async signInEmail() {

@@ -10,12 +10,13 @@ import {
 import { Observable, Subject, Subscription, map, takeUntil } from 'rxjs';
 import { MatDrawer } from '@angular/material/sidenav';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
+
 import { Category } from 'app/5.models/category';
 import { CategoryService } from 'app/4.services/category.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ImageItemIndex } from 'app/5.models/imageItem';
 import { ImageItemIndexService } from 'app/4.services/image-item-index.service';
+import { Auth } from '@angular/fire/auth';
 
 @Component({
   selector: 'category-list',
@@ -24,7 +25,6 @@ import { ImageItemIndexService } from 'app/4.services/image-item-index.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CategoryGridComponent implements OnInit, OnDestroy {
-
   @ViewChild('drawer') drawer: MatDrawer;
   drawOpen: 'open' | 'close' = 'open';
   categoryGroup: FormGroup;
@@ -35,7 +35,7 @@ export class CategoryGridComponent implements OnInit, OnDestroy {
   selectedItemKeys: any;
   private _unsubscribeAll: Subject<any> = new Subject<any>();
 
-  auth = inject(AngularFireAuth);
+  auth : Auth = inject(Auth);
   snackBar = inject(MatSnackBar);
   imageItemIndexService = inject(ImageItemIndexService);
   categoryService = inject(CategoryService);
@@ -49,16 +49,15 @@ export class CategoryGridComponent implements OnInit, OnDestroy {
 
   async onRefresh() {
     this.allCategories$ = this.categoryService.getAll();
-    (await this.sortNotUsed()).pipe(
-    takeUntil(this._unsubscribeAll)).subscribe((item) => {
-      this.not_usedImages = item;
-    });
+    (await this.sortNotUsed())
+      .pipe(takeUntil(this._unsubscribeAll))
+      .subscribe((item) => {
+        this.not_usedImages = item;
+      });
   }
 
   async sortNotUsed() {
-    return (
-      await this.imageItemIndexService.getAllImages('IN_NOT_USED')
-    ).pipe(
+    return (await this.imageItemIndexService.getAllImages('IN_NOT_USED')).pipe(
       map((data) => {
         data.sort((a, b) => {
           return a.caption < b.caption ? -1 : 1;
@@ -167,15 +166,13 @@ export class CategoryGridComponent implements OnInit, OnDestroy {
     }
   }
 
-
   onCreate() {
     this.currentDoc = '';
     this.createEmptyForm();
     this.openDrawer();
   }
 
-
-  onUpdate(category: Partial<Category>) {
+  onUpdate(category: Category) {
     if (this.currentDoc !== '') {
       category.id = this.currentDoc;
       this.categoryService.update(category);
@@ -189,7 +186,7 @@ export class CategoryGridComponent implements OnInit, OnDestroy {
         updateDate: category.updateDate,
         updateBy: category.updateBy,
       };
-      this.categoryService.create(data);
+      this.categoryService.add(data);
     }
 
     this.snackBar.open('Category Updated', 'OK', {
@@ -213,5 +210,4 @@ export class CategoryGridComponent implements OnInit, OnDestroy {
       this.createEmptyForm();
     }
   }
-
 }

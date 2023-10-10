@@ -3,8 +3,6 @@ import { Product } from 'app/5.models/products';
 import { ImageItemIndex } from 'app/5.models/imageItem';
 import { Observable } from 'rxjs';
 import { ProductsService } from 'app/4.services/products.service';
-import { ImageListService } from 'app/4.services/image-list.service';
-import { ImageItemIndexService } from 'app/4.services/image-item-index.service';
 
 @Component({
   selector: 'inventory-preview',

@@ -1,45 +1,29 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { UserRoles } from '../../5.models/user-roles';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { Auth, user, onAuthStateChanged } from '@angular/fire/auth';
+import { getAuth } from 'firebase/auth';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
 
-  constructor(private afAuth: AngularFireAuth, private router: Router) {
+  constructor(private afAuth: Auth, private router: Router) {
 
   }
 
-  user$ = this.afAuth.authState.pipe(
-    map((authState) => {
-      if (!authState) {
-        return null;
-      } else {
-        return {
-          uid: authState.uid,
-          displayName: authState.displayName,
-          email: authState.email,
-          photoURL: authState.photoURL,
-          emailVerified: authState.emailVerified,
-        };
-      }
-    })
-  );
+  isLoggedIn$: Observable<boolean>  = of(true);
+  isLoggedOut$: Observable<boolean> = of(true);
 
-  isLoggedIn$ = this.afAuth.authState.pipe(map((user) => !!user));
+  roles$ = of(this.afAuth.onIdTokenChanged((user) =>
+    user?.getIdTokenResult().then((token) => token?.claims ?? {})
+  ));
 
-  isLoggedOut$ = this.isLoggedIn$.pipe(map((loggedIn) => !loggedIn));
-
-  roles$ = this.afAuth.idTokenResult.pipe(
-    map((token) => <any>token?.claims ?? { admin: false })
-  );
-
-  logout() {
-    this.afAuth.signOut();
-    this.router.navigateByUrl('/login');
-  }
+  // logout() {
+  //   this.afAuth.signOut();
+  //   this.router.navigateByUrl('/login');
+  // }
 }

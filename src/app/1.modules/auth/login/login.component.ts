@@ -1,6 +1,6 @@
 import { Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { Auth } from '@angular/fire/auth';
 import { FirebaseUISignInFailure, FirebaseUISignInSuccessWithAuthResult } from 'firebaseui-angular';
 
 @Component({
@@ -9,7 +9,7 @@ import { FirebaseUISignInFailure, FirebaseUISignInSuccessWithAuthResult } from '
   styleUrls: ['./login.component.css'],
 })
 export class LoginComponent implements OnInit {
-  constructor(private afAuth: AngularFireAuth, private router: Router) { }
+  constructor(private afAuth: Auth, private router: Router) { }
 
   ngOnInit(): void {}
 
