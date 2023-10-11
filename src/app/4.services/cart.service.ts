@@ -1,11 +1,5 @@
 import { Injectable, OnDestroy, computed, inject, signal } from '@angular/core';
-import firebase from 'firebase/compat/app';
-import Timestamp = firebase.firestore.Timestamp;
-import {
-  AngularFirestore,
-  AngularFirestoreCollection,
-} from '@angular/fire/compat/firestore';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { Auth } from '@angular/fire/auth';
 import { first, map, Observable, of, Subject, takeUntil, throwError } from 'rxjs';
 import { Cart } from 'app/5.models/cart';
 import { Product } from 'app/5.models/products';
@@ -13,14 +7,28 @@ import { convertSnaps } from './db-utils';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from './auth/auth.service';
 import { WishList } from 'app/5.models/wishlist';
-import { CollectionReference, DocumentData, collection, getCountFromServer, query, where } from 'firebase/firestore';
 import { WishListService } from './wishlist.service';
+import {
+  doc,
+  docData,
+  DocumentReference,
+  getCountFromServer,
+  Firestore,
+  getDoc,
+  setDoc,
+  updateDoc,
+  collection,
+  addDoc,
+  deleteDoc,
+  collectionData,
+  Timestamp,
+} from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CartService implements OnDestroy {
-  private cartCollection: AngularFirestoreCollection<Cart>;
+  // private cartCollection: AngularFirestoreCollection<Cart>;
   isLoggedIn: boolean;
   userId: string;
   cart$: Observable<Cart[]>;
@@ -32,27 +40,28 @@ export class CartService implements OnDestroy {
   cartCounter = signal<number>(0);
 
   constructor(
-    public afs: AngularFirestore,
-    public auth: AngularFireAuth,
+    public afs: Firestore,
+    public auth: Auth,
     public authService: AuthService,
     private snack: MatSnackBar
   ) {
 
-    auth.authState.subscribe((user) => {
-      this.userId = user?.uid;
-    });
+    // auth.authState.subscribe((user) => {
+    //   this.userId = user?.uid;
+    // });
 
-    this.auth.authState.pipe(map((user) => !!user)).subscribe((isLoggedIn) => {
-      this.isLoggedIn = isLoggedIn;
-    });
+    // this.auth.authState.pipe(map((user) => !!user)).subscribe((isLoggedIn) => {
+    //   this.isLoggedIn = isLoggedIn;
+    // });
 
-    if (this.isLoggedIn === true) {
-      this.cartItems$ = this.cartCollection.valueChanges({ idField: 'id' });
-    }
+    // if (this.isLoggedIn === true) {
+    //   this.cartItems$ = this.cartCollection.valueChanges({ idField: 'id' });
+    // }
 
   }
 
   wishListService = inject(WishListService);
+  firestore: Firestore = inject(Firestore);
 
   updateCartCounter(userId: string) {
     this.cartByStatus(userId,'open').pipe(takeUntil(this._unsubscribeAll)).subscribe((cart) => {
@@ -61,22 +70,9 @@ export class CartService implements OnDestroy {
   }
 
   async cartCount(): Promise<number>  {
-    const { collection, getCountFromServer } = require("firebase/firestore");
-    const collectionRef = this.afs.collection(`users/${this.userId}/cart/`);
-    const snapshot = await getCountFromServer(collectionRef);
-    console.log('count: ', snapshot.data().count);
-    return snapshot.data().count;
-  }
-
-  async queryCartCount(userId: string): Promise<Observable<number>> {
-      const { collection, getCountFromServer } = require("firebase/firestore");
-      const coll = collection(this.afs.firestore, `users/${this.userId}/cart/`, (ref) => {
-        ref.where('status', '==', 'open');
-      });
-      const q = query(coll, where("status", "==", "open"));
-      const snapshot = await getCountFromServer(q);
-      console.log('count: ', snapshot.data().count);
-      return of(snapshot.data().count);
+    const count = await getCountFromServer(collection(this.firestore ,`users/${this.userId}/cart/`));
+    console.log('count: ', count.data.length);
+    return count.data.length;
   }
 
   ngOnDestroy(): void {
@@ -87,51 +83,45 @@ export class CartService implements OnDestroy {
 
   private _unsubscribeAll: Subject<any> = new Subject<any>();
 
-  getCartCount(userId: string): Observable<number | undefined> {
-    this.afs.collection(`users/${userId}/cart`)
-      .snapshotChanges()
-      .forEach((snaps) => {
-         return of(snaps.length);
-      }
-    );
-    return of(0);
-  }
+  // getCartCount(userId: string): Observable<number | undefined> {
 
-  getCartItem(userId: string, productId: string): Observable<Cart[]> {
-    return this.afs
-      .collection(`users/${userId}/cart`, (ref) =>
-        ref.where('product_id', '==', productId)
-      )
-      .snapshotChanges()
-      .pipe(
-        map((snaps) => {
-          return convertSnaps<Cart>(snaps);
-        })
-      );
-  }
+  //   collection(this.firestore, `users/${userId}/cart`)
+  //     .snapshotChanges()
+  //     .forEach((snaps) => {
+  //        return of(snaps.length);
+  //     }
+  //   );
+  //   return of(0);
+  // }
+
+  // getCartItem(userId: string, productId: string): Observable<Cart[]> {
+  //   return this.afs
+  //     .collection(`users/${userId}/cart`, (ref) =>
+  //       ref.where('product_id', '==', productId)
+  //     )
+  //     .snapshotChanges()
+  //     .pipe(
+  //       map((snaps) => {
+  //         return convertSnaps<Cart>(snaps);
+  //       })
+  //     );
+  // }
 
   getAll(userId: string) {
-    var cartItemsCollection: AngularFirestoreCollection<Cart>;
-    cartItemsCollection = this.afs.collection<Cart>(`user/${userId}/cart`);
-    this.cartItems$ = cartItemsCollection.valueChanges({ idField: 'id' });
-    return this.cartItems$;
+    return  collectionData(collection(this.firestore, `user/${userId}/cart`), {idField:  'id'}) as  Observable<Cart[]>
   }
 
-  get(id: string) {
-    return this.cartCollection.doc(id).get();
+  get(id: string, userId: string) {
+    return getDoc(doc(this.firestore, `user/${userId}/cart/${id}`));
   }
 
   cartByUserId(userId: string): Observable<Cart[] | undefined> {
-    let cartItemsCollection: AngularFirestoreCollection<Cart>;
-    cartItemsCollection = this.afs.collection<Cart>(`users/${userId}/cart`);
-    return cartItemsCollection.valueChanges({ idField: 'id' });
+    return  collectionData(collection(this.firestore, `user/${userId}/cart`), {idField:  'id'}) as  Observable<Cart[]>
   }
 
   cartByStatus(userId: string, cartStatus: string) {
-    let cartItemsCollection: AngularFirestoreCollection<Cart>;
-    cartItemsCollection = this.afs.collection<Cart>(`users/${userId}/cart`);
-    return  cartItemsCollection.valueChanges({ idField: 'id' }).pipe(map((cart) => cart.filter((status) => status.status === cartStatus))
-    );
+    return collectionData(collection(this.firestore, `user/${userId}/cart`), {idField:  'id'})
+    .pipe(map((cart) => cart.filter((status) => status.status === cartStatus))) as  Observable<Cart[]>
   }
 
   cartCountByUserId(userId: string): any {
@@ -141,46 +131,37 @@ export class CartService implements OnDestroy {
     });
   }
 
-  findCartByUrl(id: string): Observable<Cart | undefined> {
-    return this.afs
-      .collection('cart', (ref) => ref.where('id', '==', id))
-      .snapshotChanges()
-      .pipe(
-        map((snaps) => {
-          const Cart = convertSnaps<Cart>(snaps);
-          return Cart.length == 1 ? Cart[0] : undefined;
-        }),
-        first()
-      );
+  // findCartByUrl(id: string): Observable<Cart | undefined> {
+  //   return this.afs
+  //     .collection('cart', (ref) => ref.where('id', '==', id))
+  //     .snapshotChanges()
+  //     .pipe(
+  //       map((snaps) => {
+  //         const Cart = convertSnaps<Cart>(snaps);
+  //         return Cart.length == 1 ? Cart[0] : undefined;
+  //       }),
+  //       first()
+  //     );
+  // }
+
+  public create(Cart: Product) {
+    const Ref = collection(this.firestore, `users/${this.userId}/cart/`);
+    addDoc(Ref, Cart).then((newCart) => {
+        Cart.id = newCart.id;
+        // this.updateCart(Cart);
+        this.snack.open('Selection has been added to your cart ...', 'OK', {
+          verticalPosition: 'top',
+          horizontalPosition: 'right',
+          panelClass: 'bg-danger',
+          duration: 3000,
+          });
+     });
   }
 
-  public create(mtCart: Product) {
-    const collectionRef = this.afs.collection(`users/${this.userId}/cart/`);
-    collectionRef.add(mtCart).then ( (docRef) => {
-      console.debug('Document written with ID: ', docRef.id);
-      this.snack.open('Selection has been added to your cart ...', 'OK', {
-      verticalPosition: 'top',
-      horizontalPosition: 'right',
-      panelClass: 'bg-danger',
-      duration: 3000,
-      });
-      }).catch((error) => {
-         console.error('Error adding document: ', error);
-         throwError(() => new Error(error))
-      });
-  }
 
   findProductById(id: string): Observable<Product | undefined> {
-    return this.afs
-      .collection('inventory', (ref) => ref.where('id', '==', id))
-      .snapshotChanges()
-      .pipe(
-        map((snaps) => {
-          const product = convertSnaps<Product>(snaps);
-          return product.length == 1 ? product[0] : undefined;
-        }),
-        first()
-      );
+    const ref = collection(this.firestore, `inventory`)
+    return docData(doc(ref, id)) as Observable<Product | undefined>;
   }
 
   addToCart(productId: string) {
@@ -234,7 +215,8 @@ export class CartService implements OnDestroy {
   }
 
   update(mtCart: Cart) {
-    this.cartCollection.doc(mtCart.id.toString()).update(mtCart);
+    const collectionRef = collection(this.firestore, `user/${this.userId}/cart`);
+    const ref = doc(collectionRef, mtCart.id);
     this.snack.open('Cart has been updated ... ', 'OK', {
       verticalPosition: 'top',
       horizontalPosition: 'right',
@@ -243,18 +225,22 @@ export class CartService implements OnDestroy {
   }
 
   delete(id: string) {
-    var cartItems: Observable<Cart[]>;
-    var cartItemsCollection: AngularFirestoreCollection<Cart>;
-    cartItemsCollection = this.afs.collection<Cart>(
-      `users/${this.userId}/cart`
-    );
-    cartItems = cartItemsCollection.valueChanges({ idField: 'id' });
-    cartItemsCollection.doc(id).delete();
+    const ref = doc(this.firestore, `user/${this.userId}/cart`, id);
+    deleteDoc(ref).then(() => { ;
     this.snack.open('Item has been removed ... ', 'OK', {
       verticalPosition: 'top',
       horizontalPosition: 'right',
       panelClass: 'bg-danger',
       duration: 2000
     });
+    }).catch((error) => {
+      this.snack.open('Item has NOT been removed ... ', 'OK', {
+        verticalPosition: 'top',
+        horizontalPosition: 'right',
+        panelClass: 'bg-danger',
+        duration: 2000
+      });
+    });
   }
+
 }

@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
+
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -33,7 +33,6 @@ export class PolicyEditComponent implements OnInit {
     private activateRoute: ActivatedRoute,
     private route: Router,
     private _location: Location,
-    private afs: AngularFirestore,
     private readonly policyService: PolicyService,
     public dialog: MatDialog,
     private fb: FormBuilder
@@ -74,7 +73,6 @@ export class PolicyEditComponent implements OnInit {
     const newPolicy = { ...this.policyGroup.value } as PolicyDocuments;
     this.policyService.update(newPolicy);
     this.policyGroup.setValue(newPolicy);
-    this.afs.collection('policy').doc(newPolicy.id);
   }
 
   createEmptyForm() {

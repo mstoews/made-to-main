@@ -1,5 +1,5 @@
-import firebase from 'firebase/compat/app';
-import Timestamp = firebase.firestore.Timestamp;
+import firebase from 'firebase/app';
+import Timestamp = firebase.Timestamp;
 
 export interface Comments {
   id: string;

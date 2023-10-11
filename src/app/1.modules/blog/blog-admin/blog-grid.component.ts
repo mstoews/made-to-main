@@ -15,7 +15,6 @@ import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { Item } from 'app/5.models/item';
 import { IImageStorage } from 'app/5.models/maintenance';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { SelectionModel } from '@angular/cdk/collections';
 import { Router } from '@angular/router';
 import { openAddComponentDialog } from '../../shop/shop-inventory-maintenance/add/add.component';

@@ -13,11 +13,11 @@ import { ProductEditComponent } from '../shop/shop-inventory-maintenance/product
 
 import { ContactListComponent } from './contact-list/contact-list.component';
 import {
-  AngularFireAuthGuard,
+  AuthGuard,
   hasCustomClaim,
   canActivate,
   redirectUnauthorizedTo,
-} from '@angular/fire/compat/auth-guard';
+} from '@angular/fire/auth-guard';
 import { ImageMgtEditComponent } from './image-maintenance/image-edit/image-mgt-edit.component';
 
 // const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['authentication/split-screen/sign-in']);
@@ -34,14 +34,14 @@ const routes: Routes = [
     path: 'company',
     pathMatch: 'full',
     title: 'Administration',
-    canActivate: [AngularFireAuthGuard],
+    canActivate: [AuthGuard],
     data: { authGuardPipe: adminOnly },
     component: AdminFormComponent,
   },
   {
     path: 'inventory',
     title: 'Product Maintenance',
-    canActivate: [AngularFireAuthGuard],
+    canActivate: [AuthGuard],
     data: { authGuardPipe: adminOnly },
     component: InventoryComponent,
   },
@@ -52,14 +52,14 @@ const routes: Routes = [
     resolve: {
       product: ProductResolver,
     },
-    canActivate: [AngularFireAuthGuard],
+    canActivate: [AuthGuard],
     data: { authGuardPipe: adminOnly },
   },
   {
     path: 'category',
     title: 'Category Maintenance',
     component: CategoryGridComponent,
-    canActivate: [AngularFireAuthGuard],
+    canActivate: [AuthGuard],
     data: { authGuardPipe: adminOnly },
   },
 
@@ -67,21 +67,21 @@ const routes: Routes = [
     path: 'inventory-selection',
     pathMatch: 'full',
     component: InventoryImageSelectionComponent,
-    canActivate: [AngularFireAuthGuard],
+    canActivate: [AuthGuard],
     data: { authGuardPipe: adminOnly },
   },
   {
     path: 'image-maintenance',
     pathMatch: 'full',
     component: ImageMgtEditComponent,
-    canActivate: [AngularFireAuthGuard],
+    canActivate: [AuthGuard],
     data: { authGuardPipe: adminOnly },
   },
   {
     path: 'contact-grid',
     pathMatch: 'full',
     component: ContactListComponent,
-    canActivate: [AngularFireAuthGuard],
+    canActivate: [AuthGuard],
     data: { authGuardPipe: adminOnly },
   },
   {

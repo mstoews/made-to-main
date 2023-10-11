@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Route } from '@angular/router';
 import {
-  AngularFireAuthGuard,
+  AuthGuard,
   hasCustomClaim,
   redirectUnauthorizedTo,
-} from '@angular/fire/compat/auth-guard';
+} from '@angular/fire/auth-guard';
 
 // const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['authentication/split-screen/sign-in']);
 const redirectLoggedInToHome = () => redirectUnauthorizedTo(['home']);
@@ -30,13 +30,6 @@ const routes: Route[] = [
     title: 'Login',
   },
   {
-    path: 'login',
-    loadChildren: () =>
-      import('./1.modules/auth/auth.module').then((mod) => mod.AuthModule),
-    data: { state: 'login' },
-    title: 'Login',
-  },
-  {
     path: 'shop',
     loadChildren: () =>
       import('./1.modules/shop/shop.module').then((mod) => mod.ShopModule),
@@ -59,7 +52,7 @@ const routes: Route[] = [
         './1.modules/admin/image-maintenance/image-maintenance.module'
       ).then((mod) => mod.ImageMaintenanceModule),
     title: 'Image Maintenance',
-    canActivate: [AngularFireAuthGuard],
+    canActivate: [AuthGuard],
     data: { authGuardPipe: adminOnly },
   },
 
@@ -70,7 +63,7 @@ const routes: Route[] = [
         (mod) => mod.BlogAdminModule
       ),
     title: 'Blog Admin',
-    canActivate: [AngularFireAuthGuard],
+    canActivate: [AuthGuard],
     data: { authGuardPipe: adminOnly },
   },
 
@@ -81,14 +74,14 @@ const routes: Route[] = [
         (mod) => mod.CollectionsAdminModule
       ),
     title: 'Collection Admin',
-    canActivate: [AngularFireAuthGuard],
+    canActivate: [AuthGuard],
     data: { authGuardPipe: adminOnly },
   },
   {
     path: 'admin',
     loadChildren: () =>
       import('./1.modules/admin/admin.module').then((mod) => mod.AdminModule),
-    canActivate: [AngularFireAuthGuard],
+    canActivate: [AuthGuard],
     data: { authGuardPipe: redirectLoggedInToHome },
     title: 'Maintenance',
   },

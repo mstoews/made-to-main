@@ -53,7 +53,7 @@ export class AddPolicyComponentDialog {
 
     const theDate = new Date();
 
-    this.policyService.create(newPolicyDoc).then((policy) => {
+    this.policyService.add(newPolicyDoc).then((policy) => {
       this.policyId = policy.id;
       newPolicyDoc.id = this.policyId;
       this.policyService.update(newPolicyDoc);

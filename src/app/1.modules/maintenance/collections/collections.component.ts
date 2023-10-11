@@ -5,9 +5,9 @@ import { MatDrawer } from '@angular/material/sidenav';
 import { DndComponent } from 'app/3.components/loaddnd/dnd.component';
 import { IImageMaintenance } from 'app/5.models/maintenance';
 import { Observable } from 'rxjs';
-import { ImageMaintenanceService } from '../../../4.services/image-maintenance.service';
+
 import { IImageStorage } from 'app/5.models/maintenance';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { Auth } from '@angular/fire/auth';
 import { User } from 'firebase/auth';
 
 @Component({
@@ -39,15 +39,15 @@ export class CollectionsComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private matDialog: MatDialog,
-    private auth: AngularFireAuth,
+    private auth: Auth,
     @Optional() @Inject(MAT_DIALOG_DATA) public parentId: string,
-    private imageMaintanenceService: ImageMaintenanceService
+
   ) {
-    this.allImageList$ = this.imageMaintanenceService.getAll();
+
     this.createEmptyForm();
-    auth.authState.subscribe((user) => {
-      this.current_user = user?.displayName;
-    });
+
+    this.current_user = auth.currentUser.displayName;
+    ;
   }
 
   createEmptyForm() {
@@ -131,9 +131,7 @@ export class CollectionsComponent implements OnInit {
   onCreate() {
     const newItem = { ...this.imageForm.value } as IImageMaintenance;
     const currentUser = this.auth.currentUser;
-    currentUser.finally();
     newItem.user_updated = this.current_user;
-
     this.imageMaintanenceService.create(newItem);
   }
 
@@ -161,17 +159,17 @@ export class CollectionsComponent implements OnInit {
   create(data: any) {
     const rawData = this.imageForm.getRawValue();
     rawData.image_url = data.data.url;
-    this.imageMaintanenceService.update(rawData);
+
   }
 
   onUpdate(data: IImageMaintenance) {
     data = this.imageForm.getRawValue();
-    this.imageMaintanenceService.update(data);
+
   }
 
   onDelete(data: IImageMaintenance) {
     data = this.imageForm.getRawValue();
-    this.imageMaintanenceService.delete(data.id.toString());
+
   }
 
   closeDialog() {

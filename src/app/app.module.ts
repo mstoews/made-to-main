@@ -10,25 +10,25 @@ import { ScrollService } from './4.services/scroll.service';
 
 import { ProductResolver } from './4.services/product.resolver';
 import { BlogResolver, CalendarResolver } from './4.services/blog.resolver';
-import "firebase/compat/performance";
-
 
 // Firebase services + environment module
-import { AngularFireStorageModule } from '@angular/fire/compat/storage';
+
+import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { provideAuth, getAuth, connectAuthEmulator, AuthModule } from '@angular/fire/auth';
 import {
-  AngularFireAuthModule,
-  USE_EMULATOR as USE_AUTH_EMULATOR,
-} from '@angular/fire/compat/auth';
+    provideFirestore,
+    getFirestore,
+    connectFirestoreEmulator,
+} from '@angular/fire/firestore';
 import {
-  AngularFirestoreModule,
-  USE_EMULATOR as USE_FIRESTORE_EMULATOR,
-} from '@angular/fire/compat/firestore';
-import {
-  AngularFireFunctionsModule,
-  USE_EMULATOR as USE_FUNCTIONS_EMULATOR,
-} from '@angular/fire/compat/functions';
-import { AngularFireModule } from '@angular/fire/compat';
-import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
+    provideStorage,
+    getStorage,
+    connectStorageEmulator,
+} from '@angular/fire/storage';
+import { provideAnalytics, getAnalytics } from '@angular/fire/analytics';
+import { provideFunctions, getFunctions } from '@angular/fire/functions';
+import { providePerformance, getPerformance } from '@angular/fire/performance';
+
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from './4.services/auth/auth.interceptor';
 import { CartResolver } from './4.services/cart.resolver';
@@ -38,6 +38,7 @@ import { HeadingModule } from './2.main/header/heading.module';
 import { UserService } from './4.services/auth/user.service';
 import { CookieBannerComponent } from './cookie-banner/cookie-banner.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
+import { provideMessaging,getMessaging } from '@angular/fire/messaging';
 
 @NgModule({
   declarations: [AppComponent, CookieBannerComponent],
@@ -48,16 +49,42 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     CommonModule,
     SharedModule,
     HeadingModule,
-    AngularFireAuthModule,
-    AngularFirestoreModule,
-    AngularFireStorageModule,
-    AngularFireDatabaseModule,
-    AngularFireFunctionsModule,
-    AngularFireModule.initializeApp(environment.firebase),
+    provideFunctions(() => getFunctions()),
+    providePerformance(() => getPerformance()),
+    provideAnalytics(() => getAnalytics()),
+    provideFirebaseApp(() => initializeApp(environment.firebase_dev)),
+
+    provideAuth(() => {
+        const auth = getAuth();
+        if (environment.useEmulators) {
+            connectAuthEmulator(auth, 'http://localhost:9099', {
+                disableWarnings: true,
+            });
+        }
+        return auth;
+    }),
+
+    provideFirestore(() => {
+        const firestore = getFirestore();
+        if (environment.useEmulators) {
+            connectFirestoreEmulator(firestore, 'localhost', 8086);
+        }
+        return firestore;
+    }),
+
+    provideStorage(() => {
+        const storage = getStorage();
+        if (environment.useEmulators) {
+            connectStorageEmulator(storage, 'localhost', 9199);
+        }
+        return storage;
+    }),
+
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: !isDevMode(),
       registrationStrategy: 'registerWhenStable:30000'
     }),
+     provideMessaging(() => getMessaging()),
   ],
   providers: [
     ScrollService,

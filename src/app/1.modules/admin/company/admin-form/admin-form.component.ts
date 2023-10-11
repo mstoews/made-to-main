@@ -3,12 +3,15 @@ import {
   Component,
   OnDestroy,
   OnInit,
+  AfterViewInit,
+  Renderer2,
   inject,
 } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Mainpage } from 'app/5.models/mainpage';
 import { MainPageService } from 'app/4.services/main-page.service';
 import { Observable, Subscription, filter, first, take } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'admin-form',
@@ -16,19 +19,24 @@ import { Observable, Subscription, filter, first, take } from 'rxjs';
   styleUrls: ['./admin-form.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
+
 export class AdminFormComponent implements OnInit, OnDestroy {
   sTitle = 'Main Page';
   mainpageGroup: FormGroup;
-  mainPage$: Observable<Mainpage[]>;
+  // mainPage$: Observable<Mainpage[]>;
   mainPage: Mainpage;
   subMainPage: Subscription;
 
   mainPageService = inject(MainPageService);
+  renderer = inject(Renderer2);
   fb = inject(FormBuilder);
+  snackBar = inject(MatSnackBar);
+
+  mainPage$ = this.mainPageService.getAll().pipe(first());
 
   ngOnInit(): void {
-    this.mainPage$ = this.mainPageService.getAll().pipe(first());
-    this.createEmptyForm();
+    this.createEmptyForm()
+
     this.subMainPage = this.mainPage$.pipe(take(1)).subscribe((page) => {
       if (page.length > 0) {
         this.createForm(page[0]);
@@ -71,6 +79,7 @@ export class AdminFormComponent implements OnInit, OnDestroy {
     });
   }
 
+
   dateFormatter(params: any) {
     const dateAsString = params.value;
     const dateParts = dateAsString.split('-');
@@ -81,12 +90,20 @@ export class AdminFormComponent implements OnInit, OnDestroy {
     mainPage = this.mainpageGroup.getRawValue();
     console.debug(`onUpdate: ${JSON.stringify(mainPage)}`);
     this.mainPageService.update(mainPage);
+    this.snackBar.open('Landing Page Updated', 'OK', {
+      verticalPosition: 'top',
+      horizontalPosition: 'right',
+      panelClass: 'bg-success',
+      duration: 2000,
+    });
+
+
   }
 
   onCreate() {
     const mainPage = this.mainpageGroup.getRawValue();
     // console.debug(`onUpdate: ${JSON.stringify(mainPage)}`);
-    this.mainPageService.create(mainPage);
+    this.mainPageService.add(mainPage);
   }
 
   onDelete(landingPage: any) {}

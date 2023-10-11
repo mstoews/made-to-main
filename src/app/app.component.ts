@@ -13,14 +13,10 @@ import {
   group,
   animate,
 } from '@angular/animations';
-import { map, Observable } from 'rxjs';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { AuthService } from './4.services/auth/auth.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { AuthTokenService } from './4.services/auth/auth-token.service';
-import { UserService } from './4.services/auth/user.service';
+import { Observable } from 'rxjs';
 import { DOCUMENT } from '@angular/common';
 import { isPlatformBrowser } from '@angular/common';
+import { Auth, onAuthStateChanged } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-root',
@@ -65,11 +61,7 @@ export class AppComponent implements OnInit {
   isLoggedOut$: Observable<boolean>;
   User$: Observable<any>;
   constructor(
-    private afAuth: AngularFireAuth,
-    public authService: AuthService,
-    public userService: UserService,
-    private snackBar: MatSnackBar,
-    private token: AuthTokenService,
+    private auth: Auth,
     private renderer: Renderer2,
     @Inject(DOCUMENT) private _document: any,
     @Inject(PLATFORM_ID) private platformId: Object
@@ -81,9 +73,14 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.isLoggedOut$ = this.afAuth.authState.pipe(
-      map((loggedIn) => !loggedIn)
-    );
+    onAuthStateChanged(this.auth, (user) => {
+      if (user) {
+
+      } else {
+
+      }
+
+    });
   }
 
   title = 'Made-To';

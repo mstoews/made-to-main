@@ -1,5 +1,4 @@
 import { Component, Inject, OnDestroy } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Validators, FormBuilder, FormGroup } from '@angular/forms';
 import {
   MAT_DIALOG_DATA,
@@ -64,13 +63,8 @@ export class AddComponentDialog implements OnDestroy{
 
   update(results: any) {
     const newProductPartial = { ...this.form.value } as Product;
-    this.productService.createPartial(newProductPartial).then((product) => {
-      this.productId = product.id;
-      newProductPartial.id = this.productId;
-      this.productService.updatePartial(newProductPartial);
-      this.route.navigate(['admin/inventory', this.productId]);
-    });
-
+    this.productService.createPartial(newProductPartial);
+    this.route.navigate(['admin/inventory', this.productId]);
     this.close();
   }
 

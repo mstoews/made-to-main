@@ -1,19 +1,20 @@
-import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core'
+import { Component, OnInit, Input, ChangeDetectorRef, inject } from '@angular/core'
 import {
   Storage,
   ref,
   uploadBytesResumable,
   getDownloadURL,
+  UploadTaskSnapshot,
 } from '@angular/fire/storage'
-import { AngularFirestore } from '@angular/fire/compat/firestore'
+
 import { Observable, of } from 'rxjs'
-import { finalize } from 'rxjs/operators'
+
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog'
 
 import { tap } from 'rxjs/operators'
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import firebase from 'firebase/compat/app'
+
 import { CommonModule } from '@angular/common'
 import { DndDirective } from '../../loaddnd/dnd.directive'
 
@@ -31,10 +32,10 @@ import { DndDirective } from '../../loaddnd/dnd.directive'
   styleUrls: ['./upload-task.component.scss'],
 })
 export class UploadTaskComponent {
-  public file: any = {}
+  public file: any = {};
 
   percentage: any
-  snapshot: Observable<firebase.storage.UploadTaskSnapshot> | undefined
+  snapshot: Observable<UploadTaskSnapshot> | undefined
   downloadURL!: string
 
   constructor(private storage: Storage) {

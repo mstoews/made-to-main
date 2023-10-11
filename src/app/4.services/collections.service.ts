@@ -1,164 +1,167 @@
-import { Injectable } from '@angular/core';
-import {
-  AngularFirestore,
-  AngularFirestoreCollection,
-} from '@angular/fire/compat/firestore';
+import { inject, Injectable } from '@angular/core';
 import { first, map, Observable, tap } from 'rxjs';
 import { Collection, CollectionsPartial } from 'app/5.models/collection';
 import { CollectionsComments } from 'app/5.models/collection';
-import { convertSnaps } from './db-utils';
-import { ImageListService } from './image-list.service';
+
+import { ImageItemIndexService } from './image-item-index.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { addDoc, collection, collectionData, deleteDoc, doc, docData, DocumentReference, Firestore, query, updateDoc, where } from '@angular/fire/firestore';
+
 
 @Injectable({
   providedIn: 'root',
 })
 export class CollectionsService {
-  private colCollection: AngularFirestoreCollection<Collection>;
-  private colPartialCollection: AngularFirestoreCollection<CollectionsPartial>;
-  private colItems: Observable<Collection[]>;
-  private commentItems: Observable<CollectionsComments[]>;
-  private commentCollection: AngularFirestoreCollection<CollectionsComments>;
 
-  constructor(
-    private afs: AngularFirestore,
-    private snack: MatSnackBar,
-    private imageListService: ImageListService
-  ) {
-    this.colCollection = afs.collection('collection', (ref) =>
-      ref.orderBy('date_created', 'desc')
-    );
-    this.colItems = this.colCollection.valueChanges({ idField: 'id' });
-    this.colPartialCollection =
-      afs.collection<CollectionsPartial>('collection');
-  }
+  firestore = inject(Firestore);
+  snack = inject(MatSnackBar);
+  imageItemIndexService = inject(ImageItemIndexService);
+
 
   createComment(comment: CollectionsComments) {
-    const collectionRef = this.afs.collection(
-      `/collections/${comment.col_id}/comment`
-    );
+    // const collectionRef = this.afs.collection(
+    //   `/collections/${comment.col_id}/comment`
+    // );
 
-    collectionRef
-      .add(comment)
-      .then((newComment) => {
-        comment.id = newComment.id;
-        this.updateComment(comment);
-        this.snack.open('Comment added to the thoughts ... ', 'OK', {
-          verticalPosition: 'top',
-          horizontalPosition: 'right',
-          panelClass: 'bg-danger',
-        });
-      })
-      .catch((error) => {
-        alert('Unable to update comment');
-      })
-      .finally();
+    // collectionRef
+    //   .add(comment)
+    //   .then((newComment) => {
+    //     comment.id = newComment.id;
+    //     this.updateComment(comment);
+    //     this.snack.open('Comment added to the thoughts ... ', 'OK', {
+    //       verticalPosition: 'top',
+    //       horizontalPosition: 'right',
+    //       panelClass: 'bg-danger',
+    //     });
+    //   })
+    //   .catch((error) => {
+    //     alert('Unable to update comment');
+    //   })
+    //   .finally();
   }
 
   addCommentReply(collection_id: string, commentId: string, reply: string) {
-    const collectionRef = this.afs.collection(
-      `collection/${collection_id}/comment/`,
-      (ref) => ref.orderBy('date_created', 'desc')
-    );
-    const dDate = new Date();
-    const updateDate = dDate.toISOString();
-    const comment = { reply: reply, reply_date: updateDate };
-    collectionRef.doc(commentId).update(comment);
+    // const collectionRef = this.afs.collection(
+    //   `collection/${collection_id}/comment/`,
+    //   (ref) => ref.orderBy('date_created', 'desc')
+    // );
+    // const dDate = new Date();
+    // const updateDate = dDate.toISOString();
+    // const comment = { reply: reply, reply_date: updateDate };
+    // collectionRef.doc(commentId).update(comment);
   }
 
   deleteComment(collection_id: string, comment_id: string) {
-    const collectionRef = this.afs.collection(
-      `collection/${collection_id}/comment/`,
-      (ref) => ref.orderBy('created_date', 'desc')
-    );
-    collectionRef.doc(comment_id).delete();
+    // const collectionRef = this.afs.collection(
+    //   `collection/${collection_id}/comment/`,
+    //   (ref) => ref.orderBy('created_date', 'desc')
+    // );
+    // collectionRef.doc(comment_id).delete();
   }
 
   updateComment(comment: CollectionsComments) {
-    const collectionRef = this.afs.collection(
-      `collection/${comment.col_id}/comment/`
-    );
-    collectionRef.doc(comment.id).update(comment);
+    // const collectionRef = this.afs.collection(
+    //   `collection/${comment.col_id}/comment/`
+    // );
+    // collectionRef.doc(comment.id).update(comment);
   }
 
   getComments(collection_id: string): any {
-    const collectionRef = this.afs.collection(
-      `collection/${collection_id}/comment/`,
-      (ref) => ref.orderBy('created_date', 'desc')
-    );
-    const commentItems = collectionRef.valueChanges({ idField: 'id' });
-    return commentItems;
+    // const collectionRef = this.afs.collection(
+    //   `collection/${collection_id}/comment/`,
+    //   (ref) => ref.orderBy('created_date', 'desc')
+    // );
+    // const commentItems = collectionRef.valueChanges({ idField: 'id' });
+    // return commentItems;
   }
 
   setToPublish(collection: Collection) {
     collection.published = true;
-    this.colCollection.doc(collection.id).update(collection);
+
   }
+
+  getAll() {
+    const collectionRef = collection(this.firestore, 'collection');
+    return collectionData(collectionRef, { idField: 'id' }) as Observable<Collection[]>;
+  }
+
+  getById(id: string) {
+    const collectionRef = collection(this.firestore, 'collection');
+    const ref = doc(collectionRef, id);
+    return docData(ref) as Observable<Collection>;
+  }
+
+  getCollectionList() {
+    return this.getAll().pipe(
+      map((collection) =>
+        collection.filter((available) => available.published === true)
+      )
+    );
+  }
+
+  // Add
+  add(collect: Collection) {
+    return addDoc(collection(this.firestore, 'category'), collect);
+  }
+
+  // Update
+
+  update(collect: Collection) {
+    const ref = doc(
+      this.firestore,
+      'collection',
+      collect.id
+    ) as DocumentReference<Collection>;
+    return updateDoc(ref, collect);
+  }
+
+  // Delete
+  delete(id: string) {
+    const ref = doc(this.firestore, 'category', id);
+    return deleteDoc(ref);
+  }
+
+
 
   getCollectionsImage(parentId: string): any {
-    return this.imageListService.getImagesByProductId(parentId);
+    return this.imageItemIndexService.getImagesByTypeId(parentId);
   }
 
-  getAllPublishedBlog() {
-    return this.colItems.pipe(
+  getAllPublishedCollections() {
+    return this.getAll().pipe(
       map((collections) => collections.filter((pub) => pub.published === true))
     );
   }
 
-  getAll(): Observable<Collection[]> {
-    return this.colItems;
-  }
-
   getCollections(id: string) {
-    const ref = this.afs
-      .collection<Collection>('collection', (ref) =>
-        ref.where('id', '==', id).limit(1)
-      )
-      .snapshotChanges()
-      .pipe(
-        map((collection) =>
-          collection.map((a) => {
-            // console.debug(a.payload.doc.id);
-          })
-        )
-      );
+    return this.getAll().pipe(
+      map((collections) => collections.filter((pub) => pub.id === id))
+    );
   }
 
-  findCollectionByUrl(id: string): Observable<Collection | undefined> {
-    return this.afs
-      .collection('collection', (ref) => ref.where('id', '==', id))
-      .snapshotChanges()
-      .pipe(
-        map((snaps) => {
-          const col = convertSnaps<Collection>(snaps);
-          return col.length == 1 ? col[0] : undefined;
-        }),
-        first()
-      );
+  findCollectionByUrl(id: string): Observable<Collection> {
+    const collectionRef = collection(this.firestore, 'collection');
+    const q = query(collectionRef, where('id', '==', id));
+    const list = collectionData(q, { idField: 'id' }) as Observable<Collection[]>;
+    return list.pipe(map((col) => col[0]));
   }
 
   retrieveCollections() {
-    return this.colItems;
+    return this.getAll();
   }
 
   createCollection(col: Collection) {
-    col.published = false;
-    return this.colCollection.add(col);
+    return this.add(col);
   }
 
-  update(col: Collection) {
-    this.colCollection.doc(col.id).update(col);
+
+  updatePartial(col: Collection) {
+    return this.update(col);
   }
 
-  updatePartial(col: CollectionsPartial) {
-    return this.colCollection.doc(col.id).update(col);
+  createPartial(col: Collection) {
+    return this.add(col);
   }
 
-  createPartial(col: CollectionsPartial) {
-    return this.colPartialCollection.add(col);
-  }
 
-  delete(id: string) {
-    this.colCollection.doc(id).delete();
-  }
 }

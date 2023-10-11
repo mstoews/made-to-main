@@ -12,11 +12,11 @@ import { Observable } from 'rxjs';
 })
 export class ProductCardComponent implements OnInit {
   @Input() collection: Collection;
-  imageListService = inject(ImageItemIndexService);
+  imageItemIndexService = inject(ImageItemIndexService);
   images$: Observable<ImageItemIndex[]>;
 
   ngOnInit(): void {
-    this.images$ = this.imageListService.getAllImages(this.collection.id);
+    this.images$ = this.imageItemIndexService.getAllImages(this.collection.id);
     console.log(this.collection);
   }
 

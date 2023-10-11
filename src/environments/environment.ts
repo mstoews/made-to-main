@@ -6,13 +6,14 @@ import 'zone.js/plugins/zone-error';
 
 export const environment = {
   firebase: {
-    apiKey: "AIzaSyAoyvHYrm3X8JkcpsPBkjKKyYMvO2yp3H4",
-    authDomain: "made-to-dev.firebaseapp.com",
-    projectId: "made-to-dev",
-    storageBucket: "made-to-dev.appspot.com",
-    messagingSenderId: "943801679790",
-    appId: "1:943801679790:web:fc1acc16908ea3a4bc123f",
-    measurementId: "G-4YP76MJH8S"
+    projectId: 'made-to-cassie',
+    appId: '1:819679326368:web:8bf0a91436ec18a06019c5',
+    storageBucket: 'made-to-cassie.appspot.com',
+    locationId: 'asia-east2',
+    apiKey: 'AIzaSyB0kkt0xQJbdFwd9Fnh1F7x6taE30F76ME',
+    authDomain: 'made-to-cassie.firebaseapp.com',
+    messagingSenderId: '819679326368',
+    measurementId: 'G-WGMMJK9NR3',
   },
   production: false,
   useEmulators: false,

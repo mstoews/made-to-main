@@ -6,10 +6,6 @@ import { MaterialModule } from 'app/material.module';
 import { ProfileService } from 'app/4.services/profile.service';
 import { AuthService } from 'app/4.services/auth/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import {
-  AngularFirestore,
-  AngularFirestoreCollection,
-} from '@angular/fire/compat/firestore';
 import { UserService } from 'app/4.services/auth/user.service';
 
 @Component({
@@ -23,9 +19,6 @@ export class AddressComponent implements OnInit {
   profile$: Observable<ProfileModel[]>;
   formGroup: FormGroup;
   profileExists: boolean;
-  private profileCollection: AngularFirestoreCollection<ProfileModel>;
-  private profileItems: Observable<ProfileModel[]>;
-
   updateBtnState: boolean = false;
   userId: string;
   email: string;
@@ -34,15 +27,9 @@ export class AddressComponent implements OnInit {
     public fb: FormBuilder,
     public authService: AuthService,
     public userService: UserService,
-    public afs: AngularFirestore,
     public profileService: ProfileService,
     public snack: MatSnackBar
   ) {
-    this.profileCollection = afs.collection<ProfileModel>(
-      `users/${this.authService.userId}/profile`
-    );
-    this.profileItems = this.profileCollection.valueChanges({ idField: 'id' });
-
     const theDate = new Date();
     const address: ProfileModel = {
       id: '',
@@ -66,15 +53,17 @@ export class AddressComponent implements OnInit {
 
   ngOnInit() {
     this.profileExists = false;
-    this.authService.afAuth.authState.subscribe((user) => {
-      this.userId = user?.uid;
-      this.email = user?.email;
+    this.authService.getUserId().then((userId) => {
+      this.userId = userId;
+      this.email = this.authService.email;
+    });
 
-      let collection = this.afs.collection<ProfileModel>(
-        `users/${this.userId}/profile`
+      let collection = this.profileService.getAll();
+      let profiles = collection.pipe(
+        map((result) => {
+          return result.filter((mr) => mr.userId === this.userId);
+        })
       );
-      const profiles = collection.valueChanges({ idField: 'id' });
-
       console.debug('ngOnInit', this.userId);
 
       // return only the first element of document which constains the only profile for the user ID if it exists.
@@ -89,74 +78,76 @@ export class AddressComponent implements OnInit {
           });
         }
       });
-    });
-  }
+    }
 
   onUpdateProfile() {
     let data = this.formGroup.getRawValue();
     this.updateBtnState = true;
 
     if (this.profileExists === false) {
-      this.authService.afAuth.currentUser
-        .then((user) => {
-          //const collectionRef = this.afs.collection(`users/${user.uid}/profile/`);
-          this.profileCollection
-            .add(data)
-            .then((newProfile) => {
-              data.id = newProfile.id;
-              this.profileCollection.doc(data.id).update(data);
-            })
-            .catch()
-            .finally();
-          this.snack.open('Profile has been add ...', 'OK', {
-            verticalPosition: 'top',
-            horizontalPosition: 'right',
-            panelClass: 'bg-danger',
-          });
-          console.debug('user doc', this.updateStripeCustomerId(user.uid));
-        })
-        .then()
-        .catch((error) => {
-          console.error('Error writing document: ', error);
+      this.profileService.update(data)
+        this.snack.open('Profile has been updated ...', 'OK', {
+          duration: 3000,
         });
-    } else {
-      this.authService.afAuth.currentUser
-        .then((user) => {
-          const collectionRef = this.afs.collection(
-            `users/${user.uid}/profile/`
-          );
-          data.id = this.profileId;
-          collectionRef.doc(this.profileId).update(data);
-          this.snack.open('Profile has been updated ...', 'OK', {
-            duration: 3000,
-          });
-          this.updateStripeCustomerId(user.uid);
-          console.debug('user doc', this.updateStripeCustomerId(user.uid));
-        })
-        .then(() => {
-          // console.debug('Document successfully written!');
-        })
-        .catch((error) => {
-          console.error('Error writing document: ', error);
-        });
+      }
+      this.updateBtnState = false;
     }
-    this.updateBtnState = false;
-  }
+    //   this.authService.getUserId()
+    //     .then((user) => {
+    //       //const collectionRef = this.afs.collection(`users/${user.uid}/profile/`);
+    //       this.profileCollection
+    //         .add(data)
+    //         .then((newProfile) => {
+    //           data.id = newProfile.id;
+    //           this.profileCollection.doc(data.id).update(data);
+    //         })
+    //         .catch()
+    //         .finally();
+    //       this.snack.open('Profile has been add ...', 'OK', {
+    //         verticalPosition: 'top',
+    //         horizontalPosition: 'right',
+    //         panelClass: 'bg-danger',
+    //       });
+    //     })
+    //     .then()
+    //     .catch((error) => {
+    //       console.error('Error writing document: ', error);
+    //     });
+    // } else {
+    //   this.authService.getUserId()
+    //     .then((userId) => {
+    //       const collectionRef = this.afs.collection(
+    //         `users/${userId}/profile/`
+    //       );
+    //       data.id = this.profileId;
+    //       collectionRef.doc(this.profileId).update(data);
+    //       this.snack.open('Profile has been updated ...', 'OK', {
+    //         duration: 3000,
+    //       });
+    //       this.updateStripeCustomerId(userId);
+    //       console.debug('user doc', this.updateStripeCustomerId(userId));
+    //     })
+    //     .catch((error) => {
+    //       console.error('Error writing document: ', error);
+    //     });
+
 
   updateStripeCustomerId(userId: string) {
-    this.afs
-      .collection(`/users/{$userId}/stripe`)
-      .get()
-      .pipe(
-        map((result) => {
-          return result.docs.map((snap) => {
-            return {
-              id: snap.id,
-              ...(<any>snap.data()),
-            };
-          });
-        })
-      );
+    // this.afs
+    //   .collection(`/users/{$userId}/stripe`)
+    //   .get()
+    //   .pipe(
+    //     map((result) => {
+    //       return result.docs.map((snap) => {
+    //         return {
+    //           id: snap.id,
+    //           ...(<any>snap.data()),
+    //         };
+    //       });
+    //     })
+    //   );
+
+    /* MARK check whether we should save the stripe customer information */
   }
 
   createForm(profile: ProfileModel) {

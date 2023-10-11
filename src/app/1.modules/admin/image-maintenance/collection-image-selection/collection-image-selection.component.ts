@@ -8,7 +8,6 @@ import {
 } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Observable, Subject, Subscription, map } from 'rxjs';
-// import { ImageListService } from 'app/4.services/image-list.service';
 import { ImageItemIndex } from 'app/5.models/imageItem';
 
 import {

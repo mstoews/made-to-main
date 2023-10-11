@@ -6,28 +6,23 @@ import {
   OnDestroy,
   OnInit,
   Output,
-
   inject,
   signal,
 } from '@angular/core';
 
 import { Router, RouterLink, RouterModule } from '@angular/router';
-
 import { onMainContentChange } from '../animations';
 import { Location } from '@angular/common';
-
 import { MenuToggleService } from 'app/4.services/menu-toggle.service';
 import { AuthService } from 'app/4.services/auth/auth.service';
-
 import { CartService } from 'app/4.services/cart.service';
 import { WishListService } from 'app/4.services/wishlist.service';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { ProfileService } from 'app/4.services/profile.service';
 import { ProfileModel } from 'app/5.models/profile';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { UserService } from 'app/4.services/auth/user.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, Subject, Subscription, first, takeUntil } from 'rxjs';
+import { Auth } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-header',
@@ -43,14 +38,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private _router = inject(Router);
   private menuToggle = inject(MenuToggleService);
   private authService = inject(AuthService);
-  private afAuth = inject(AngularFireAuth);
   public userService = inject(UserService);
   public cartService = inject(CartService);
   public wishListService = inject(WishListService);
   private profile = inject(ProfileService);
-  private afs = inject(AngularFirestore);
   private snackBar = inject(MatSnackBar);
   private _location = inject(Location);
+  private auth : Auth = inject(Auth);
 
   @Input() title: string;
   @Input() sub_title: string;
@@ -72,23 +66,23 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.menuToggle.setDrawerState(false);
     this.emailName = 'Guest';
-    
+
+
+    if (this.auth.currentUser.uid) {
+      this.userId = this.auth.currentUser.uid;
+      this.isLoggedIn = true;
+    }
+
     this.userService.isLoggedIn$.pipe(takeUntil(this._unsubscribeAll)).subscribe((res) => {
       if (res === true) {
         this.isLoggedIn = true;
 
-        this.authService.afAuth.authState.pipe(takeUntil(this._unsubscribeAll)).subscribe((user) => {
-          this.userId = user?.uid;
-        });
-
-        // this.cartService.updateCartCounter(this.userId);
-
-         this.cartService.cartByUserId(this.authService.userData.uid).pipe(takeUntil(this._unsubscribeAll)).subscribe((cart) => {
+        this.cartService.cartByUserId(this.userId).pipe(takeUntil(this._unsubscribeAll)).subscribe((cart) => {
           this.cartCounter.set(cart.length);
         });
 
         this.wishListService
-          .wishListByUserId(this.authService.userData.uid)
+          .wishListByUserId(this.userId)
           .subscribe((wishlist) => {
             this.wishCounter.set(wishlist.length);
           });
@@ -96,6 +90,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.isLoggedIn = false;
       }
     });
+
+    /*
 
      this.authService.afAuth.authState.pipe(takeUntil(this._unsubscribeAll)).subscribe((user) => {
       if (user) {
@@ -128,6 +124,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.authService.setUserName('');
       }
     });
+    */
   }
 
   public onToggleSideNav() {

@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit, ViewChild, inject, signal } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -48,7 +47,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   matDialog = inject(MatDialog);
   activateRoute = inject( ActivatedRoute);
   route = inject( Router);
-  afs = inject( AngularFirestore);
+
   categoryService = inject( CategoryService);
   productService = inject( ProductsService);
   fb  = inject( FormBuilder);
@@ -179,11 +178,12 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     newProduct.image = results.data.url;
     this.productService.update(newProduct);
     this.prdGroup.setValue(newProduct);
-    this.afs
-      .collection('inventory')
-      .doc(newProduct.id)
-      .collection('images')
-      .add(results.data);
+    // this.afs
+    //   .collection('inventory')
+    //   .doc(newProduct.id)
+    //   .collection('images')
+    //   .add(results.data);
+    
   }
 
   changeCategory(category: any) {

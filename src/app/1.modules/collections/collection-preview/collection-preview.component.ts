@@ -29,7 +29,7 @@ export class CollectionPreviewComponent implements OnInit, OnDestroy {
   @Input() collection: Collection;
   Title = '';
   Description = '';
-  imageListService = inject(ImageItemIndexService);
+  imageItemIndexService = inject(ImageItemIndexService);
   fb = inject(FormBuilder);
 
   collectionsImages: ImageItemIndex[] = [];
@@ -47,7 +47,7 @@ export class CollectionPreviewComponent implements OnInit, OnDestroy {
   }
 
   onUpdate(imgItem: ImageItemIndex) {
-    this.imageListService.updateCollectionDescription(imgItem);
+    this.imageItemIndexService.updateCollectionDescription(imgItem);
   }
 
   createEmptyForm() {
@@ -58,7 +58,7 @@ export class CollectionPreviewComponent implements OnInit, OnDestroy {
   }
 
   async Refresh(id: string) {
-    this.subCollections = (await this.imageListService.getImageByType(id))
+    this.subCollections = (await this.imageItemIndexService.getImageByType(id))
       .pipe(takeUntil(this.destroy$))
       .subscribe((item) => {
         this.collectionsImages = item;
@@ -86,7 +86,7 @@ export class CollectionPreviewComponent implements OnInit, OnDestroy {
     let item = this.collectionsImages.find((x) => x.id === this.id);
     if (item !== undefined || item !== null) {
       item.description = desc;
-      this.imageListService.updateCollectionDescription(item);
+      this.imageItemIndexService.updateCollectionDescription(item);
     }
   }
 

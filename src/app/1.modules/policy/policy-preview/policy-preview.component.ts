@@ -23,7 +23,7 @@ export class PolicyPreviewComponent implements OnInit {
 
   ngOnInit() {
     if (this.policy.id) {
-      this.policyService.findPolicyByUrl(this.policy.id).subscribe((policy) => {
+      this.policyService.getById(this.policy.id).subscribe((policy) => {
         this.policy = policy;
       });
     }

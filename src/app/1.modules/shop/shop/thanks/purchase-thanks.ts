@@ -18,11 +18,10 @@ export class PurchaseThanksComponent {
     private snackBar: MatSnackBar,
     private route: Router
   ) {
-    this.authService.afAuth.authState.subscribe((user) => {
-      if (user) {
-        const userId = user.uid;
+    this.authService.getUserId().then((userId) => {
         this.userId = userId;
         const url = new URL(window.location.href);
+
         if (url.searchParams.get('purchaseResult') === 'failed') {
           this.snackBar.open(
             'Purchase checkout has been cancelled by the users',
@@ -35,8 +34,7 @@ export class PurchaseThanksComponent {
           );
           this.backToCart(this.userId);
         }
-      }
-    });
+      });
   }
 
   ngOnInit(): void {

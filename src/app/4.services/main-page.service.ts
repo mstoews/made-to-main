@@ -1,39 +1,56 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
-  AngularFirestore,
-  AngularFirestoreCollection,
-} from '@angular/fire/compat/firestore';
-import { Observable } from 'rxjs';
+  doc,
+  docData,
+  DocumentReference,
+  Firestore,
+  getDoc,
+  setDoc,
+  updateDoc,
+  collection,
+  addDoc,
+  deleteDoc,
+  collectionData,
+  Timestamp,
+} from '@angular/fire/firestore';
+import { Observable, Subscription, map } from 'rxjs';
 import { Mainpage } from 'app/5.models/mainpage';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MainPageService {
-  private mainpageCollection: AngularFirestoreCollection<Mainpage>;
-  private mainpageItems: Observable<Mainpage[]>;
 
-  constructor(public afs: AngularFirestore) {
-    this.mainpageCollection = afs.collection<Mainpage>('mainpage');
-    this.mainpageItems = this.mainpageCollection.valueChanges({
-      idField: 'id',
-    });
-  }
+  firestore: Firestore = inject(Firestore);
 
+  //Query
   getAll() {
-    return this.mainpageItems;
+    const collectionRef = collection(this.firestore, 'mainpage');
+    return collectionData(collectionRef, { idField: 'id' }) as Observable<Mainpage[]>;
   }
 
-  create(mainpage: Mainpage) {
-    this.mainpageCollection.add(mainpage);
+  getById(id: string) {
+    const collectionRef = collection(this.firestore, 'mainpage');
+    const docRef = doc(collectionRef, id);
+    return docData(docRef) as Observable<Mainpage>;
   }
 
+  // Add
+  add(mainpage: Mainpage) {
+    return addDoc(collection(this.firestore, 'mainpage'), mainpage);
+  }
+
+  // Update
   update(mainpage: Mainpage) {
-    mainpage.active = true;
-    this.mainpageCollection.doc(mainpage.id.toString()).update(mainpage);
+     const ref = doc(this.firestore,'mainpage', mainpage.id) as DocumentReference<Mainpage>;
+     return updateDoc(ref, mainpage);
   }
 
-  delete(name: string) {
-    this.mainpageCollection.doc(name).delete();
+  // Delete
+  delete(id: string) {
+    const ref = doc(this.firestore, 'mainpage', id);
+    return deleteDoc(ref);
   }
+
+
 }

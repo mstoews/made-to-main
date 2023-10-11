@@ -7,10 +7,10 @@ import {
 import { Blog } from 'app/5.models/blog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { imageItem } from 'app/5.models/imageItem';
-import { ImageListService } from 'app/4.services/image-list.service';
 import { AuthService } from 'app/4.services/auth/auth.service';
 import { ScrollService } from 'app/4.services/scroll.service';
+import { ImageItemIndexService } from 'app/4.services/image-item-index.service';
+import { ImageItemIndex } from 'app/5.models/imageItem';
 
 @Component({
   selector: 'app-calendar-detail',
@@ -23,7 +23,7 @@ export class CalendarDetailComponent implements OnInit, OnDestroy {
   blogId: string;
   blogItem: Observable<Blog>;
   allBlogs$: Observable<Blog[]>;
-  blogImages$: Observable<imageItem[]>;
+  blogImages$: Observable<ImageItemIndex[]>;
   public blog!: Blog;
   public userName: string;
   public blog_id: string;
@@ -34,19 +34,18 @@ export class CalendarDetailComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private scrollTo: ScrollService,
     private route: Router,
-    private imageListService: ImageListService
+    private imageItemIndexService: ImageItemIndexService
   ) {}
+
 
   ngOnInit(): void {
     let id: string;
-    
-
     this.blog = this.activateRoute.snapshot.data['blog'];
 
     if (this.blog.id) {
       this.blog_id = this.blog.id;
       // console.debug('Blog ID: ' , this.blog_id);
-      this.blogImages$ = this.imageListService.getImagesByType(this.blog.id);
+      this.blogImages$ = this.imageItemIndexService.getImagesByTypeId(this.blog.id);
     }
   }
 

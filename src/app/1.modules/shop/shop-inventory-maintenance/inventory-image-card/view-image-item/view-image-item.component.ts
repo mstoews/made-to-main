@@ -9,7 +9,6 @@ import {
   MatDialogRef,
 } from '@angular/material/dialog';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ImageListService } from 'app/4.services/image-list.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MaterialModule } from 'app/material.module';
 import { ImageItemIndexService } from 'app/4.services/image-item-index.service';
@@ -30,7 +29,7 @@ export class ViewImageItemComponent {
 
   constructor(
     private fb: FormBuilder,
-    private imageListService: ImageItemIndexService,
+    private imageIndexIndexService: ImageItemIndexService,
     @Inject(MAT_DIALOG_DATA) private item: ImageItemIndex,
     private dialogRef: MatDialogRef<ViewImageItemComponent>
   ) {
@@ -55,7 +54,7 @@ export class ViewImageItemComponent {
       this.item.type = 'IN_DELETED';
     }
     this.item.description = results.description;
-    this.imageListService.updateImageList(this.item);
+    this.imageIndexIndexService.updateImageList(this.item);
     this.close();
   }
 

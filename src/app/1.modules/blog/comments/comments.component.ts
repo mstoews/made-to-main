@@ -1,11 +1,6 @@
-import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { AuthService } from 'app/4.services/auth/auth.service';
 import { BlogService } from 'app/4.services/blog.service';
-
 import { Comments } from '../../../5.models/blog';
 
 @Component({
@@ -19,11 +14,9 @@ export class CommentsComponent implements OnInit {
   comment: Comments;
 
   constructor(
-    private afs: AngularFirestore,
-    private _snackBar: MatSnackBar,
-    private http: HttpClient,
+
     private fb: FormBuilder,
-    private authService: AuthService,
+
     private blogService: BlogService
   ) {
     this.createForm();

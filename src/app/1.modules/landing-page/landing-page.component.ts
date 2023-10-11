@@ -8,16 +8,11 @@ import {
   signal,
 } from '@angular/core';
 import { Router } from '@angular/router';
-//import { ScrollService } from 'app/4.services/scroll.service';
 import { animate, style, transition, trigger } from '@angular/animations';
-//import { Observable, of } from 'rxjs';
 import { ContactService } from 'app/4.services/contact.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
-//import { Contact } from 'app/5.models/contact';
 import { MainPageService } from 'app/4.services/main-page.service';
 import { Mainpage } from 'app/5.models/mainpage';
-//import { imageItem } from 'app/5.models/imageItem';
-//import { AuthService } from 'app/4.services/auth/auth.service';
 import { BlogService } from '../../4.services/blog.service';
 import { MenuToggleService } from '../../4.services/menu-toggle.service';
 import { ImageItemIndexService } from 'app/4.services/image-item-index.service';
@@ -70,7 +65,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   cartService = inject(CartService);
   wishListService = inject(WishListService);
 
-  imageListService = inject(ImageItemIndexService);
+  imageItemIndexService = inject(ImageItemIndexService);
   blogService = inject(BlogService);
   userService = inject(UserService);
   authService = inject(AuthService);
@@ -80,32 +75,30 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   cartCounter = signal<number>(0);
   _unsubscribeAll: Subject<any> = new Subject<any>();
 
-  // featuredList$ = this.imageListService.getAllImages('IN_GALLERY');
-
   ngOnInit(): void {
     this.userService.isLoggedIn$
       .pipe(takeUntil(this._unsubscribeAll))
       .subscribe((res) => {
         if (res === true) {
-          this.authService.afAuth.authState
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((user) => {
-              const userId = user?.uid;
+          this.authService.getUserId().then((id) => {
               this.cartService
-                .cartByUserId(this.authService.userData.uid)
+                .cartByUserId(id)
                 .pipe(takeUntil(this._unsubscribeAll))
                 .subscribe((cart) => {
                   this.cartCounter.set(cart.length);
                 });
 
               this.wishListService
-                .wishListByUserId(this.authService.userData.uid)
+                .wishListByUserId(id)
+                .pipe(takeUntil(this._unsubscribeAll))
                 .subscribe((wishlist) => {
                   this.wishCounter.set(wishlist.length);
                 });
-            });
-        }
-      });
+            }).catch((error) => {
+              console.log('Error getting user id: ', error);
+        });
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -199,6 +192,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
 
   populateImageList() {
     let imageCount = 0;
-    // this.featuredList$ = this.imageListService.getAllImages('IN_GAllERY');
+
   }
 }
