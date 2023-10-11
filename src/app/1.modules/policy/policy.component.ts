@@ -85,7 +85,7 @@ export class PolicyComponent {
     const newPolicy = { ...this.policyGroup.value } as PolicyDocuments;
     newPolicy.date_updated = updateDate;
     newPolicy.date_created = updateDate;
-    this.policyService.create(newPolicy);
+    this.policyService.add(newPolicy);
   }
 
   onDelete(data: PolicyDocuments) {

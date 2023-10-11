@@ -1,6 +1,7 @@
 {
   "projects": {
-    "default": "made-to-cassie"
+    "default": "made-to-cassie",
+    "staging": "angular-firebase-dev"
   },
   "targets": {
     "made-to-cassie": {

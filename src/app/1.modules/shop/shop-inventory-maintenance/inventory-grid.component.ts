@@ -9,7 +9,6 @@ import { Category } from 'app/5.models/category';
 import { DndComponent } from 'app/3.components/loaddnd/dnd.component';
 import { MatDialog } from '@angular/material/dialog';
 import { IImageStorage } from 'app/5.models/maintenance';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Router } from '@angular/router';
 import { openAddComponentDialog } from './add/add.component';
 import { Workbook } from 'exceljs';
@@ -48,7 +47,6 @@ export class InventoryComponent implements OnInit, OnDestroy {
   constructor(
     private matDialog: MatDialog,
     private route: Router,
-    private afs: AngularFirestore,
     private readonly categoryService: CategoryService,
     private readonly productService: ProductsService,
     private dialog: MatDialog,
@@ -131,11 +129,11 @@ export class InventoryComponent implements OnInit, OnDestroy {
     newProduct.image = results.data.url;
     this.productService.update(newProduct);
     this.prdGroup.setValue(newProduct);
-    this.afs
-      .collection('inventory')
-      .doc(newProduct.id)
-      .collection('images')
-      .add(results.data);
+    // this.afs
+    //   .collection('inventory')
+    //   .doc(newProduct.id)
+    //   .collection('images')
+    //   .add(results.data);
   }
 
   changeCategory(category: any) {

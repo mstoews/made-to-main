@@ -13,12 +13,7 @@ import {
   group,
   animate,
 } from '@angular/animations';
-import { map, Observable } from 'rxjs';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { AuthService } from './4.services/auth/auth.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { AuthTokenService } from './4.services/auth/auth-token.service';
-import { UserService } from './4.services/auth/user.service';
+import { Observable } from 'rxjs';
 import { DOCUMENT } from '@angular/common';
 import { isPlatformBrowser } from '@angular/common';
 import { Auth, onAuthStateChanged } from '@angular/fire/auth';
@@ -80,7 +75,7 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     onAuthStateChanged(this.auth, (user) => {
       if (user) {
-        
+
       } else {
 
       }

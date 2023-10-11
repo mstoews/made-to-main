@@ -7,7 +7,7 @@ import {
   MatDialogConfig,
 } from '@angular/material/dialog';
 import { Blog, BlogPartial } from 'app/5.models/blog';
-import { AngularFireStorage } from '@angular/fire/compat/storage';
+
 import { BlogService } from 'app/4.services/blog.service';
 import { Router } from '@angular/router';
 
@@ -25,7 +25,6 @@ export class BlogAddDialog {
     private fb: FormBuilder,
     @Inject(MAT_DIALOG_DATA) private blog: Blog,
     private blogService: BlogService,
-    private afs: AngularFireStorage,
     private route: Router,
     private dialogRef: MatDialogRef<BlogAddDialog>
   ) {

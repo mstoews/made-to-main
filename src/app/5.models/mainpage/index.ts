@@ -1,5 +1,5 @@
 export interface Mainpage {
-  id: number;
+  id: string;
   hero_title: string;
   features_header: string;
   features_subheader: string;

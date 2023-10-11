@@ -13,39 +13,19 @@ export class ContactService {
   //Query
 
   getAll() {
-    const collectionRef = collection(this.firestore, 'contacts');
-    return collectionData(collectionRef, { idField: 'id' }) as Observable<Contact[]>;
+    return collectionData(collection(this.firestore, 'contacts'), { idField: 'id' }) as Observable<Contact[]>;
   }
 
   getById(id: string) {
-    const collectionRef = collection(this.firestore, 'category');
-    const blog = doc(collectionRef, id);
-    return docData(blog) as Observable<Category>;
-  }
-
-  getCategoryList() {
-    return this.getAll().pipe(
-      map((category) =>
-        category.filter((available) => available.isUsed === true)
-      )
-    );
+    return docData(doc(collection(this.firestore, 'contacts'), id)) as Observable<Contact>;
   }
 
   // Add
-  add(category: Category) {
-    return addDoc(collection(this.firestore, 'category'), category);
+  add(contact: Contact) {
+    return addDoc(collection(this.firestore, 'contacts'), contact);
   }
 
   // Update
-
-  update(category: Category) {
-    const ref = doc(
-      this.firestore,
-      'category',
-      category.id
-    ) as DocumentReference<Category>;
-    return updateDoc(ref, category);
-  }
 
   // Delete
   delete(id: string) {
@@ -54,21 +34,17 @@ export class ContactService {
   }
 
 
-
   create(contact: Contact) {
     // console.debug(JSON.stringify(contact));
-
     const currentDate = new Intl.DateTimeFormat('en');
     const theDate = currentDate.format();
-
     const contact_update = {
       name: contact.name,
       email: contact.email,
       message: contact.message,
       created_date: theDate,
     };
-
-    this.contactCollection.add(contact_update);
+     addDoc(collection(this.firestore, 'contacts'), contact_update);
   }
 
 

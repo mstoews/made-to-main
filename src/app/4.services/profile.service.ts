@@ -36,11 +36,19 @@ export class ProfileService {
 
   getAll(): Observable<ProfileModel[]> {
     // query must be set to order descending
-    const collectionRef = collection(this.firestore, 'profile');
-    return collectionData(collectionRef, { idField: 'id' }) as Observable<
-      ProfileModel[]
-    >;
+    const collectionRef = collection(this.firestore, `users/${this.userId}/profile`);
+    return collectionData(collectionRef, { idField: 'id' }) as Observable<ProfileModel[]>;
   }
+
+  getUserCountry(): string
+  {
+    let country: string;
+    this.getAll().pipe(first()).subscribe((data) => {
+      country = data[0].country;
+    });
+    return country;
+  }
+
 
   update(profile: ProfileModel) {
     const ref = doc(this.firestore, 'profile', profile.id ) as DocumentReference<ProfileModel>;

@@ -7,7 +7,6 @@ import { Observable } from 'rxjs';
 import { Location } from '@angular/common';
 import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DndComponent } from 'app/3.components/loaddnd/dnd.component';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { FilterEnum, ImageToolbarService } from 'app/4.services/image-toolbar.service';
 
 
@@ -41,7 +40,6 @@ export class BlogEditComponent implements OnInit {
     private _location: Location,
     private blogService: BlogService,
     private fb: FormBuilder,
-    private afs: AngularFirestore,
     @Optional() @Inject(MAT_DIALOG_DATA) public parentId: string
   ) {}
 
@@ -178,7 +176,8 @@ export class BlogEditComponent implements OnInit {
   create(data: any) {
     const rawData = this.blogGroup.getRawValue();
     this.blogService.update(rawData);
-    this.afs.collection('blog').doc(rawData.id).collection('images').add(data);
+    /// this.afs.collection('blog').doc(rawData.id).collection('images').add(data);
+    /* MARK */
   }
 
   createEmptyForm() {

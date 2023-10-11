@@ -6,8 +6,7 @@ import {
   MatDialog,
   MatDialogConfig,
 } from '@angular/material/dialog';
-import { Collection, CollectionsPartial } from 'app/5.models/collection';
-import { AngularFireStorage } from '@angular/fire/compat/storage';
+import { Collection } from 'app/5.models/collection';
 import { CollectionsService } from 'app/4.services/collections.service';
 import { Router } from '@angular/router';
 
@@ -25,7 +24,6 @@ export class CollectionsDetailsAddDialog {
     private fb: FormBuilder,
     @Inject(MAT_DIALOG_DATA) private collection: Collection,
     private collectionService: CollectionsService,
-    private afs: AngularFireStorage,
     private route: Router,
     private dialogRef: MatDialogRef<CollectionsDetailsAddDialog>
   ) {
@@ -43,7 +41,7 @@ export class CollectionsDetailsAddDialog {
   save() {}
 
   update(results: any) {
-    const newCollection = { ...this.form.value } as CollectionsPartial;
+    const newCollection = { ...this.form.value } as Collection;
     this.collectionService.createPartial(newCollection).then((collection) => {
       this.collectionId = collection.id;
       newCollection.id = this.collectionId;

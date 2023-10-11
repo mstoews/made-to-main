@@ -46,6 +46,7 @@ export class SideNavComponent implements OnInit {
 
   ngOnInit() {
     initTE({ Carousel, Dropdown, Sidenav, Ripple });
+  
   }
 
 

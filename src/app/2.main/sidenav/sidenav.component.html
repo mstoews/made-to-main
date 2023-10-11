@@ -9,7 +9,7 @@
      <div class="px-3 text-gray-100 rounded dark:bg-gray-800 ">
       <ul class="space-y-2">
         <ng-container *ngIf="show_admin_menu === false">
-          <ng-container *ngIf="(userService.roles$ | async) as roles">
+          <ng-container *ngIf="(userService.aroles$ | async) as roles">
             <div *ngIf="roles.admin">
           <li class="mt-3 flex items-center p-2 pr-5 font-normal text-gray-700 rounded-lg text-base grow hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-300" (click)="isToggle === 1 ? (isToggle = 2) : (isToggle = 1)">
             <span></span>
@@ -94,8 +94,8 @@
           </ul>
         </ng-container>
 
-        <ng-container *ngIf="(userService.roles$ | async) as roles">
-          <div *ngIf="roles.admin">
+        <ng-container *ngIf="(userService.isAdmin$ | async) as admin">
+          <div *ngIf="admin">
             <li class="mt-3 transition-transform duration-300 motion-reduce:transition-none flex items-center p-2 pr-5 font-normal text-gray-700 rounded-lg text-base grow hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-300" (click)="isToggle === 2 ? (isToggle = 1) : (isToggle = 2)">
               <span></span>
                <mat-icon class="text-gray-800" [svgIcon]="'heroicons_outline:briefcase'"></mat-icon>

@@ -30,13 +30,6 @@ const routes: Route[] = [
     title: 'Login',
   },
   {
-    path: 'login',
-    loadChildren: () =>
-      import('./1.modules/auth/auth.module').then((mod) => mod.AuthModule),
-    data: { state: 'login' },
-    title: 'Login',
-  },
-  {
     path: 'shop',
     loadChildren: () =>
       import('./1.modules/shop/shop.module').then((mod) => mod.ShopModule),

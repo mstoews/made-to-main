@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 import { Location } from '@angular/common';
 import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DndComponent } from 'app/3.components/loaddnd/dnd.component';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
+
 
 @Component({
   selector: 'app-collection-edit',
@@ -18,7 +18,7 @@ export class CollectionsEditComponent implements OnInit {
   sTitle: any;
   collectionGroup: any;
   isFormDirty = false;
-  
+
   sub: any;
   @Input() collectionId: string;
   para: string;
@@ -36,7 +36,7 @@ export class CollectionsEditComponent implements OnInit {
     private _location: Location,
     private collectionService: CollectionsService,
     private fb: FormBuilder,
-    private afs: AngularFirestore,
+
     @Optional() @Inject(MAT_DIALOG_DATA) public parentId: string
   ) {}
 
@@ -149,11 +149,7 @@ export class CollectionsEditComponent implements OnInit {
   create(data: any) {
     const rawData = this.collectionGroup.getRawValue();
     this.collectionService.update(rawData);
-    this.afs
-      .collection('collection')
-      .doc(rawData.id)
-      .collection('images')
-      .add(data);
+    // this.afs.collection('collection').doc(rawData.id).collection('images').add(data);
   }
 
   createEmptyForm() {

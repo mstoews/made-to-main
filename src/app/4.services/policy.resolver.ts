@@ -12,6 +12,6 @@ export class PolicyResolver  {
     state: RouterStateSnapshot
   ): Observable<PolicyDocuments> | PolicyDocuments {
     const id = route.paramMap.get('id') as string;
-    return this.policyService.findPolicyByUrl(id);
+    return this.policyService.getById(id);
   }
 }

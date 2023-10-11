@@ -4,12 +4,15 @@ import { Router } from '@angular/router';
 import { User } from 'firebase/auth';
 import { Observable, Subject, of, takeUntil } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Auth,
+import {
+  Auth,
+  onAuthStateChanged,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendEmailVerification,
   signOut,
-  sendPasswordResetEmail } from '@angular/fire/auth';
+  sendPasswordResetEmail,
+} from '@angular/fire/auth';
 
 @Injectable({
   providedIn: 'root',
@@ -23,7 +26,6 @@ export class AuthService implements OnDestroy {
   email: string;
   private userName: string;
   private destroy$ = new Subject<void>();
-
 
   // private subject = new BehaviorSubject<User>(ANONYMOUS_USER);
 
@@ -41,25 +43,43 @@ export class AuthService implements OnDestroy {
     private snackBar: MatSnackBar
   ) {
     if (auth) {
-      // this.isAdminUser = false;
-      // this.userId = this.auth.currentUser.uid;
-      // this.email = this.auth.currentUser.email;
-      // this.isAnonymous = this.auth.currentUser.isAnonymous;
-      // this.isRegistered = this.auth.currentUser.emailVerified;
+      this.auth.onAuthStateChanged((user) => {
+        if (user) {
+          this.userId = user.uid;
+          this.email = user.email;
+          this.isAnonymous = user.isAnonymous;
+          this.isRegistered = user.emailVerified;
+        } else {
+          this.userId = undefined;
+          this.email = undefined;
+          this.isRegistered = undefined;
+        }
+      });
+      this.auth.onIdTokenChanged((user) => {
+        if (user) {
+          user.getIdTokenResult().then((idTokenResult) => {
+              idTokenResult.claims.admin ? this.isAdminUser = true : this.isAdminUser = false;
+          });
+        }
+      });
     }
   }
 
-  IsUserAdmin() {
-     this.auth.onIdTokenChanged((user) => {
-      if (user) {
-        user.getIdTokenResult().then((idTokenResult) => {
-          const admin = of(idTokenResult.claims.admin);
-        });
-      } else {
-        this.userId = undefined;
-        this.email = undefined;
-        this.isRegistered = undefined;
-     }
+  public isUserAdmin(): Observable<boolean> {
+    return new Observable<boolean>((observer) => {
+      
+      this.auth.onIdTokenChanged((user) => {
+        if (user) {
+          user.getIdTokenResult().then((idTokenResult) => {
+            observer.next(idTokenResult.claims.admin);
+          });
+        } else {
+          this.userId = undefined;
+          this.email = undefined;
+          this.isRegistered = undefined;
+          observer.next(false);
+        }
+      });
     });
   }
 
@@ -69,40 +89,55 @@ export class AuthService implements OnDestroy {
   }
 
   async signIn(email: string, password: string) {
-      const credentials = await signInWithEmailAndPassword(this.auth, email, password).then((result) => {
+    const credentials = await signInWithEmailAndPassword(
+      this.auth,
+      email,
+      password
+    )
+      .then((result) => {
         console.log(result);
-    }).catch ((error) => {
-      console.error(error);
-      return;
-    });
+      })
+      .catch((error) => {
+        console.error(error);
+        return;
+      });
   }
 
   async registerUser(email: string, password: string) {
-    const credentials = await createUserWithEmailAndPassword(this.auth, email, password).then((result) => {
-      console.log(result);
-  }).catch ((error) => {
-    console.error(error);
-    return;
-  });
-}
-
+    const credentials = await createUserWithEmailAndPassword(
+      this.auth,
+      email,
+      password
+    )
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((error) => {
+        console.error(error);
+        return;
+      });
+  }
 
   // Send email verfificaiton when new user sign up
   async SendVerificationMail() {
-    await sendEmailVerification(this.auth.currentUser).then(() => {
-      this.router.navigate(['verify-email-address']);
-    }).catch ((error) => {
-      window.alert(error);
-    });
+    await sendEmailVerification(this.auth.currentUser)
+      .then(() => {
+        this.router.navigate(['verify-email-address']);
+      })
+      .catch((error) => {
+        window.alert(error);
+      });
   }
 
   // Reset Forggot password
   async ForgotPassword(passwordResetEmail: string) {
-    await sendPasswordResetEmail(this.auth, passwordResetEmail).then(() => {
-      window.alert('Password reset email sent, check your inbox.');
-    }).catch ((error) => {
-      window.alert(error);
-    });
+    await sendPasswordResetEmail(this.auth, passwordResetEmail)
+      .then(() => {
+        window.alert('Password reset email sent, check your inbox.');
+      })
+      .catch((error) => {
+        window.alert(error);
+      });
   }
 
   // Sign out
@@ -121,6 +156,5 @@ export class AuthService implements OnDestroy {
   async getUserId() {
     return (await this.auth.currentUser).uid;
   }
-
 }
 // Sign out

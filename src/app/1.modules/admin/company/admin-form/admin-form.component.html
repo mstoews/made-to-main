@@ -1,11 +1,11 @@
 <div class="flex flex-col bg-white">
-<app-header [title]="'Maintenance'"> </app-header>
+<app-header [title]="'Landing Page'"> </app-header>
 
 <mat-card class="m-4 text-gray-700 max-w-3/8 filter-article filter-interactive mat-elevation-z8">
-  <div mat-dialog-title class="pl-2 mb-3 ml-1 text-3xl border-green-600"
+  <!-- <div mat-dialog-title class="pl-2 mb-3 ml-1 text-3xl border-green-600"
     [ngStyle]="{ 'border-left': '10px solid', 'border-color': 'green' }">
     {{ sTitle }}
-  </div>
+  </div> -->
 
   <div mat-dialog-content>
     <form [formGroup]="mainpageGroup" (ngSubmit)="onUpdate(mainpageGroup.value)">
@@ -13,7 +13,7 @@
         <div class="flex flex-col grow">
           <mat-form-field class="m-1 flex-start" appearance="outline">
             <mat-label class="ml-2 text-base">Landing Page Hero Title</mat-label>
-            <input matInput placeholder="Landing Page" formControlName="hero_title" />
+            <input #myInput matInput placeholder="Landing Page" formControlName="hero_title" />
           </mat-form-field>
         </div>
 

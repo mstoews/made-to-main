@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnDestroy, OnInit, AfterViewInit, ChangeDetectionStrategy, inject } from '@angular/core';
 import { ActivatedRoute, Router, TitleStrategy } from '@angular/router';
 import { CartService } from 'app/4.services/cart.service';
 import { CheckoutService } from 'app/4.services/checkout.service';
@@ -7,7 +7,8 @@ import { Cart } from 'app/5.models/cart';
 import { AuthService } from 'app/4.services/auth/auth.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ProfileModel } from 'app/5.models/profile';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { ProfileService } from 'app/4.services/profile.service';
 
 
 interface profile {
@@ -50,7 +51,7 @@ export class CartComponent implements OnInit, OnDestroy {
     private checkoutService: CheckoutService,
     private cartService: CartService,
     private ngxSpinner: NgxSpinnerService,
-    public afs: AngularFirestore,
+    private profileService: ProfileService,
   ) {
     this.authService.getUserId().then ((userId) => {
       this.userId = userId
@@ -58,7 +59,7 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   async ngAfterViewInit(){
-    this.userCountry = await this.getUserCountry(this.userId);
+    this.userCountry = await this.getUserCountry();
   }
 
   async ngOnInit(): Promise<void> {
@@ -69,6 +70,22 @@ export class CartComponent implements OnInit, OnDestroy {
       this.calculateTotals();
     }
   }
+
+  fb = inject(FormBuilder);
+  measurementGroup: FormGroup;
+
+  createEmptyForm() {
+    this.measurementGroup = this.fb.group({
+      bust: [''],
+      waist: [''],
+      hips: [''],
+      height: [''],
+      inseam: [''],
+      outseam: [''],
+      sleeve_length: [''],
+    });
+  }
+
 
   onCheckOut() {
     // this.calculateTotals();
@@ -118,21 +135,22 @@ export class CartComponent implements OnInit, OnDestroy {
     }
   }
 
-  async getUserCountry(userId: string) {
-    let userCountry = '';
-    let collection = this.afs.collection<ProfileModel>( `users/${userId}/profile` );
-    const profiles = collection.valueChanges({ idField: 'id' });
+  async getUserCountry() {
 
-    await profiles.pipe(first()).subscribe((ref) => {
-      if (ref.length > 0) {
-        ref.forEach((mr) => {
-          userCountry = mr.country
-        });
-      }
-    });
-    return userCountry;
+    return this.profileService.getUserCountry();
+    // let collection = this.afs.collection<ProfileModel>( `users/${userId}/profile` );
+
+    // const profiles = collection.valueChanges({ idField: 'id' });
+
+    // await profiles.pipe(first()).subscribe((ref) => {
+    //   if (ref.length > 0) {
+    //     ref.forEach((mr) => {
+    //       userCountry = mr.country
+    //     });
+    //   }
+    // });
+
   }
-
 
   async calculateTotals() {
     this.cartItemsAvailable = false;

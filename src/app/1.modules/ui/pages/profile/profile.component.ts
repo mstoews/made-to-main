@@ -6,7 +6,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'app/4.services/auth/auth.service';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
+
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'environments/environment.prod';
 import { catchError, first, throwError } from 'rxjs';
@@ -29,7 +29,6 @@ export class ProfileComponent implements OnInit {
     private router: Router,
     private auth: Auth,
     public authService: AuthService,
-    public afs: AngularFirestore,
     public userService: UserService,
     private http: HttpClient
   )

@@ -35,7 +35,7 @@ export class InventoryPreviewComponent implements OnInit {
     console.debug('inventory-preview.component.ts: ngOnInit()', JSON.stringify(this.product));
 
     if (this.product.id) {
-      this.inventoryImages$ = await this.productService.getImageListByProduct(
+        this.inventoryImages$ = await this.productService.getImageListByProduct(
         this.product.id
       );
     }

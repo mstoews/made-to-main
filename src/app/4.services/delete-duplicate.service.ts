@@ -1,9 +1,4 @@
 import { Injectable, OnDestroy, OnInit, inject } from '@angular/core';
-// import {
-//   AngularFirestore,
-//   AngularFirestoreCollection,
-// } from '@angular/fire/compat/firestore';
-// import { AngularFireStorage, AngularFireStorageReference } from '@angular/fire/compat/storage';
 
 import {
   DocumentReference,

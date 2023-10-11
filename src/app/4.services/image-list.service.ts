@@ -14,7 +14,6 @@ import {
   of,
   Subscription,
 } from 'rxjs';
-import { AngularFireStorage } from '@angular/fire/compat/storage';
 import {
   addDoc,
   collection,
@@ -46,11 +45,6 @@ export class ImageListService {
   typeFilter$: BehaviorSubject<string | null>;
   rawImagesArray: imageItem[] = [];
 
-  constructor(
-
-    private storage: AngularFireStorage
-  ) {
-  }
 
   matSnackBar = inject(MatSnackBar);
 
@@ -70,44 +64,44 @@ export class ImageListService {
 
   async createImageSrc(ref: string, size: string) {
     let ranking = 0;
-    this.storage
-      .ref(ref)
-      .listAll()
-      .subscribe((files) => {
-        files.items.forEach((imageRef) => {
-          imageRef.getDownloadURL().then((downloadURL) => {
-            ranking++;
-            const imageUrl = downloadURL;
-            const imageData: imageItem = {
-              parentId: '',
-              caption: imageRef.fullPath,
-              type: 'IN_NOT_USED',
-              imageSrc: imageUrl,
-              largeImageSrc: imageUrl,
-              imageAlt: imageRef.name,
-              ranking: ranking,
-              id: '',
-            };
-            console.debug(`Creating ${imageData.imageAlt}`);
-            // switch (size) {
-            //   case 'small':
-            //     this.smallImageCol.doc(imageData.imageAlt).set(imageData);
-            //     break;
-            //   case 'medium':
-            //     this.mediumImageCol.doc(imageData.imageAlt).set(imageData);
-            //     break;
-            //   case 'large':
-            //     this.largeImageCol.doc(imageData.imageAlt).set(imageData);
-            //     break;
-            //   case 'original':
-            //     this.originalImageCol.doc(imageData.imageAlt).set(imageData);
-            //     break;
-            //   default:
-            //     this.originalImageCol.doc(imageData.imageAlt).set(imageData);
-            // }
-          });
-        });
-      });
+    // this.storage
+    //   .ref(ref)
+    //   .listAll()
+    //   .subscribe((files) => {
+    //     files.items.forEach((imageRef) => {
+    //       imageRef.getDownloadURL().then((downloadURL) => {
+    //         ranking++;
+    //         const imageUrl = downloadURL;
+    //         const imageData: imageItem = {
+    //           parentId: '',
+    //           caption: imageRef.fullPath,
+    //           type: 'IN_NOT_USED',
+    //           imageSrc: imageUrl,
+    //           largeImageSrc: imageUrl,
+    //           imageAlt: imageRef.name,
+    //           ranking: ranking,
+    //           id: '',
+    //         };
+    //         console.debug(`Creating ${imageData.imageAlt}`);
+    //         // switch (size) {
+    //         //   case 'small':
+    //         //     this.smallImageCol.doc(imageData.imageAlt).set(imageData);
+    //         //     break;
+    //         //   case 'medium':
+    //         //     this.mediumImageCol.doc(imageData.imageAlt).set(imageData);
+    //         //     break;
+    //         //   case 'large':
+    //         //     this.largeImageCol.doc(imageData.imageAlt).set(imageData);
+    //         //     break;
+    //         //   case 'original':
+    //         //     this.originalImageCol.doc(imageData.imageAlt).set(imageData);
+    //         //     break;
+    //         //   default:
+    //         //     this.originalImageCol.doc(imageData.imageAlt).set(imageData);
+    //         // }
+    //       });
+    //     });
+    //   });
   }
 
   // getLargeImagesList(): Observable<imageItem[]> {
@@ -393,73 +387,73 @@ export class ImageListService {
   //   });
   // }
 
-  async getImgFromServer(imgItem: imageItem): Promise<string> {
-    let img = '';
-    let size = '';
-    if (imgItem.imageAlt.includes('200')) {
-      size = '200';
-    }
-    if (imgItem.imageAlt.includes('400')) {
-      size = '400';
-    }
-    if (imgItem.imageAlt.includes('800')) {
-      size = '800';
-    }
+  async getImgFromServer(imgItem: imageItem)  {
+    // let img = '';
+    // let size = '';
+    // if (imgItem.imageAlt.includes('200')) {
+    //   size = '200';
+    // }
+    // if (imgItem.imageAlt.includes('400')) {
+    //   size = '400';
+    // }
+    // if (imgItem.imageAlt.includes('800')) {
+    //   size = '800';
+    // }
 
-    var fileExt = imgItem.imageAlt.split('.').pop();
-    let fileName = imgItem.imageAlt.replace(/\.[^/.]+$/, '');
-    fileName = fileName.replace(`/${size}`, '').replace(`_${size}x${size}`, '');
+    // var fileExt = imgItem.imageAlt.split('.').pop();
+    // let fileName = imgItem.imageAlt.replace(/\.[^/.]+$/, '');
+    // fileName = fileName.replace(`/${size}`, '').replace(`_${size}x${size}`, '');
 
-    switch (size) {
-      case '200':
-        fileName = `/thumbnails/${fileName}_${size}x${size}.${fileExt}`;
-        var pathReference = this.storage
-          .ref(fileName)
-          .getDownloadURL()
-          .subscribe((smallSrc) => {
-            console.debug(smallSrc);
-            imgItem.imageSrc200 = smallSrc;
-            imgItem.id = imgItem.imageAlt;
-          });
-        break;
-      case '400':
-        fileName = `/${size}/${fileName}_${size}x${size}.${fileExt}`;
-        var pathReference = this.storage
-          .ref(fileName)
-          .getDownloadURL()
-          .subscribe((smallSrc) => {
-            console.debug(smallSrc);
-            imgItem.imageSrc400 = smallSrc;
-            imgItem.id = imgItem.imageAlt;
-            //this.imageItemCopyCol.doc(imgItem.id).update(imgItem);
-          });
-        break;
-      case '800':
-        fileName = `/${size}/${fileName}_${size}x${size}.${fileExt}`;
-        var pathReference = this.storage
-          .ref(fileName)
-          .getDownloadURL()
-          .subscribe((smallSrc) => {
-            console.debug(smallSrc);
-            imgItem.imageSrc800 = smallSrc;
-            imgItem.id = imgItem.imageAlt;
-            //this.imageItemCopyCol.doc(imgItem.id).update(imgItem);
-          });
-        break;
-      default:
-        let fileNameDefault = `/thumbnails/${imgItem}`;
-        var pathReferenceDefault = this.storage
-          .ref(fileNameDefault)
-          .getDownloadURL()
+    // switch (size) {
+    //   case '200':
+    //     fileName = `/thumbnails/${fileName}_${size}x${size}.${fileExt}`;
+    //     var pathReference = this.storage
+    //       .ref(fileName)
+    //       .getDownloadURL()
+    //       .subscribe((smallSrc) => {
+    //         console.debug(smallSrc);
+    //         imgItem.imageSrc200 = smallSrc;
+    //         imgItem.id = imgItem.imageAlt;
+    //       });
+    //     break;
+    //   case '400':
+    //     fileName = `/${size}/${fileName}_${size}x${size}.${fileExt}`;
+    //     var pathReference = this.storage
+    //       .ref(fileName)
+    //       .getDownloadURL()
+    //       .subscribe((smallSrc) => {
+    //         console.debug(smallSrc);
+    //         imgItem.imageSrc400 = smallSrc;
+    //         imgItem.id = imgItem.imageAlt;
+    //         //this.imageItemCopyCol.doc(imgItem.id).update(imgItem);
+    //       });
+    //     break;
+    //   case '800':
+    //     fileName = `/${size}/${fileName}_${size}x${size}.${fileExt}`;
+    //     var pathReference = this.storage
+    //       .ref(fileName)
+    //       .getDownloadURL()
+    //       .subscribe((smallSrc) => {
+    //         console.debug(smallSrc);
+    //         imgItem.imageSrc800 = smallSrc;
+    //         imgItem.id = imgItem.imageAlt;
+    //         //this.imageItemCopyCol.doc(imgItem.id).update(imgItem);
+    //       });
+    //     break;
+    //   default:
+    //     let fileNameDefault = `/thumbnails/${imgItem}`;
+    //     var pathReferenceDefault = this.storage
+    //       .ref(fileNameDefault)
+    //       .getDownloadURL()
 
-          .subscribe((data) => {
-            console.debug(data);
-            img = data;
-          });
-        break;
-    }
-    //this.imageItemCollections.doc(imgItem.id).update(imgItem);
-    return img;
+    //       .subscribe((data) => {
+    //         console.debug(data);
+    //         img = data;
+    //       });
+    //     break;
+    // }
+    // //this.imageItemCollections.doc(imgItem.id).update(imgItem);
+    // return img;
   }
 
   getExistingImage(): Observable<imageItem[]> {
@@ -469,156 +463,156 @@ export class ImageListService {
   }
 
   async createMainImageList(): Promise<void> {
-    this.rawImagesArray = [];
-    this.getExistingImage().subscribe((imageList) => {
-      this.rawImagesArray = imageList;
-      let ranking = 0;
-      this.storage
-        .ref('/thumbnails')
-        .listAll()
-        .subscribe((files) => {
-          files.items.forEach((imageRef) => {
-            imageRef.getDownloadURL().then((downloadURL) => {
-              ranking++;
-              const imageUrl = downloadURL;
-              const imageData: imageItem = {
-                parentId: '',
-                caption: imageRef.fullPath,
-                type: 'IN_NOT_USED',
-                imageSrc: imageUrl,
-                largeImageSrc: imageUrl,
-                imageAlt: imageRef.name,
-                ranking: ranking,
-                id: '',
-              };
-              let found = false;
-              this.rawImagesArray.forEach((img) => {
-                if (img.imageAlt === imageData.imageAlt) {
-                  found = true;
-                }
-              });
-              if (!found) {
-      //          this.createItem(imageData);
-                console.debug(`Added ${imageData.imageAlt}`);
-              }
-            });
-          });
-          console.debug('createRawImagesList_200 completed');
-        });
-    });
+    // this.rawImagesArray = [];
+    // this.getExistingImage().subscribe((imageList) => {
+    //   this.rawImagesArray = imageList;
+    //   let ranking = 0;
+    //   this.storage
+    //     .ref('/thumbnails')
+    //     .listAll()
+    //     .subscribe((files) => {
+    //       files.items.forEach((imageRef) => {
+    //         imageRef.getDownloadURL().then((downloadURL) => {
+    //           ranking++;
+    //           const imageUrl = downloadURL;
+    //           const imageData: imageItem = {
+    //             parentId: '',
+    //             caption: imageRef.fullPath,
+    //             type: 'IN_NOT_USED',
+    //             imageSrc: imageUrl,
+    //             largeImageSrc: imageUrl,
+    //             imageAlt: imageRef.name,
+    //             ranking: ranking,
+    //             id: '',
+    //           };
+    //           let found = false;
+    //           this.rawImagesArray.forEach((img) => {
+    //             if (img.imageAlt === imageData.imageAlt) {
+    //               found = true;
+    //             }
+    //           });
+    //           if (!found) {
+    //   //          this.createItem(imageData);
+    //             console.debug(`Added ${imageData.imageAlt}`);
+    //           }
+    //         });
+    //       });
+    //       console.debug('createRawImagesList_200 completed');
+    //     });
+    // });
   }
 
   async createRawImagesList_200(): Promise<void> {
-    this.rawImagesArray = [];
-    this.getImagesBySize('200').subscribe((imageList) => {
-      this.rawImagesArray = imageList;
-      let ranking = 0;
-      this.storage
-        .ref('/thumbnails')
-        .listAll()
-        .subscribe((files) => {
-          files.items.forEach((imageRef) => {
-            imageRef.getDownloadURL().then((downloadURL) => {
-              ranking++;
-              const imageUrl = downloadURL;
-              const imageData: imageItem = {
-                parentId: '',
-                caption: imageRef.fullPath,
-                type: 'IN_NOT_USED',
-                imageSrc: imageUrl,
-                largeImageSrc: imageUrl,
-                imageAlt: imageRef.name,
-                ranking: ranking,
-                id: '',
-              };
-              let found = false;
-              this.rawImagesArray.forEach((img) => {
-                if (img.imageAlt === imageData.imageAlt) {
-                  found = true;
-                }
-              });
-              if (!found) {
-        //        this.createItem(imageData);
-                console.debug(`Added ${imageData.imageAlt}`);
-              }
-            });
-          });
-          console.debug('createRawImagesList_200 completed');
-        });
-    });
+    // this.rawImagesArray = [];
+    // this.getImagesBySize('200').subscribe((imageList) => {
+    //   this.rawImagesArray = imageList;
+    //   let ranking = 0;
+    //   this.storage
+    //     .ref('/thumbnails')
+    //     .listAll()
+    //     .subscribe((files) => {
+    //       files.items.forEach((imageRef) => {
+    //         imageRef.getDownloadURL().then((downloadURL) => {
+    //           ranking++;
+    //           const imageUrl = downloadURL;
+    //           const imageData: imageItem = {
+    //             parentId: '',
+    //             caption: imageRef.fullPath,
+    //             type: 'IN_NOT_USED',
+    //             imageSrc: imageUrl,
+    //             largeImageSrc: imageUrl,
+    //             imageAlt: imageRef.name,
+    //             ranking: ranking,
+    //             id: '',
+    //           };
+    //           let found = false;
+    //           this.rawImagesArray.forEach((img) => {
+    //             if (img.imageAlt === imageData.imageAlt) {
+    //               found = true;
+    //             }
+    //           });
+    //           if (!found) {
+    //     //        this.createItem(imageData);
+    //             console.debug(`Added ${imageData.imageAlt}`);
+    //           }
+    //         });
+    //       });
+    //       console.debug('createRawImagesList_200 completed');
+    //     });
+    // });
   }
 
   async createRawImagesList_400() {
     this.updateRawImageList();
     let ranking = 0;
-    this.storage
-      .ref('/400')
-      .listAll()
-      .subscribe((files) => {
-        files.items.forEach((imageRef) => {
-          imageRef.getDownloadURL().then((downloadURL) => {
-            ranking++;
-            const imageUrl = downloadURL;
-            const imageData: imageItem = {
-              parentId: '',
-              caption: imageRef.fullPath,
-              type: 'IN_NOT_USED',
-              imageSrc: imageUrl,
-              largeImageSrc: imageUrl,
-              imageAlt: imageRef.name,
-              ranking: ranking,
-              id: '',
-            };
-            let found = false;
-            this.rawImagesArray.forEach((img) => {
-              if (img.imageAlt === imageData.imageAlt) {
-                found = true;
-              }
-            });
-            if (!found) {
-          //    this.createItem(imageData);
-              console.debug(`Added ${imageData.imageAlt}`);
-            }
-          });
-        });
-        console.debug('createRawImagesList_400 completed');
-      });
+    // this.storage
+    //   .ref('/400')
+    //   .listAll()
+    //   .subscribe((files) => {
+    //     files.items.forEach((imageRef) => {
+    //       imageRef.getDownloadURL().then((downloadURL) => {
+    //         ranking++;
+    //         const imageUrl = downloadURL;
+    //         const imageData: imageItem = {
+    //           parentId: '',
+    //           caption: imageRef.fullPath,
+    //           type: 'IN_NOT_USED',
+    //           imageSrc: imageUrl,
+    //           largeImageSrc: imageUrl,
+    //           imageAlt: imageRef.name,
+    //           ranking: ranking,
+    //           id: '',
+    //         };
+    //         let found = false;
+    //         this.rawImagesArray.forEach((img) => {
+    //           if (img.imageAlt === imageData.imageAlt) {
+    //             found = true;
+    //           }
+    //         });
+    //         if (!found) {
+    //       //    this.createItem(imageData);
+    //           console.debug(`Added ${imageData.imageAlt}`);
+    //         }
+    //       });
+    //     });
+    //     console.debug('createRawImagesList_400 completed');
+    //   });
   }
 
   async createRawImagesList_800() {
     this.updateRawImageList();
-    let ranking = 0;
-    this.storage
-      .ref('/800')
-      .listAll()
-      .subscribe((files) => {
-        files.items.forEach((imageRef) => {
-          imageRef.getDownloadURL().then((downloadURL) => {
-            ranking++;
-            const imageUrl = downloadURL;
-            const imageData: imageItem = {
-              parentId: '',
-              caption: imageRef.fullPath,
-              type: 'IN_NOT_USED',
-              imageSrc: imageUrl,
-              largeImageSrc: imageUrl,
-              imageAlt: imageRef.name,
-              ranking: ranking,
-              id: '',
-            };
-            let found = false;
-            this.rawImagesArray.forEach((img) => {
-              if (img.imageAlt === imageData.imageAlt) {
-                found = true;
-              }
-            });
-            if (!found) {
-//              this.createItem(imageData);
-              console.debug(`Added ${imageData.imageAlt}`);
-            }
-          });
-        });
-        console.debug('createRawImagesList_800 completed');
-      });
+//     let ranking = 0;
+//     this.storage
+//       .ref('/800')
+//       .listAll()
+//       .subscribe((files) => {
+//         files.items.forEach((imageRef) => {
+//           imageRef.getDownloadURL().then((downloadURL) => {
+//             ranking++;
+//             const imageUrl = downloadURL;
+//             const imageData: imageItem = {
+//               parentId: '',
+//               caption: imageRef.fullPath,
+//               type: 'IN_NOT_USED',
+//               imageSrc: imageUrl,
+//               largeImageSrc: imageUrl,
+//               imageAlt: imageRef.name,
+//               ranking: ranking,
+//               id: '',
+//             };
+//             let found = false;
+//             this.rawImagesArray.forEach((img) => {
+//               if (img.imageAlt === imageData.imageAlt) {
+//                 found = true;
+//               }
+//             });
+//             if (!found) {
+// //              this.createItem(imageData);
+//               console.debug(`Added ${imageData.imageAlt}`);
+//             }
+//           });
+//         });
+//         console.debug('createRawImagesList_800 completed');
+//       });
   }
 }

@@ -4,7 +4,7 @@ import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatDrawer } from '@angular/material/sidenav';
 import { DndComponent } from 'app/3.components/loaddnd/dnd.component';
 import { IImageMaintenance } from 'app/5.models/maintenance';
-import { ImageMaintenanceService } from 'app/4.services/image-maintenance.service';
+
 
 import { Observable } from 'rxjs';
 import { Auth } from '@angular/fire/auth';
@@ -40,9 +40,9 @@ export class ImagesComponent implements OnInit {
     private auth: Auth,
     private matDialog: MatDialog,
     @Optional() @Inject(MAT_DIALOG_DATA) public parentId: string,
-    private imageMaintanenceService: ImageMaintenanceService
+
   ) {
-     this.allImageList$ = this.imageMaintanenceService.getAll();
+
       this.createEmptyForm();
       this.current_user = this.auth.currentUser?.displayName;
   }
@@ -136,10 +136,10 @@ export class ImagesComponent implements OnInit {
   onCreate() {
     const newItem = { ...this.imageForm.value } as IImageMaintenance;
     const currentUser = this.auth.currentUser;
-    currentUser.finally();
+
     newItem.user_updated = this.current_user;
     // console.debug(`onCreate ${newItem}`);
-    this.imageMaintanenceService.create(newItem);
+
   }
 
   onImages() {
@@ -169,18 +169,18 @@ export class ImagesComponent implements OnInit {
   create(data: any) {
     const rawData = this.imageForm.getRawValue();
     rawData.image_url = data.data.url;
-    this.imageMaintanenceService.update(rawData);
+
   }
 
   onUpdate(data: IImageMaintenance) {
     // console.debug(`onUpdate:  ${data}`);
     data = this.imageForm.getRawValue();
-    this.imageMaintanenceService.update(data);
+
   }
 
   onDelete(data: IImageMaintenance) {
     data = this.imageForm.getRawValue();
-    this.imageMaintanenceService.delete(data.id.toString());
+
   }
 
   closeDialog() {

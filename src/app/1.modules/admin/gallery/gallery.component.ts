@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
-import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { IImageStorage } from 'app/5.models/maintenance';
 import { Subject, takeUntil } from 'rxjs';
 
@@ -19,7 +18,7 @@ export class GalleryComponent implements OnInit, OnDestroy {
   imagesArray: IImageStorage[] = [];
   allImagesArray: IImageStorage[] = [];
 
-  constructor(public storage: AngularFireStorage) {}
+  constructor(public storage: Storage) {}
 
   private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -32,7 +31,7 @@ export class GalleryComponent implements OnInit, OnDestroy {
     this._unsubscribeAll.next(null);
     this._unsubscribeAll.complete();
   }
-  
+
   ImagesList() {
     var imageCount = 0;
     this.storage

@@ -26,7 +26,7 @@ import { ImageItemIndexService } from './image-item-index.service';
 })
 export class BlogService {
 
-  private blogItems: Observable<Blog[]>;
+
   private commentItems: Observable<Comments[]>;
 
   constructor(private snack: MatSnackBar) {
@@ -115,7 +115,7 @@ export class BlogService {
   }
 
   getAllPublishedBlog() {
-    return this.blogItems.pipe(
+    return this.getAll().pipe(
       map((blogs) =>
         blogs.filter(
           (pub) =>
@@ -129,7 +129,7 @@ export class BlogService {
   }
 
   getTailoringBlog() {
-    return this.blogItems.pipe(
+    return this.getAll().pipe(
       map((blogs) =>
         blogs.filter(
           (pub) =>
@@ -142,7 +142,7 @@ export class BlogService {
   }
 
   getCalendarBlog() {
-    return this.blogItems.pipe(
+    return this.getAll().pipe(
       map((blogs) =>
         blogs.filter((pub) => pub.calendar === true && pub.published === true)
       )
@@ -168,9 +168,6 @@ export class BlogService {
     return docData(blog) as Observable<Blog>;
   }
 
-  retrieveBlogs() {
-    return this.blogItems;
-  }
 
   createBlog(blog: Blog) {
     // this.blogCollection.add(blog);

@@ -6,7 +6,6 @@ import {
   OnDestroy,
   OnInit,
   Output,
-
   inject,
   signal,
 } from '@angular/core';
@@ -23,6 +22,7 @@ import { ProfileModel } from 'app/5.models/profile';
 import { UserService } from 'app/4.services/auth/user.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, Subject, Subscription, first, takeUntil } from 'rxjs';
+import { Auth } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-header',
@@ -44,6 +44,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private profile = inject(ProfileService);
   private snackBar = inject(MatSnackBar);
   private _location = inject(Location);
+  private auth : Auth = inject(Auth);
 
   @Input() title: string;
   @Input() sub_title: string;
@@ -66,20 +67,22 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.menuToggle.setDrawerState(false);
     this.emailName = 'Guest';
 
+
+    if (this.auth.currentUser.uid) {
+      this.userId = this.auth.currentUser.uid;
+      this.isLoggedIn = true;
+    }
+
     this.userService.isLoggedIn$.pipe(takeUntil(this._unsubscribeAll)).subscribe((res) => {
       if (res === true) {
         this.isLoggedIn = true;
 
-        this.userId = this.authService.userId
-
-        // this.cartService.updateCartCounter(this.userId);
-
-         this.cartService.cartByUserId(this.authService.userData.uid).pipe(takeUntil(this._unsubscribeAll)).subscribe((cart) => {
+        this.cartService.cartByUserId(this.userId).pipe(takeUntil(this._unsubscribeAll)).subscribe((cart) => {
           this.cartCounter.set(cart.length);
         });
 
         this.wishListService
-          .wishListByUserId(this.authService.userData.uid)
+          .wishListByUserId(this.userId)
           .subscribe((wishlist) => {
             this.wishCounter.set(wishlist.length);
           });
