@@ -9,7 +9,7 @@
         <mat-tab-group #tabGroup mat-stretch-tabs="false">
 
           <!-- <ng-container *ngIf="(userService.isLoggedIn$ | async) as loggedin"> -->
-            <div *ngIf="!loggedIn">
+            <div *ngIf="loggedIn">
               <mat-tab label="Sign In">
                 <ng-template matTabContent>
                   <sign-in-classic></sign-in-classic>
@@ -29,7 +29,7 @@
                   <sign-out-fullscreen></sign-out-fullscreen>
                 </ng-template>
               </mat-tab>
-              
+
             </div>
           <!-- </ng-container> -->
         </mat-tab-group>

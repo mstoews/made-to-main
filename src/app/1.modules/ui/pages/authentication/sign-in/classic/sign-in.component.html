@@ -8,13 +8,32 @@
         <img src="/favicon.ico" />
       </div>
       <!-- Title -->
-      <div class="mt-1 text-4xl text-gray-400 font-extrabold tracking-tight leading-tight">
+
+      <div class="m-2 text-4xl text-gray-400 font-extrabold tracking-tight leading-tight">
         Sign In
       </div>
+      <form [formGroup]="signInForm" class="flex flex-col justify-center w-full">
+      <mat-form-field class="m-1 flex-start grow w-full" appearance="outline">
+        <mat-label class="ml-2 text-base">Email</mat-label>
+        <input #myInput matInput placeholder="Email" formControlName="email" />
+      </mat-form-field>
+
+      <mat-form-field class="m-1 flex-start grow w-full" appearance="outline">
+        <mat-label class="ml-2 text-base">Password</mat-label>
+        <input #myInput matInput type="password" placeholder="Password" formControlName="password" />
+      </mat-form-field>
+
+      <!-- <div class="form-group">
+        <input [type]="changetype?'password':'text'" placeholder="Enter your password">
+        <span class="eyeicon" (click)="viewpass()"><i [ngClass]="visible?'fa fa-eye':'fa fa-eye-slash'"></i>
+        </span>
+    </div> -->
+
+      <button  (click)="signIn()" class="w-full h-50 p-2" mat-raised-button color="primary">Sign In</button>
+      </form>
+
+      <div class="text-gray-400 mt-5">Signing in will register you as a Made To users. </div>
       <br>
-      <h2 class="text-gray-400">Signing in will register you as a Made To users. </h2>
-      <div id="firebaseui-auth-container" class="text-gray-700 justify-center">
-      </div>
     </div>
   </div>
   <div

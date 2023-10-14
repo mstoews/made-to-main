@@ -43,6 +43,7 @@ export class CartComponent implements OnInit, OnDestroy {
   admin_login = false;
   cartItemsAvailable: boolean = false;
   userCountry: string;
+  fg: FormGroup;
 
   constructor(
     private authService: AuthService,
@@ -52,6 +53,7 @@ export class CartComponent implements OnInit, OnDestroy {
     private cartService: CartService,
     private ngxSpinner: NgxSpinnerService,
     private profileService: ProfileService,
+    public fb: FormBuilder
   ) {
     this.authService.getUserId().then ((userId) => {
       this.userId = userId
@@ -64,21 +66,48 @@ export class CartComponent implements OnInit, OnDestroy {
 
   async ngOnInit(): Promise<void> {
     this.userId = this.activateRoute.snapshot.params.id;
+    console.debug('userId: ', this.userId);
     this.cart$ = this.cartService.cartByStatus(this.userId, 'open');
 
-    if (this.cart$) {
+    this.cart$.subscribe((cart) => {
+      this.cartData = cart;
       this.calculateTotals();
+      this.createForm();
+    });
+
+    this.cartService.getCartCountByUser(this.userId).then((count) => {
+      console.debug('count there: ', count);
+    });
+
+  }
+
+
+
+  onSaveMeasurements() {
+    let userId = this.userId;
+    let measurements = this.fg.getRawValue();
+    const dDate = new Date();
+    const updateDate = dDate.toISOString().split('T')[0];
+
+    if (measurements) {
+      const cart: Cart = {
+        ...measurements,
+        is_completed: false,
+        user_purchased: userId,
+        date_sold: updateDate,
+        date_updated: updateDate,
+        status: 'open',
+        quantity: 1,
+      };
+      this.cartService.updateByCartId(cart, this.cartId)
     }
   }
 
-  fb = inject(FormBuilder);
-  measurementGroup: FormGroup;
-
   createEmptyForm() {
-    this.measurementGroup = this.fb.group({
+    this.fg = this.fb.group({
       bust: [''],
       waist: [''],
-      hips: [''],
+      hip: [''],
       height: [''],
       inseam: [''],
       outseam: [''],
@@ -86,10 +115,30 @@ export class CartComponent implements OnInit, OnDestroy {
     });
   }
 
+  createForm() {
+    let cart: Cart;
+    this.cart$.subscribe((result) => {
+      result.forEach((item) => {
+        cart = item;
+        if (item.is_clothing === false) {
+          this.fg = this.fb.group({
+            bust: [cart.bust],
+            waist: [cart.waist],
+            hip: [cart.hip],
+            height: [cart.height],
+            inseam: [cart.inseam],
+            outseam: [cart.outseam],
+            sleeve_length: [cart.sleeve_length],
+          });
+        }
+      });
+    });
+  }
 
   onCheckOut() {
     // this.calculateTotals();
     // this.route.navigate(['shop/coming-soon']);
+    this.onSaveMeasurements();
     this.ngxSpinner.show().then(() => {
       setTimeout(() => {
         this.ngxSpinner.hide();
@@ -114,6 +163,7 @@ export class CartComponent implements OnInit, OnDestroy {
   onCheckOutPaymentIntent() {
     // this.calculateTotals();
     // this.route.navigate(['shop/coming-soon']);
+    this.onSaveMeasurements();
     this.ngxSpinner.show().then(() => {
       setTimeout(() => {
         this.ngxSpinner.hide();
@@ -138,6 +188,7 @@ export class CartComponent implements OnInit, OnDestroy {
   async getUserCountry() {
 
     return this.profileService.getUserCountry();
+
     // let collection = this.afs.collection<ProfileModel>( `users/${userId}/profile` );
 
     // const profiles = collection.valueChanges({ idField: 'id' });

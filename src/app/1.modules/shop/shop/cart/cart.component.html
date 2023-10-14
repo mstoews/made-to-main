@@ -1,9 +1,12 @@
-<ng-container class="bg-gray-50" *ngIf="cart$ | async as cartItems">
-  <app-header [title]="'Shopping Cart'"></app-header>
 
-  <mat-card bg-gray-50>
+<app-header [title]="'Shopping Cart'"></app-header>
 
-    <div class="max-w-2xl px-4 pt-6 mx-auto sm:px-6 lg:max-w-7xl lg:px-8">
+<div class="bg-gray-50 h-screen" *ngIf="cart$ | async as cartItems">
+
+
+  <mat-card bg-gray-50 >
+
+    <div class="max-w-2xl px-4 pt-6 mx-auto sm:px-6 lg:max-w-7xl lg:px-8 m-10">
       <div class="mt-6 lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-12 xl:gap-x-16">
         <section aria-labelledby="cart-heading" class="lg:col-span-7">
           <div *ngIf="cartItems.length > 0; else nocart">
@@ -19,9 +22,9 @@
                     <div class="relative pr-9 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:pr-0">
                       <div>
                         <div class="flex justify-between">
-                          <h3 class="text-sm">
-                            <a href="#" class="font-medium text-gray-700 hover:text-gray-800">{{item.description}}</a>
-                          </h3>
+                          <div class="text-sm">
+                            <a href="#" class="text-2xl text-gray-700 hover:text-gray-800">{{item.description}}</a>
+                          </div>
                         </div>
                         <div class="flex mt-1 text-sm">
                           <p class="text-gray-500">{{item.short_description}}</p>
@@ -73,8 +76,7 @@
               <div class="m-2 p-2 max-w-[650px] center" *ngIf="item.is_tailoring">
                 <div mat-dialog-content>
                   <mat-card-title class="bg-gray-700 rounded-sm m-1 p-1">Measurements</mat-card-title>
-                  <form [formGroup]="measurementGroup" (ngSubmit)="onUpdate(mainpageGroup.value)">
-
+                  <form [formGroup]="fg">
                     <section class="flex flex-col md:flex-row">
 
                       <mat-form-field class="mt-2 m-1 grow" appearance="outline">
@@ -118,11 +120,84 @@
                         <mat-label class="text-base">Hip</mat-label>
                         <input matInput placeholder="Hip" type="number" formControlName="hip" />
                       </mat-form-field>
+                    </section>
+                    <button color="primary" class="bg-gray-600 hover:text-gray-100" mat-raised-button  (click)="onSaveMeasurements()">Save Measurements</button>
+                  </form>
+              </div>
+              </div>
+              <div class="m-2 p-2 max-w-[650px] center" *ngIf="item.is_trousers">
+                <div mat-dialog-content>
+                  <mat-card-title class="bg-gray-700 rounded-sm m-1 p-1">Measurements</mat-card-title>
+                  <form [formGroup]="fg">
+
+                    <section class="flex flex-col md:flex-row">
+
+                      <mat-form-field class="pt-2 mr-2 grow" appearance="outline">
+                        <mat-label class="text-base">Waist</mat-label>
+                        <input matInput placeholder="Waist" type="number" formControlName="waist" />
+                      </mat-form-field>
+
+
+                      <mat-form-field class="pt-2 mr-2 grow" appearance="outline">
+                        <mat-label class="text-base">Height</mat-label>
+                        <input matInput placeholder="Height" type="number" formControlName="height" />
+                      </mat-form-field>
+
+                    <!-- </section>
+
+                    <section class="flex flex-col md:flex-row"> -->
+                      <mat-form-field class="pt-2 mr-2 grow" appearance="outline">
+                        <mat-label class="text-base">Inseam</mat-label>
+                        <input matInput placeholder="Inseam" type="number" formControlName="inseam" />
+                      </mat-form-field>
+
+
+                      <mat-form-field class="pt-2 mr-2 grow" appearance="outline">
+                        <mat-label class="text-base">Outseam</mat-label>
+                        <input matInput placeholder="Outseam" type="number" formControlName="outseam" />
+                      </mat-form-field>
+
+                      <mat-form-field class="mt-2 form-element grow" appearance="outline">
+                        <mat-label class="text-base">Hip</mat-label>
+                        <input matInput placeholder="Hip" type="number" formControlName="hip" />
+                      </mat-form-field>
 
                     </section>
-
+                    <button color="primary" class="bg-gray-600 hover:text-gray-100" mat-raised-button  (click)="onSaveMeasurements()">Save Measurements</button>
                   </form>
                 </div>
+              </div>
+              <div class="m-2 p-2 max-w-[650px] center" *ngIf="item.is_coats_tops">
+                <div mat-dialog-content>
+                  <mat-card-title class="bg-gray-700 rounded-sm m-1 p-1">Measurements</mat-card-title>
+                  <form [formGroup]="fg">
+                    <section class="flex flex-col md:flex-row">
+
+                      <mat-form-field class="pt-2 mr-2 grow" appearance="outline">
+                        <mat-label class="text-base">Waist</mat-label>
+                        <input matInput placeholder="Waist" type="number" formControlName="waist" />
+                      </mat-form-field>
+
+                      <mat-form-field class="pt-2 mr-2 grow" appearance="outline">
+                        <mat-label class="text-base">Bust</mat-label>
+                        <input matInput placeholder="Bust" type="number" formControlName="bust" />
+                      </mat-form-field>
+
+                      <mat-form-field class="pt-2 mr-2 grow" appearance="outline">
+                        <mat-label class="text-base">Height</mat-label>
+                        <input matInput placeholder="Height" type="number" formControlName="height" />
+                      </mat-form-field>
+
+                      <mat-form-field class="pt-2 mr-2 grow" appearance="outline">
+                        <mat-label class="text-base">Sleeve length</mat-label>
+                        <input matInput placeholder="Sleeve length" type="number" formControlName="sleeve_length" />
+                      </mat-form-field>
+
+                    </section>
+                  </form>
+                  <button color="primary" class="bg-gray-600 hover:text-gray-100" mat-raised-button  (click)="onSaveMeasurements()">Save Measurements</button>
+                </div>
+
               </div>
             </div>
           </div>
@@ -132,7 +207,7 @@
 
         <section aria-labelledby="summary-heading"
           class="px-4 py-6 mt-16 rounded-lg bg-gray-50 sm:p-6 lg:col-span-5 lg:mt-0 lg:p-8">
-          <h2 id="summary-heading" class="text-lg font-medium text-gray-900">Order summary</h2>
+          <div id="summary-heading" class="text-2xl font-medium text-gray-900">Order summary</div>
 
           <dl class="mt-6 space-y-4">
             <div class="flex items-center justify-between">
@@ -163,15 +238,14 @@
             </div>
           </dl>
 
-          <app-elements [amount]="grand_total"></app-elements>
+          <!-- <app-elements [amount]="grand_total"></app-elements> -->
 
-          <!-- <div class="mt-6">
+          <div class="mt-6">
             <button type="submit" (click)="onCheckOut()"
               class="w-full px-4 py-3 text-base font-medium text-white bg-gray-800 border border-transparent rounded-md shadow-sm hover:bg-gray-200 hover:text-black hover:border-2 hover:border-black focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50">
               Checkout
             </button>
-
-          </div> -->
+          </div>
         </section>
 
       </div>
@@ -197,4 +271,4 @@
   <ngx-spinner type="ball-scale-multiple">
     <p class="loading">Initializing Checkout</p>
   </ngx-spinner>
-</ng-container>
+</div>

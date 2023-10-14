@@ -35,18 +35,15 @@ export class SideNavComponent implements OnInit {
     private route: Router,
 
   ) {
-     const user =  this.auth.currentUser;
-     if (user) {
-        this.userId = user.uid;
-        this.userEmail = user.email;
-        console.log('User Email: ', this.userEmail);
-      }
-    }
-
+     auth.onAuthStateChanged((user) => {
+        this.userEmail = user.email!;
+        this.userId = user.uid!;
+      });
+  }
 
   ngOnInit() {
     initTE({ Carousel, Dropdown, Sidenav, Ripple });
-  
+    this.userId = this.userService.getUserId();
   }
 
 
@@ -91,8 +88,7 @@ export class SideNavComponent implements OnInit {
 
 
   onWishList() {
-    this.userService.isLoggedIn$.subscribe((user) => {
-      if (user === false) {
+      if (!this.userId) {
         this.snackBar.open('Please sign in to access the wish list', 'OK', {
           verticalPosition: 'top',
           horizontalPosition: 'center',
@@ -104,12 +100,11 @@ export class SideNavComponent implements OnInit {
           this.route.navigate(['/shop/wishlist/', this.userId]);
           this.notifyParentCloseDrawer.emit();
       }
-    });
+
   }
 
   onCart() {
-    this.userService.isLoggedIn$.subscribe((user) => {
-      if (user === false) {
+      if (!this.userId) {
         this.snackBar.open('Please sign in to access the cart', 'OK', {
           verticalPosition: 'top',
           horizontalPosition: 'right',
@@ -121,7 +116,6 @@ export class SideNavComponent implements OnInit {
         this.route.navigate(['/shop/cart/', this.userId]);
         this.notifyParentCloseDrawer.emit();
       }
-    });
   }
 
 

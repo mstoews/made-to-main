@@ -71,9 +71,11 @@ export class CartService implements OnDestroy {
 
   async cartCount(): Promise<number>  {
     const count = await getCountFromServer(collection(this.firestore ,`users/${this.userId}/cart/`));
-    console.log('count: ', count.data.length);
+    console.log('cartCount: ', count.data().count);
     return count.data.length;
   }
+
+
 
   ngOnDestroy(): void {
     this._unsubscribeAll.next(null);
@@ -83,52 +85,36 @@ export class CartService implements OnDestroy {
 
   private _unsubscribeAll: Subject<any> = new Subject<any>();
 
-  // getCartCount(userId: string): Observable<number | undefined> {
-
-  //   collection(this.firestore, `users/${userId}/cart`)
-  //     .snapshotChanges()
-  //     .forEach((snaps) => {
-  //        return of(snaps.length);
-  //     }
-  //   );
-  //   return of(0);
-  // }
-
-  // getCartItem(userId: string, productId: string): Observable<Cart[]> {
-  //   return this.afs
-  //     .collection(`users/${userId}/cart`, (ref) =>
-  //       ref.where('product_id', '==', productId)
-  //     )
-  //     .snapshotChanges()
-  //     .pipe(
-  //       map((snaps) => {
-  //         return convertSnaps<Cart>(snaps);
-  //       })
-  //     );
-  // }
-
   getAll(userId: string) {
-    return  collectionData(collection(this.firestore, `user/${userId}/cart`), {idField:  'id'}) as  Observable<Cart[]>
+    return  collectionData(collection(this.firestore, `users/${userId}/cart`), {idField:  'id'}) as  Observable<Cart[]>
   }
 
   get(id: string, userId: string) {
-    return getDoc(doc(this.firestore, `user/${userId}/cart/${id}`));
+    return getDoc(doc(this.firestore, `users/${userId}/cart/${id}`));
   }
 
   cartByUserId(userId: string): Observable<Cart[] | undefined> {
-    return  collectionData(collection(this.firestore, `user/${userId}/cart`), {idField:  'id'}) as  Observable<Cart[]>
+    return  collectionData(collection(this.firestore, `users/${userId}/cart`), {idField:  'id'}) as  Observable<Cart[]>
   }
 
   cartByStatus(userId: string, cartStatus: string) {
-    return collectionData(collection(this.firestore, `user/${userId}/cart`), {idField:  'id'})
+    return collectionData(collection(this.firestore, `users/${userId}/cart`), {idField:  'id'})
     .pipe(map((cart) => cart.filter((status) => status.status === cartStatus))) as  Observable<Cart[]>
   }
 
-  cartCountByUserId(userId: string): any {
-    const cartCount = this.cartByStatus(userId, 'Open');
-    cartCount.subscribe((cart) => {
-      return of(cart.length);
+  cartCountByUserId(userId: string): number {
+    const sub = this.cartByStatus(userId, 'open').pipe(
+      map((cart) => cart.length)).subscribe((count) => {
+      this.cartCounter.set(count);
     });
+    sub.unsubscribe
+    return this.cartCounter();
+  }
+
+  async getCartCountByUser(userId: string): Promise<number>  {
+    const count = await (await getCountFromServer(collection(this.firestore ,`users/${userId}/cart/`)))
+    console.log('count getCartCountByUser: ', count.data().count);
+    return count.data().count;
   }
 
   // findCartByUrl(id: string): Observable<Cart | undefined> {
@@ -214,18 +200,43 @@ export class CartService implements OnDestroy {
     }
   }
 
-  update(mtCart: Cart) {
-    const collectionRef = collection(this.firestore, `user/${this.userId}/cart`);
-    const ref = doc(collectionRef, mtCart.id);
-    this.snack.open('Cart has been updated ... ', 'OK', {
-      verticalPosition: 'top',
-      horizontalPosition: 'right',
-      panelClass: 'bg-danger',
-    });
+  // const collectionRef = collection(this.firestore, `blog/${blog_id}/comment/`);
+  // const ref = doc(collectionRef, commentId);
+  // updateDoc(ref, comment);
+
+  update(cart: Cart) {
+    const ref = doc(collection(this.firestore, `users/${this.userId}/cart`), cart.id) as DocumentReference<Cart>;
+    updateDoc(ref, cart).then(() => {
+        this.snack.open('Cart has been updated ... ', 'OK', {
+          verticalPosition: 'top',
+          horizontalPosition: 'right',
+          panelClass: 'bg-danger',
+          duration: 2000,
+        });
+      })
+      .catch((error) => {
+        console.log('Error updating cart');
+        alert(`Error updating cart:  error ${error}`);
+      });
   }
 
+  updateByCartId(cart: Cart, id: string) {
+    const ref = doc(collection(this.firestore, `users/${this.userId}/cart`),id) as DocumentReference<Cart>;
+    updateDoc(ref, cart).then(() => {
+        this.snack.open('Cart has been updated ... ', 'OK', {
+          verticalPosition: 'top',
+          horizontalPosition: 'right',
+          panelClass: 'bg-danger',
+          duration: 2000,
+        });
+      }
+    )
+  }
+
+
+
   delete(id: string) {
-    const ref = doc(this.firestore, `user/${this.userId}/cart`, id);
+    const ref = doc(this.firestore, `users/${this.userId}/cart`, id);
     deleteDoc(ref).then(() => { ;
     this.snack.open('Item has been removed ... ', 'OK', {
       verticalPosition: 'top',

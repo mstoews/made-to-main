@@ -72,7 +72,7 @@ export class BlogService {
     const dDate = new Date();
     const updateDate = dDate.toISOString();
     const comment = { reply: reply, reply_date: updateDate };
-    // collectionRef.updateDoc(commentId).update(comment);
+
     const collectionRef = collection(this.firestore, `blog/${blog_id}/comment/`);
     const ref = doc(collectionRef, commentId);
     updateDoc(ref, comment);

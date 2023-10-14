@@ -16,14 +16,15 @@ import { AuthService } from './auth.service';
     isLoggedIn$: Observable<boolean> = of(false);
     isLoggedOut$: Observable<boolean> = of(true);
 
+
     constructor(
       public authService: AuthService,
       public Auth: Auth,
       private router: Router
     ) {
       this.Auth.onIdTokenChanged((user) => {
-        this.isLoggedIn$ = of(!!user);
-        this.isLoggedOut$ = of(!user);
+        this.isLoggedIn$ = of(true);
+        this.isLoggedOut$ = of(false);
         if (user) {
           user.getIdTokenResult().then((idTokenResult) => {
             if (!!idTokenResult.claims.admin) {
@@ -39,6 +40,14 @@ import { AuthService } from './auth.service';
           this.isAdmin$ = of(false);
         }
       });
+    }
+
+    getUserId(): string {
+      const user = getAuth().currentUser;
+      if (user) {
+        return user.uid;
+      }
+      return '';
     }
 
 }
