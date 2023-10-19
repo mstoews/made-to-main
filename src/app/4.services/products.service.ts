@@ -1,31 +1,53 @@
 import { Injectable, inject } from '@angular/core';
-import { first, from, map, Observable } from 'rxjs';
+import { from, map, Observable } from 'rxjs';
 import { Product } from 'app/5.models/products';
-import { convertSnaps } from './db-utils';
 import { ImageItemIndex } from 'app/5.models/imageItem';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ImageItemIndexService } from './image-item-index.service';
-import { DocumentReference, Firestore, addDoc, collection, collectionData, deleteDoc, doc, docData, orderBy, query, updateDoc, where } from '@angular/fire/firestore';
-
-
+import { DocumentReference, Firestore, addDoc, and, collection, collectionData, deleteDoc, doc, docData, orderBy, query, updateDoc, where } from '@angular/fire/firestore';
 
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProductsService {
-  [x: string]: any;
 
-  imageItemIndexService: ImageItemIndexService = inject(ImageItemIndexService);
+  ALL_CATEGORY = 'All Categories';
+
+  // imageItemIndexService: ImageItemIndexService = inject(ImageItemIndexService);
   firestore = inject(Firestore);
-  snakBar = inject(MatSnackBar);
-
+  snackBar = inject(MatSnackBar);
 
     //Query
 
     getAll() {
-      const collectionRef = collection(this.firestore, 'inventory');
+      const collectionRef = query(collection(this.firestore, 'inventory'), orderBy('category'));
       return collectionData(collectionRef, { idField: 'id' }) as Observable<Product[]>;
+    }
+
+
+    getInventoryByCategory(category: string) {
+      if (category === this.ALL_CATEGORY || category === null) {
+        return this.getAvailableInventory();
+      }
+      else {
+
+      const collectionRef = query(collection(this.firestore, 'inventory'),
+      and (
+      where('category', '==', category),
+      where('purchases_allowed', '==', true)),
+      orderBy('category') ) ;
+        return collectionData(collectionRef, { idField: 'id' }) as Observable<Product[]>;
+      }
+
+      // if (category === null) {
+      //   return this.getAvailableInventory();
+      // } else {
+      //   return this.getAvailableInventory().pipe(
+      //     map((inventory) =>
+      //       inventory.filter((product) => product.category === category)
+      //     )
+      //   );
+      // }
     }
 
     getById(id: string) {
@@ -68,13 +90,6 @@ export class ProductsService {
     this.add(productPartial);
   }
 
-  getAvailableInventory() {
-    return this.getAll().pipe(
-      map((inventory) =>
-        inventory.filter((available) => available.purchases_allowed === true)
-      )
-    );
-  }
 
   updateMainImage(product: Product) {
     this.update(product);
@@ -105,40 +120,41 @@ export class ProductsService {
     return this.getById(id);
   }
 
-  getInventoryByProduct(category: string) {
-    if (category === 'All Categories' || category === null) {
-      return this.getAvailableInventory();
-    } else {
-      return this.getAvailableInventory().pipe(
-        map((inventory) =>
-          inventory.filter((product) => product.category === category)
-        )
-      );
-    }
-  }
-
-  getInventoryByCategory(category: string) {
-    if (category === null) {
-      return this.getAvailableInventory();
-    } else {
-      return this.getAvailableInventory().pipe(
-        map((inventory) =>
-          inventory.filter((product) => product.category === category)
-        )
-      );
-    }
-  }
-
-  getProductImage(parentId: string): any {
-    const productImages = this.imageItemIndexService.getImagesByTypeId(parentId);
-    return productImages.pipe(
-      map((images) => images.filter((product) => product.parentId === parentId))
+  getAvailableInventory() {
+    return this.getAll().pipe(
+      map((inventory) =>
+        inventory.filter((available) => available.purchases_allowed === true)
+      )
     );
   }
 
+  getInventoryByProduct(category: string) {
+    if (category === this.ALL_CATEGORY || category === null) {
+      return this.getAvailableInventory();
+    } else {
+      return this.getAvailableInventory().pipe(
+        map((inventory) =>
+          inventory.filter((product) => product.category === category)
+        )
+      );
+    }
+  }
+
+
+  getProductImage(parentId: string): any {
+    const collectionRef = collection(this.firestore, 'originalImageList');
+    const col = collectionData(collectionRef, { idField: 'id' }) as Observable<ImageItemIndex[]>;
+    return col.pipe(map((images) => images.filter((product) => product.parentId === parentId)));
+  }
+
   getImageList() {
-    const collectionRef = collection(this.afs, 'originalImageList');
+    const collectionRef = collection(this.firestore, 'originalImageList');
     const q = query(collectionRef, orderBy('ranking'));
+    return collectionData(q, { idField: 'id' }) as Observable<ImageItemIndex[]>;
+  }
+
+  getImageListByProductId(parentId: string) {
+    const q = query(collection(this.firestore, 'originalImageList'), where(parentId, '==', parentId) , orderBy('ranking'));
     return collectionData(q, { idField: 'id' }) as Observable<ImageItemIndex[]>;
   }
 
@@ -158,12 +174,12 @@ export class ProductsService {
     return list.pipe(map((product) => product[0]));
   }
 
-  create(mtProduct: Product) {
-    return from(this.productsCollection.add(mtProduct));
+  create(product: Product) {
+    return addDoc(collection(this.firestore, 'inventory'), product);
   }
 
   updatePartial(product: Product) {
-    this.productPartialCollection.doc(product.id.toString()).update(product);
+    return addDoc(collection(this.firestore, 'inventory'), product);
   }
 
 }

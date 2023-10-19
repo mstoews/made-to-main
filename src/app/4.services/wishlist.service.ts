@@ -8,8 +8,10 @@ import { OrderByDirection } from 'firebase/firestore';
 import { Router } from '@angular/router';
 import { CartService } from './cart.service';
 import { WishList } from 'app/5.models/wishlist';
-import { Firestore, collection, getDoc, getCountFromServer, collectionData, doc, docData, addDoc, deleteDoc, updateDoc } from '@angular/fire/firestore';
-import { Auth } from '@angular/fire/auth';
+import { Firestore, collection, getDoc, getCountFromServer, collectionData, doc, docData, addDoc, deleteDoc, updateDoc, where, query } from '@angular/fire/firestore';
+import { Auth, onAuthStateChanged } from '@angular/fire/auth';
+import { on } from 'events';
+
 
 @Injectable({
   providedIn: 'root',
@@ -35,7 +37,14 @@ export class WishListService {
     private menuToggleService: MenuToggleService,
     private route: Router
   ) {
-      // this.userId = auth.currentUser.uid;
+      onAuthStateChanged(this.auth, (user) => {
+        if (user) {
+          this.isLoggedIn = true;
+          this.userId = user.uid;
+        } else {
+          this.isLoggedIn = false;
+        }
+      });
   }
 
 
@@ -53,6 +62,29 @@ export class WishListService {
     return docData(wishlist) as Observable<WishList>;
   }
 
+  addToWishList(userId: string, productId: string) {
+    let prod = this.findProductById(productId);
+    const dDate = new Date();
+    const updateDate = dDate.toISOString().split('T')[0];
+
+    if (prod) {
+      prod.subscribe((result) => {
+        const cart: Product = {
+          ...result,
+          id: productId,
+          is_completed: false,
+          user_purchased: userId,
+          date_sold: updateDate,
+          date_updated: updateDate,
+          status: 'open',
+          quantity: 1,
+        };
+        this.create(userId, cart);
+      });
+    }
+  }
+
+
   createCart(product: Product) {
     addDoc(collection(this.firestore, `users/${this.userId}/cart`), product).then((newProduct) => {
         console.debug('Document written with ID: ', newProduct.id);
@@ -69,7 +101,7 @@ export class WishListService {
       });
   }
 
-  createWishList(productId: string) {
+  createWishList(userId: string, productId: string) {
     let prod = this.findProductById(productId);
     if (prod) {
       prod.subscribe((result) => {
@@ -77,7 +109,8 @@ export class WishListService {
           ...result,
           product_id: result.id,
         };
-        this.create(wish);
+        this.create(userId, wish);
+        console.debug('wish list created for product id: ', productId);
       });
     }
     //}
@@ -108,25 +141,9 @@ export class WishListService {
   }
 
   findCartItemByProductId(productId: string): any {
-    const collectionRef = collection(this.firestore, `users/${this.userId}/cart/`);
-    const product = doc(collectionRef, productId);
-    docData(product).subscribe((result) => {
-      return result;
-    });
-  }
-
-  create(mtProduct: Product): void {
-    // console.debug('product id:', mtProduct.id);
-    if (this.findWishListItemById(mtProduct.id)) {
-      this.createWishList(mtProduct.id);
-
-      this.snack.open('Wish list has been added ...', 'OK', {
-        verticalPosition: 'top',
-        horizontalPosition: 'right',
-        panelClass: 'bg-danger',
-        duration: 3000,
-      });
-    }
+    return collectionData(
+      query(collection(this.firestore, `users/${this.userId}/cart`) ,
+      where('product_id', '==', productId)), { idField: 'id' }) as Observable<Product[]>;
   }
 
   isProductInCart(productId: string): boolean {
@@ -146,15 +163,6 @@ export class WishListService {
     }
   }
 
-  findCart(
-    productId: string,
-    userId: string,
-    sortOrder: OrderByDirection = 'asc',
-    pageNumber = 0,
-    pageSize = 3
-  ): Observable<Product[]> {
-    return this.findCartItemByProductId(productId);
-  }
 
   addToCartWithQuantity(productId: string, quantity: number) {
     let userId = this.userId;
@@ -215,20 +223,44 @@ export class WishListService {
                   hip: this.hip,
                 };
                 // create the cart item from the list item
-                this.createCart(wish);
+                this.create(this.userId, wish);
                 // delete the wish item from the wish list
-                this.deleteWishListItemById(productId);
-                this.cartService.cartCounter.set(
-                  this.cartService.cartCounter() + 1
-                );
               });
             }
           })
+
         // });
       }
     }
     return true;
   }
+
+  async create(userId: string, product: Product) {
+    const Ref = collection(this.firestore, `users/${userId}/wishlist/`);
+    addDoc(Ref, product)
+      .then((newCart) => {
+        updateDoc(doc(Ref, newCart.id), { id: newCart.id } );
+        this.snack.open('Selection has been added to your wishlist ...', 'OK', {
+          verticalPosition: 'top',
+          horizontalPosition: 'right',
+          panelClass: 'bg-danger',
+          duration: 3000,
+        });
+      })
+      .catch((error) => {
+        this.snack.open(
+          `Selection has NOT been added to your wishlist ...\n${error} `,
+          'OK',
+          {
+            verticalPosition: 'top',
+            horizontalPosition: 'right',
+            panelClass: 'bg-danger',
+            duration: 3000,
+          }
+        );
+      });
+  }
+
 
   wishListByUserId(userId: string): any {
     const collectionRef = collection(this.firestore, `users/${userId}/wishlist/`);

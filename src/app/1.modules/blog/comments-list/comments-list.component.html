@@ -1,24 +1,22 @@
-<div class="mt-10">
-  <div class="text-gray-900 text-2xl text-bold m-2">Comments</div>
-
+<div class="p-4">
+  <div class="text-gray-900 text-2xl text-bold m-2 p-2">Comments</div>
   <div *ngIf="Comments$ | async as comments">
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 m-2">
       <div *ngFor="let comment of comments">
         <mat-card
-          class="relative flex items-left space-x-3 rounded-lg border border-gray-300 bg-gray-600 px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400">
-
-          <div class="min-w-0 flex-1">
-            <p class="text-sm font-medium text-gray-600">{{comment.name}}</p>
-            <p class="text-sm text-gray-500">{{comment.message}}</p>
-            <p class="text-sm font-medium text-gray-600 text-right">{{comment.created_date | date}}</p>
+          class="relative flex items-left space-x-3 rounded-lg border-l-gray-700 border-gray-700 bg-gray-800  shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400">
+          <div class="min-w-0 flex-1 m-2">
+            <div class="text-lg font-bold text-gray-800">{{comment.name}}</div>
+            <div class="text-lg text-gray-800">{{comment.message}}</div>
+            <div class="text-lg font-medium text-gray-800 text-right">{{comment.created_date | date}}</div>
 
             <ng-container *ngIf="comment.reply">
-              <p class="text-sm font-medium text-gray-600">Reply from Made To Cassie</p>
-              <p class="text-sm text-gray-500">{{comment.reply}}</p>
-              <p class="text-sm font-medium text-gray-600 text-right">{{comment.reply_date | date}}</p>
+              <div class="text-lg font-bold text-gray-800">Reply from Made-To</div>
+              <div class="text-lg text-gray-800">{{comment.reply}}</div>
+              <div class="text-lg font-medium text-gray-800 text-right m-3">{{comment.reply_date | date}}</div>
             </ng-container>
-            <ng-container *ngIf="(userService.roles$ | async) as roles">
-              <ng-container *ngIf="roles.admin">
+            <ng-container *ngIf="(userService.isAdmin$ | async) as admin">
+              <ng-container *ngIf="admin">
                 <button mat-raised-button (click)="createReply(comment.blog_id, comment.id)"
                   class="text-gray-500 bg-blue-600 hover:bg-blue-800 hover:text-white m-2">REPLY</button>
                 <button mat-raised-button (click)="deleteComment(comment.blog_id, comment.id)"

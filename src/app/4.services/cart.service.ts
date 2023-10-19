@@ -1,13 +1,20 @@
 import { Injectable, OnDestroy, computed, inject, signal } from '@angular/core';
 import { Auth } from '@angular/fire/auth';
-import { first, map, Observable, of, Subject, takeUntil, throwError } from 'rxjs';
+import {
+  first,
+  map,
+  Observable,
+  of,
+  Subject,
+  takeUntil,
+  throwError,
+} from 'rxjs';
 import { Cart } from 'app/5.models/cart';
 import { Product } from 'app/5.models/products';
 import { convertSnaps } from './db-utils';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from './auth/auth.service';
-import { WishList } from 'app/5.models/wishlist';
-import { WishListService } from './wishlist.service';
+
 import {
   doc,
   docData,
@@ -36,57 +43,35 @@ export class CartService implements OnDestroy {
   userCountry: string;
   // Manage state with signals
   cartItem = signal<Cart[]>([]);
+  private _unsubscribeAll: Subject<any> = new Subject<any>();
 
   cartCounter = signal<number>(0);
-
-  constructor(
-    public afs: Firestore,
-    public auth: Auth,
-    public authService: AuthService,
-    private snack: MatSnackBar
-  ) {
-
-    // auth.authState.subscribe((user) => {
-    //   this.userId = user?.uid;
-    // });
-
-    // this.auth.authState.pipe(map((user) => !!user)).subscribe((isLoggedIn) => {
-    //   this.isLoggedIn = isLoggedIn;
-    // });
-
-    // if (this.isLoggedIn === true) {
-    //   this.cartItems$ = this.cartCollection.valueChanges({ idField: 'id' });
-    // }
-
-  }
-
-  wishListService = inject(WishListService);
+  afs = inject(Firestore);
+  auth = inject(Auth);
+  authService = inject(AuthService);
+  snack = inject(MatSnackBar);
   firestore: Firestore = inject(Firestore);
 
   updateCartCounter(userId: string) {
-    this.cartByStatus(userId,'open').pipe(takeUntil(this._unsubscribeAll)).subscribe((cart) => {
-    console.debug('cart length:', cart.length);
-    });
+    this.cartByStatus(userId, 'open')
+      .pipe(takeUntil(this._unsubscribeAll))
+      .subscribe((cart) => {
+        console.debug('cart length:', cart.length);
+      });
   }
 
-  async cartCount(): Promise<number>  {
-    const count = await getCountFromServer(collection(this.firestore ,`users/${this.userId}/cart/`));
+  async cartCount(userId: string): Promise<number> {
+    const count = await getCountFromServer(
+      collection(this.firestore, `users/${this.userId}/cart/`)
+    );
     console.log('cartCount: ', count.data().count);
-    return count.data.length;
+    return count.data().count;
   }
-
-
-
-  ngOnDestroy(): void {
-    this._unsubscribeAll.next(null);
-    this._unsubscribeAll.complete();
-
-  }
-
-  private _unsubscribeAll: Subject<any> = new Subject<any>();
 
   getAll(userId: string) {
-    return  collectionData(collection(this.firestore, `users/${userId}/cart`), {idField:  'id'}) as  Observable<Cart[]>
+    return collectionData(collection(this.firestore, `users/${userId}/cart`), {
+      idField: 'id',
+    }) as Observable<Cart[]>;
   }
 
   get(id: string, userId: string) {
@@ -94,64 +79,59 @@ export class CartService implements OnDestroy {
   }
 
   cartByUserId(userId: string): Observable<Cart[] | undefined> {
-    return  collectionData(collection(this.firestore, `users/${userId}/cart`), {idField:  'id'}) as  Observable<Cart[]>
+    return collectionData(collection(this.firestore, `users/${userId}/cart`), {
+      idField: 'id',
+    }) as Observable<Cart[]>;
   }
 
   cartByStatus(userId: string, cartStatus: string) {
-    return collectionData(collection(this.firestore, `users/${userId}/cart`), {idField:  'id'})
-    .pipe(map((cart) => cart.filter((status) => status.status === cartStatus))) as  Observable<Cart[]>
+    return collectionData(collection(this.firestore, `users/${userId}/cart`), {
+      idField: 'id',
+    }).pipe(
+      map((cart) => cart.filter((status) => status.status === cartStatus))
+    ) as Observable<Cart[]>;
   }
 
-  cartCountByUserId(userId: string): number {
-    const sub = this.cartByStatus(userId, 'open').pipe(
-      map((cart) => cart.length)).subscribe((count) => {
-      this.cartCounter.set(count);
-    });
-    sub.unsubscribe
-    return this.cartCounter();
-  }
-
-  async getCartCountByUser(userId: string): Promise<number>  {
-    const count = await (await getCountFromServer(collection(this.firestore ,`users/${userId}/cart/`)))
+  async getCartCountByUser(userId: string): Promise<number> {
+    const count = await await getCountFromServer(
+      collection(this.firestore, `users/${userId}/cart/`)
+    );
     console.log('count getCartCountByUser: ', count.data().count);
     return count.data().count;
   }
 
-  // findCartByUrl(id: string): Observable<Cart | undefined> {
-  //   return this.afs
-  //     .collection('cart', (ref) => ref.where('id', '==', id))
-  //     .snapshotChanges()
-  //     .pipe(
-  //       map((snaps) => {
-  //         const Cart = convertSnaps<Cart>(snaps);
-  //         return Cart.length == 1 ? Cart[0] : undefined;
-  //       }),
-  //       first()
-  //     );
-  // }
-
-  public create(Cart: Product) {
-    const Ref = collection(this.firestore, `users/${this.userId}/cart/`);
-    addDoc(Ref, Cart).then((newCart) => {
-        Cart.id = newCart.id;
-        // this.updateCart(Cart);
+  async create(userId: string, product: Product) {
+    const Ref = collection(this.firestore, `users/${userId}/cart/`);
+    addDoc(Ref, product)
+      .then((newCart) => {
+        updateDoc(doc(Ref, newCart.id), { id: newCart.id } );
         this.snack.open('Selection has been added to your cart ...', 'OK', {
           verticalPosition: 'top',
           horizontalPosition: 'right',
           panelClass: 'bg-danger',
           duration: 3000,
-          });
-     });
+        });
+      })
+      .catch((error) => {
+        this.snack.open(
+          `Selection has NOT been added to your cart ...\n${error} `,
+          'OK',
+          {
+            verticalPosition: 'top',
+            horizontalPosition: 'right',
+            panelClass: 'bg-danger',
+            duration: 3000,
+          }
+        );
+      });
   }
-
 
   findProductById(id: string): Observable<Product | undefined> {
-    const ref = collection(this.firestore, `inventory`)
-    return docData(doc(ref, id)) as Observable<Product | undefined>;
+    const ref = collection(this.firestore, `inventory`);
+    return docData(doc(ref, id)) as Observable<Product>;
   }
 
-  addToCart(productId: string) {
-    let userId = this.userId;
+  addToCart(userId: string, productId: string) {
     let prod = this.findProductById(productId);
     const dDate = new Date();
     const updateDate = dDate.toISOString().split('T')[0];
@@ -168,20 +148,19 @@ export class CartService implements OnDestroy {
           status: 'open',
           quantity: 1,
         };
-        this.create(cart);
+        this.create(userId, cart);
       });
     }
   }
 
-  addToCartWithQuantity(productId: string, quantity: number) {
-    let userId = this.userId;
+  addToCartWithQuantity(userId: string, productId: string, quantity: number) {
     let prod = this.findProductById(productId);
     const dDate = new Date();
     const updateDate = dDate.toISOString().split('T')[0];
     if (prod) {
       prod.subscribe((result) => {
         // get the wish item
-        const wish: Product = {
+        const cart: Product = {
           ...result,
           product_id: productId,
           is_completed: false,
@@ -192,12 +171,28 @@ export class CartService implements OnDestroy {
           status: 'open',
         };
         // create the cart item from the list item
-        this.create(wish);
+        this.create(userId, cart)
+          .then(() => {
+            this.cartCounter.set(this.cartCounter() + 1);
+          })
+          .catch((error) => {
+            console.log('Error adding cart item');
+            alert(`Error adding cart item:  error ${error}`);
+          });
+
         // delete the wish item from the wish list
-        this.wishListService.deleteWishListItemById(productId);
-        this.cartCounter.set(this.cartCounter() + 1);
+        this.deleteWishListItemById(productId);
       });
     }
+  }
+
+  deleteWishListItemById(id: string) {
+    const collectionRef = collection(
+      this.firestore,
+      `users/${this.userId}/wishlist/`
+    );
+    deleteDoc(doc(collectionRef, id));
+    return true;
   }
 
   // const collectionRef = collection(this.firestore, `blog/${blog_id}/comment/`);
@@ -205,8 +200,12 @@ export class CartService implements OnDestroy {
   // updateDoc(ref, comment);
 
   update(cart: Cart) {
-    const ref = doc(collection(this.firestore, `users/${this.userId}/cart`), cart.id) as DocumentReference<Cart>;
-    updateDoc(ref, cart).then(() => {
+    const ref = doc(
+      collection(this.firestore, `users/${this.userId}/cart`),
+      cart.id
+    ) as DocumentReference<Cart>;
+    updateDoc(ref, cart)
+      .then(() => {
         this.snack.open('Cart has been updated ... ', 'OK', {
           verticalPosition: 'top',
           horizontalPosition: 'right',
@@ -221,37 +220,68 @@ export class CartService implements OnDestroy {
   }
 
   updateByCartId(cart: Cart, id: string) {
-    const ref = doc(collection(this.firestore, `users/${this.userId}/cart`),id) as DocumentReference<Cart>;
-    updateDoc(ref, cart).then(() => {
+    const ref = doc(
+      collection(this.firestore, `users/${this.userId}/cart`),
+      id
+    ) as DocumentReference<Cart>;
+    updateDoc(ref, cart)
+      .then(() => {
         this.snack.open('Cart has been updated ... ', 'OK', {
           verticalPosition: 'top',
           horizontalPosition: 'right',
           panelClass: 'bg-danger',
           duration: 2000,
         });
-      }
-    )
-  }
-
-
-
-  delete(id: string) {
-    const ref = doc(this.firestore, `users/${this.userId}/cart`, id);
-    deleteDoc(ref).then(() => { ;
-    this.snack.open('Item has been removed ... ', 'OK', {
-      verticalPosition: 'top',
-      horizontalPosition: 'right',
-      panelClass: 'bg-danger',
-      duration: 2000
-    });
-    }).catch((error) => {
-      this.snack.open('Item has NOT been removed ... ', 'OK', {
-        verticalPosition: 'top',
-        horizontalPosition: 'right',
-        panelClass: 'bg-danger',
-        duration: 2000
+      })
+      .catch((error) => {
+        console.log('Error updating cart');
+        alert(`Error updating cart:  error ${error}`);
       });
-    });
   }
 
+  updateUserPurchases(userId: string, cart: any) {
+    const collectionRef = doc(
+      collection(this.firestore, `users/${userId}/purchases/`),
+      cart.id
+    ) as DocumentReference<Cart>;
+    updateDoc(collectionRef, cart)
+      .then((docRef) => {
+        this.snack.open(`Cart has been updated ... `, 'OK', {
+          verticalPosition: 'top',
+          horizontalPosition: 'right',
+          panelClass: 'bg-danger',
+          duration: 2000,
+        });
+      })
+      .catch((error) => {
+        console.error('Error adding document: ', error);
+        throwError(() => new Error(error));
+      });
+  }
+
+  delete(userId: string, id: string) {
+    const ref = doc(this.firestore, `users/${userId}/cart`, id);
+    deleteDoc(ref)
+      .then(() => {
+        this.snack.open('Item has been removed ... ', 'OK', {
+          verticalPosition: 'top',
+          horizontalPosition: 'right',
+          panelClass: 'bg-danger',
+          duration: 2000,
+        });
+      })
+      .catch((error) => {
+        this.snack.open('Item has NOT been removed ... ', 'OK', {
+          verticalPosition: 'top',
+          horizontalPosition: 'right',
+          panelClass: 'bg-danger',
+          duration: 2000,
+        });
+      });
+  }
+
+  ngOnDestroy(): void {
+    this._unsubscribeAll.next(null);
+    this._unsubscribeAll.complete();
+  }
 }

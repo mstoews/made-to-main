@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, inject } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { UserService } from 'app/4.services/auth/user.service';
 import { BlogService } from 'app/4.services/blog.service';
@@ -12,11 +12,9 @@ import { ReplyDialogComponent } from '../reply-dialog/reply-dialog.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CommentsListComponent implements OnInit {
-  constructor(
-    private blogService: BlogService,
-    public userService: UserService,
-    private dialog: MatDialog
-  ) {}
+  userService = inject(UserService);
+  blogService = inject(BlogService);
+  dialog = inject(MatDialog);
 
   isAdmin = false;
 

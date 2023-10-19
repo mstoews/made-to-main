@@ -23,6 +23,7 @@ import { UserService } from 'app/4.services/auth/user.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, Subject, Subscription, first, takeUntil } from 'rxjs';
 import { Auth } from '@angular/fire/auth';
+import { onAuthStateChanged } from 'firebase/auth';
 
 @Component({
   selector: 'app-header',
@@ -37,11 +38,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   private _router = inject(Router);
   private menuToggle = inject(MenuToggleService);
-  private authService = inject(AuthService);
   public userService = inject(UserService);
   public cartService = inject(CartService);
   public wishListService = inject(WishListService);
-  private profile = inject(ProfileService);
   private snackBar = inject(MatSnackBar);
   private _location = inject(Location);
   private auth : Auth = inject(Auth);
@@ -66,31 +65,25 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.menuToggle.setDrawerState(false);
     this.emailName = 'Guest';
+    this.isLoggedIn = false;
 
-
-    if (this.auth.currentUser.uid) {
-      this.userId = this.auth.currentUser.uid;
+    onAuthStateChanged(this.auth, (user) => {
+      this.userId = user.uid;
       this.isLoggedIn = true;
-    }
+      console.debug(this.userId);
+      this.cartService.cartByUserId(user.uid)
+      .pipe(takeUntil(this._unsubscribeAll))
+      .subscribe((cart) => {
+        this.cartCounter.set(cart.length);
+      });
 
-    this.userService.isLoggedIn$.pipe(takeUntil(this._unsubscribeAll)).subscribe((res) => {
-      if (res === true) {
-        this.isLoggedIn = true;
-
-        this.cartService.cartByUserId(this.userId).pipe(takeUntil(this._unsubscribeAll)).subscribe((cart) => {
-          this.cartCounter.set(cart.length);
+      this.wishListService
+        .wishListByUserId(user.uid)
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe((wishlist) => {
+          this.wishCounter.set(wishlist.length);
         });
-
-        this.wishListService
-          .wishListByUserId(this.userId)
-          .subscribe((wishlist) => {
-            this.wishCounter.set(wishlist.length);
-          });
-      } else {
-        this.isLoggedIn = false;
-      }
     });
-
     /*
 
      this.authService.afAuth.authState.pipe(takeUntil(this._unsubscribeAll)).subscribe((user) => {

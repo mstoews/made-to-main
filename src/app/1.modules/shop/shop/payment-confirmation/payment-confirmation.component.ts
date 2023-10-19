@@ -127,7 +127,7 @@ export class PaymentConfirmationComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {}
 
   onRemoveItem(item: string) {
-    this.cartService.delete(item);
+    this.cartService.delete(this.userId, item);
     this.calculateTotals();
   }
 }

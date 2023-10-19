@@ -3,12 +3,12 @@
     <div class="flex flex-row sm:flex-row sm:space-x-4 sm:mr-10 sm:mt-10 sm:ml-2 ">
       <div class="block m-1 ">
         <button (click)="onToggleSideNav()" matTooltip="Toggle Navigation"
-          class="flex items-center mt-1 font-normal text-gray-900 hover:cursor-pointer grow hover:bg-gray-700 hover:text-gray-100 dark:hover:bg-gray-100">
+          class="flex items-center text-xl md:mt-1 text-gray-900 hover:cursor-pointer grow hover:bg-gray-700 hover:text-gray-100 dark:hover:bg-gray-100">
           <mat-icon [svgIcon]="'mat_outline:menu'"></mat-icon>
         </button>
       </div>
       <div
-        class="flex-col inline-block align-middle sm:ml-4 sm:w-auto focus:outline-none font-bold text-3xl lg:text-3xl text-gray-900 ">
+        class="flex-col inline-block align-middle ml-2 sm:w-auto focus:outline-none font-bold mt-1 text-xl md:text-2xl lg:text-3xl text-gray-900 ">
         {{ title }}
       </div>
       <span class="flex-auto"></span>
@@ -28,8 +28,6 @@
             [svgIcon]="'heroicons_outline:gift'"></mat-icon>
         </button>
       </div>
-
-
 
        <div class="block" >
         <button (click)="onBack()" matTooltip="Back"

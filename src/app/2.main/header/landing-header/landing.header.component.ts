@@ -58,11 +58,12 @@ export class LandingHeaderComponent implements OnInit, OnDestroy {
 
   _unsubscribeAll: Subject<any> = new Subject<any>();
 
-
   ngOnInit() {
     this.authService.getUserId().then((id) => {
       this.userId = id;
-      this.cartCounter.set(this.cartService.cartCountByUserId(this.userId));
+      this.cartService.getCartCountByUser(this.userId).then((count) => {
+        this.cartCount = count;
+      });
       this.wishCounter.set(this.wishListService.wishCountByUserId(this.userId));
     }).catch((error) => {
         console.log('Error getting user id: ', error);

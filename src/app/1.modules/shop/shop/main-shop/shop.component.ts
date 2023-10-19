@@ -49,6 +49,7 @@ export class MainShopComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.category  = this.actRoute.snapshot.paramMap.get('id');
+
     if (window.screen.width <= this.MOBILE_SIZE) {
       // 768px portrait
       this.mobile = true;
@@ -58,7 +59,7 @@ export class MainShopComponent implements OnInit, OnDestroy {
 
     this.products$ = this.productService.getInventoryByCategory(this.category);
     this.category$ = this.categoryService. getCategoryList();
-    this.data$ = combineLatest([this.category, this.products$, this.category$]).pipe(
+    this.data$ = combineLatest([of(this.category), this.products$, this.category$]).pipe(
       map(([category, products, categories]) => {
         return {category, products, categories }
       }),
@@ -83,7 +84,7 @@ export class MainShopComponent implements OnInit, OnDestroy {
   onRefreshName(category: string) {
     this.category = category;
     this.products$ = this.productService.getInventoryByCategory(category);
-    this.data$ = combineLatest([category, this.products$, this.category$]).pipe(
+    this.data$ = combineLatest([of(category), this.products$, this.category$]).pipe(
       map(([category, products, categories]) => {
         return {category, products, categories }
       }),

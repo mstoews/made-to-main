@@ -6,18 +6,26 @@ import {
   Firestore,
   getDoc,
   setDoc,
+  query,
   updateDoc,
   collection,
   addDoc,
   deleteDoc,
   collectionData,
   Timestamp,
+  orderBy,
 } from '@angular/fire/firestore';
-import { Auth, authState, GoogleAuthProvider, signInWithPopup, signOut, user } from  '@angular/fire/auth';
+import {
+  Auth,
+  authState,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+  user,
+} from '@angular/fire/auth';
 
 import { filter, first, map, Observable, tap } from 'rxjs';
 import { Blog, BlogPartial, Comments } from 'app/5.models/blog';
-import { convertSnaps } from './db-utils';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ImageItemIndexService } from './image-item-index.service';
 
@@ -25,8 +33,6 @@ import { ImageItemIndexService } from './image-item-index.service';
   providedIn: 'root',
 })
 export class BlogService {
-
-
   private commentItems: Observable<Comments[]>;
 
   constructor(private snack: MatSnackBar) {
@@ -39,19 +45,27 @@ export class BlogService {
 
   firestore: Firestore = inject(Firestore);
   auth: Auth = inject(Auth);
-  user$ = authState(this.auth).pipe(filter(user  =>  user !== null), map(user  =>  user!));
+  user$ = authState(this.auth).pipe(
+    filter((user) => user !== null),
+    map((user) => user!)
+  );
 
   imageItemIndexService = inject(ImageItemIndexService);
 
   getBlogData(path: string) {
-    return  collectionData(collection(this.firestore, path), {idField:  'id'}) as  Observable<Blog[]>
+    return collectionData(collection(this.firestore, path), {
+      idField: 'id',
+    }) as Observable<Blog[]>;
   }
-0
+  0;
   createComment(comment: Comments) {
+    const collectionRef = collection(
+      this.firestore,
+      `blog/${comment.blog_id}/comment`
+    );
 
-    const collectionRef = collection(this.firestore, `blog/${comment.blog_id}/comment`);
-
-    addDoc(collectionRef, comment).then((newComment) => {
+    addDoc(collectionRef, comment)
+      .then((newComment) => {
         comment.id = newComment.id;
         this.updateComment(comment);
         this.snack.open('Comment added to the thoughts ... ', 'OK', {
@@ -68,18 +82,23 @@ export class BlogService {
   }
 
   addCommentReply(blog_id: string, commentId: string, reply: string) {
-
     const dDate = new Date();
     const updateDate = dDate.toISOString();
     const comment = { reply: reply, reply_date: updateDate };
 
-    const collectionRef = collection(this.firestore, `blog/${blog_id}/comment/`);
+    const collectionRef = collection(
+      this.firestore,
+      `blog/${blog_id}/comment/`
+    );
     const ref = doc(collectionRef, commentId);
     updateDoc(ref, comment);
   }
 
   deleteComment(blog_id: string, comment_id: string) {
-    const collectionRef = collection(this.firestore, `blog/${blog_id}/comment/`);
+    const collectionRef = collection(
+      this.firestore,
+      `blog/${blog_id}/comment/`
+    );
     deleteDoc(doc(collectionRef, comment_id));
     // const collectionRef = this.afs.collection(
     //   `blog/${blog_id}/comment/`,
@@ -91,7 +110,10 @@ export class BlogService {
   updateComment(comment: Comments) {
     // const collectionRef = collection(this.firestore, `blog/${comment.blog_id}/comment/` );
     // updateDoc(collectionRef,  comment);
-    const collectionRef = collection(this.firestore, `blog/${comment.blog_id}/comment/`);
+    const collectionRef = collection(
+      this.firestore,
+      `blog/${comment.blog_id}/comment/`
+    );
     const ref = doc(collectionRef, comment.id);
     // updateDoc(ref, comment);
 
@@ -99,14 +121,9 @@ export class BlogService {
   }
 
   getComments(blog_id: string): Observable<Comments[]> {
-    const collectionRef = collection(this.firestore, `blog/${blog_id}/comment/`);
-    const commentItems = collectionData(collectionRef, {idField:  'id'}) as  Observable<Comments[]>;
-
-    // const collectionRef = this.afs.collection(
-    //   `blog/${blog_id}/comment/`,
-    //   (ref) => ref.orderBy('created_date', 'desc')
-    // );
-    // const commentItems = collectionRef.valueChanges({ idField: 'id' });
+    const collectionRef = collection(  this.firestore, `blog/${blog_id}/comment/` );
+    const q = query(collectionRef, orderBy('created_date', 'desc'));
+    const commentItems = collectionData(q, { idField: 'id',}) as Observable<Comments[]>;
     return commentItems;
   }
 
@@ -121,8 +138,7 @@ export class BlogService {
           (pub) =>
             (pub.published === true &&
               pub.calendar === false &&
-              pub.tailoring === false) ||
-            pub.tailoring === undefined
+              pub.tailoring === false) || pub.tailoring === undefined
         )
       )
     );
@@ -150,13 +166,12 @@ export class BlogService {
   }
 
   getAll(): Observable<Blog[]> {
-    // query must be set to order descending
-     const collectionRef = collection(this.firestore, 'blog');
-     return collectionData(collectionRef, {idField:  'id'}) as  Observable<Blog[]>
+    const collectionRef = collection(this.firestore, 'blog');
+    const q = query(collectionRef, orderBy('date_created', 'desc'));
+    return collectionData(q, { idField: 'id' }) as Observable<Blog[]>;
   }
 
   getBlog(id: string) {
-
     const collectionRef = collection(this.firestore, 'blog');
     const blog = doc(collectionRef, id);
     return docData(blog) as Observable<Blog>;
@@ -168,9 +183,7 @@ export class BlogService {
     return docData(blog) as Observable<Blog>;
   }
 
-
   createBlog(blog: Blog) {
-    // this.blogCollection.add(blog);
     blog.published = false;
     blog.date_updated = new Date().toISOString();
     blog.date_created = new Date().toISOString();
@@ -179,13 +192,13 @@ export class BlogService {
 
   update(blog: Blog) {
     blog.date_updated = new Date().toISOString();
-    const ref = doc(this.firestore, 'blog', blog.id) as DocumentReference<Blog>; ;
+    const ref = doc(this.firestore, 'blog', blog.id) as DocumentReference<Blog>;
     updateDoc(ref, blog);
   }
 
   updatePartial(blog: Blog) {
     blog.date_updated = new Date().toISOString();
-    const ref = doc(this.firestore, 'blog', blog.id) as DocumentReference<Blog>; ;
+    const ref = doc(this.firestore, 'blog', blog.id) as DocumentReference<Blog>;
     return updateDoc(ref, blog);
   }
 

@@ -8,11 +8,13 @@ import {
 } from '@angular/core';
 import { BlogService } from 'app/4.services/blog.service';
 import { Blog } from 'app/5.models/blog';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { Router } from '@angular/router';
 import { fadeInOut } from '../landing-page/animations';
 import { ImageItemIndexService } from 'app/4.services/image-item-index.service';
 import { ImageItemIndex } from 'app/5.models/imageItem';
+import { Auth, onAuthStateChanged } from '@angular/fire/auth';
+import { getAuth } from 'firebase/auth';
 
 @Component({
   selector: 'app-blog',
@@ -25,10 +27,11 @@ export class BlogComponent implements OnInit {
     // console.debug('Add a comment to the blog');
   }
 
-
+  auth: Auth = inject(Auth);
   route = inject(Router);
   blogService = inject(BlogService);
   imageItemIndexService = inject(ImageItemIndexService);
+  admin$ = of(false)
 
   valueChangedEvent($event: Event) {}
 
@@ -39,6 +42,9 @@ export class BlogComponent implements OnInit {
   allBlogs$ = this.blogService.getAllPublishedBlog();
 
   ngOnInit(): void {
+
+  }
+
     // this.allBlogs$.pipe().subscribe((blogs) => {
     //   blogs.forEach((blog) => {
     //     console.log('Blog image is undefine',blog.image);
@@ -47,5 +53,4 @@ export class BlogComponent implements OnInit {
     //     });
     //   });
     // });
-  }
 }

@@ -12,6 +12,8 @@ import {
   deleteDoc,
   collectionData,
   Timestamp,
+  query,
+  orderBy,
 } from '@angular/fire/firestore';
 import { Observable, Subscription, map } from 'rxjs';
 import { Category } from 'app/5.models/category';
@@ -81,7 +83,7 @@ export class CategoryService implements OnDestroy {
   //Query
 
   getAll() {
-    const collectionRef = collection(this.firestore, 'category');
+    const collectionRef = query(collection(this.firestore, 'category'), orderBy('name'));
     return collectionData(collectionRef, { idField: 'id' }) as Observable<Category[]>;
   }
 

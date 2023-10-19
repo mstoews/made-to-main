@@ -9,8 +9,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { animate, style, transition, trigger } from '@angular/animations';
-import { ContactService } from 'app/4.services/contact.service';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { MainPageService } from 'app/4.services/main-page.service';
 import { Mainpage } from 'app/5.models/mainpage';
 import { BlogService } from '../../4.services/blog.service';
@@ -19,8 +18,7 @@ import { ImageItemIndexService } from 'app/4.services/image-item-index.service';
 import { CartService } from 'app/4.services/cart.service';
 import { WishListService } from 'app/4.services/wishlist.service';
 import { Subject, takeUntil } from 'rxjs';
-import { UserService } from 'app/4.services/auth/user.service';
-import { AuthService } from 'app/4.services/auth/auth.service';
+import { Auth, onAuthStateChanged } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-landing-page',
@@ -45,30 +43,19 @@ export class LandingPageComponent implements OnInit, OnDestroy {
 
   contactGroup: FormGroup;
   mainPageDoc: Mainpage;
+  userId: string;
   titleMessage = '';
-  // features_image = './assets/images/tailoring.jpg';
-  // services_one = './assets/images/tailoring.jpg';
-  // services_two = './assets/images/knitting.jpg';
-  // services_three = './assets/images/repairs.jpg';
-  // services_four = './assets/images/bespoke_knitting.jpg';
-  // about_us = './assets/images/about.jpg';
-
-  constructor(
-    private contactService: ContactService,
-    private mainPage: MainPageService,
-    private router: Router,
-
-    private fb: FormBuilder,
-    private menuToggle: MenuToggleService
-  ) {}
+  emailName = 'Guest';
+  isLoggedIn = false;
 
   cartService = inject(CartService);
   wishListService = inject(WishListService);
-
+  mainPage= inject(MainPageService);
+  menuToggle = inject(MenuToggleService);
+  router = inject(Router);
   imageItemIndexService = inject(ImageItemIndexService);
   blogService = inject(BlogService);
-  userService = inject(UserService);
-  authService = inject(AuthService);
+  auth = inject(Auth);
 
   mainPage$ = this.mainPage.getAll();
   wishCounter = signal<number>(0);
@@ -76,29 +63,26 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   _unsubscribeAll: Subject<any> = new Subject<any>();
 
   ngOnInit(): void {
-    this.userService.isLoggedIn$
-      .pipe(takeUntil(this._unsubscribeAll))
-      .subscribe((res) => {
-        if (res === true) {
-          this.authService.getUserId().then((id) => {
-              this.cartService
-                .cartByUserId(id)
-                .pipe(takeUntil(this._unsubscribeAll))
-                .subscribe((cart) => {
-                  this.cartCounter.set(cart.length);
-                });
+    this.menuToggle.setDrawerState(false);
+    this.emailName = 'Guest';
+    this.isLoggedIn = false;
 
-              this.wishListService
-                .wishListByUserId(id)
-                .pipe(takeUntil(this._unsubscribeAll))
-                .subscribe((wishlist) => {
-                  this.wishCounter.set(wishlist.length);
-                });
-            }).catch((error) => {
-              console.log('Error getting user id: ', error);
+    onAuthStateChanged(this.auth, (user) => {
+      this.userId = user.uid;
+      this.isLoggedIn = true;
+      console.debug(this.userId);
+      this.cartService.cartByUserId(user.uid).pipe(takeUntil(this._unsubscribeAll)).subscribe((cart) => {
+        this.cartCounter.set(cart.length);
+      });
+
+      this.wishListService
+        .wishListByUserId(user.uid)
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe((wishlist) => {
+          this.wishCounter.set(wishlist.length);
         });
-      }
     });
+
   }
 
   ngOnDestroy(): void {
@@ -137,12 +121,12 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   }
 
   onServices(service: string) {
-    // console.debug(service);
+
     this.router.navigate(['service']);
   }
 
   openShoppingCart() {
-    this.router.navigate(['shop/cart', this.authService.userData.uid]);
+    this.router.navigate(['shop/cart', this.userId]);
   }
 
   openShop() {
@@ -150,7 +134,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   }
 
   openWishList() {
-    this.router.navigate(['shop/wishlist', this.authService.userData.uid]);
+    this.router.navigate(['shop/wishlist', this.userId]);
   }
 
   onAboutUs(service: string) {
@@ -158,21 +142,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     this.onClickAboutUs();
   }
 
-  // onUpdate(contact: Contact) {
-  //   contact = this.contactGroup.getRawValue();
-  //   this.contactService.create(contact);
-  //   this.createEmptyForm();
-  // }
-
-  // createEmptyForm() {
-  //   this.contactGroup = this.fb.group({
-  //     id: [''],
-  //     name: [''],
-  //     email: [''],
-  //     phone: [''],
-  //     message: [''],
-  //   });
-  // }
 
   onClickAboutUs() {
     this.router.navigate(['home/about_us']);

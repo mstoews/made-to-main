@@ -1,5 +1,6 @@
 export interface Cart {
   id: string;
+  description: string;
   rich_description: string;
   date_created: string;
   short_description?: string;
@@ -23,6 +24,7 @@ export interface Cart {
   is_tailoring?: boolean;
   is_coats_tops?: boolean;
   is_trousers?: boolean;
+  is_measurement_saved?: boolean;
   user_purchased?: string;
   date_sold?: string;
   waist?: number;

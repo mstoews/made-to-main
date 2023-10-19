@@ -67,7 +67,7 @@ export class AuthService implements OnDestroy {
 
   public isUserAdmin(): Observable<boolean> {
     return new Observable<boolean>((observer) => {
-      
+
       this.auth.onIdTokenChanged((user) => {
         if (user) {
           user.getIdTokenResult().then((idTokenResult) => {
@@ -154,7 +154,7 @@ export class AuthService implements OnDestroy {
   }
 
   async getUserId() {
-    return (await this.auth.currentUser).uid;
+    return this.userId
   }
 }
 // Sign out

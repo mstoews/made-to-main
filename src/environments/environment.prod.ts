@@ -20,7 +20,7 @@ export const environment = {
     appId: "1:943801679790:web:fc1acc16908ea3a4bc123f",
     measurementId: "G-4YP76MJH8S"
   },
-  production: true,
+  production: false,
   useEmulators: false,
   gtm_id: "G-WGMMJK9NR3",
   stripe: {
@@ -30,6 +30,7 @@ export const environment = {
     createMessage: "http://localhost:9000/api/createMessage",
     createAdmin: "http://localhost:9000/api/createAdmin",
     paymentIntent: "http://localhost:9000/api/payment_intent",
+    get_public_key:"http://localhost:9000/api/get-public-key",
   },
   api: {
     prdUrl: "https://made-to-server.an.r.appspot.com/",

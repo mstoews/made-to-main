@@ -1,5 +1,5 @@
 <div class=" bg-white h-full">
-<app-header [title]="'Inventory Maintenance'"> 
+<app-header [title]="'Inventory Maintenance'">
 </app-header>
 
   <mat-drawer-container class="ml-10 mr-10 -mt-5 flex-col h-full bg-white" (onValueChangedEvent)="valueChangedEvent($event)">
@@ -7,12 +7,18 @@
     <ng-container *ngIf="allProducts$ | async as rows">
 
       <div class="m-4 h-full">
-        <dx-data-grid flex id="categoryGrid" [wordWrapEnabled]="true" [dataSource]="rows" [showColumnLines]="true"
-        [showRowLines]="true"
-        [showBorders]="true"
-        [focusedRowEnabled]="true"
-        (onExporting)="onExporting($event)"
-        [focusedRowIndex]="0" (onCellDblClick)="onCellDoublClicked($event)" [repaintChangesOnly]="true" keyExpr="id">
+        <dx-data-grid flex id="inventoryGrid"
+          [wordWrapEnabled]="true"
+          [dataSource]="rows"
+          [showColumnLines]="true"
+          [showRowLines]="true"
+          [showBorders]="true"
+          [focusedRowEnabled]="true"
+          (onExporting)="onExporting($event)"
+          (onRowPrepared)="onRowPrepared($event)"
+          [focusedRowIndex]="0"
+          (onCellDblClick)="onCellDoublClicked($event)"
+          [repaintChangesOnly]="true" keyExpr="id">
 
           <dxo-paging [pageSize]="9"></dxo-paging>
           <dxo-pager [showPageSizeSelector]="true" [allowedPageSizes]="[6, 9, 12, 15]"></dxo-pager>
@@ -24,9 +30,9 @@
           <dxi-column dataField="image" [width]="80" cellTemplate="imageTemplate"> </dxi-column>
           <dxi-column dataField="category" [width]="150"> </dxi-column>
           <dxi-column dataField="price" [width]="100"> </dxi-column>
-          <dxi-column dataField="description" [width]="200"> </dxi-column>
-          <dxi-column dataField="short_description"[width]="300"> </dxi-column>
-          <dxi-column dataField="rich_description" cellTemplate="richTemplate"> </dxi-column>
+          <dxi-column dataField="description" [width]="300"> </dxi-column>
+          <dxi-column dataField="short_description"></dxi-column>
+          <!-- <dxi-column dataField="rich_description" cellTemplate="richTemplate"> </dxi-column> -->
           <dxi-column dataField="purchases_allowed" caption="Sell" [width]="100" type="boolean"> </dxi-column>
           <dxi-column dataField="quantity_required" caption="Per Quantity" [width]="100" type="boolean"> </dxi-column>
           <div *dxTemplate="let data of 'imageTemplate'">

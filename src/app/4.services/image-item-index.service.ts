@@ -1,8 +1,7 @@
 import { Injectable, OnDestroy, inject } from '@angular/core';
 import { ImageItemIndex } from 'app/5.models/imageItem';
 import { Observable, Subscription, map } from 'rxjs';
-import { DeleteDuplicateService } from './delete-duplicate.service';
-import { ProductsService } from './products.service';
+
 import { Storage, StorageReference, getDownloadURL, getMetadata, listAll, ref } from '@angular/fire/storage';
 
 import {
@@ -29,8 +28,7 @@ export class ImageItemIndexService implements OnDestroy{
 
   firestore = inject(Firestore);
   storage = inject(Storage);
-  duplicates = inject(DeleteDuplicateService)
-  inventory = inject(ProductsService);
+
   private sub: Subscription;
 
   hashUsedImagesMap = new Map<string, ImageItemIndex>();

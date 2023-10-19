@@ -121,12 +121,7 @@ const routes: Route[] = [
     data: { state: 'tos' },
     title: 'Terms of Service',
   },
-  {
-    path: '/',
-    redirectTo: '/home',
-    data: { state: 'home' },
-  },
-
+  
   {
     path: '**',
     redirectTo: '/home',

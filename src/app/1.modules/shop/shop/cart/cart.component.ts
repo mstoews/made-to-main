@@ -6,8 +6,7 @@ import { Observable, first, Subscription } from 'rxjs';
 import { Cart } from 'app/5.models/cart';
 import { AuthService } from 'app/4.services/auth/auth.service';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { ProfileModel } from 'app/5.models/profile';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ProfileService } from 'app/4.services/profile.service';
 
 
@@ -38,12 +37,13 @@ export class CartComponent implements OnInit, OnDestroy {
   tax: number;
   shipping: number;
   grand_total: number;
-  cartData: any;
   purchaseStarted: boolean;
   admin_login = false;
   cartItemsAvailable: boolean = false;
+  measurmentsVerified: boolean = true;
   userCountry: string;
   fg: FormGroup;
+  cartItems: Cart[] = [];
 
   constructor(
     private authService: AuthService,
@@ -67,10 +67,8 @@ export class CartComponent implements OnInit, OnDestroy {
   async ngOnInit(): Promise<void> {
     this.userId = this.activateRoute.snapshot.params.id;
     console.debug('userId: ', this.userId);
-    this.cart$ = this.cartService.cartByStatus(this.userId, 'open');
-
-    this.cart$.subscribe((cart) => {
-      this.cartData = cart;
+    this.cartService.cartByStatus(this.userId, 'open').subscribe((cart) => {
+      this.cartItems = cart;
       this.calculateTotals();
       this.createForm();
     });
@@ -81,58 +79,9 @@ export class CartComponent implements OnInit, OnDestroy {
 
   }
 
-
-
-  onSaveMeasurements() {
-    let userId = this.userId;
-    let measurements = this.fg.getRawValue();
-    const dDate = new Date();
-    const updateDate = dDate.toISOString().split('T')[0];
-
-    if (measurements) {
-      const cart: Cart = {
-        ...measurements,
-        is_completed: false,
-        user_purchased: userId,
-        date_sold: updateDate,
-        date_updated: updateDate,
-        status: 'open',
-        quantity: 1,
-      };
-      this.cartService.updateByCartId(cart, this.cartId)
-    }
-  }
-
-  createEmptyForm() {
-    this.fg = this.fb.group({
-      bust: [''],
-      waist: [''],
-      hip: [''],
-      height: [''],
-      inseam: [''],
-      outseam: [''],
-      sleeve_length: [''],
-    });
-  }
-
-  createForm() {
-    let cart: Cart;
-    this.cart$.subscribe((result) => {
-      result.forEach((item) => {
-        cart = item;
-        if (item.is_clothing === false) {
-          this.fg = this.fb.group({
-            bust: [cart.bust],
-            waist: [cart.waist],
-            hip: [cart.hip],
-            height: [cart.height],
-            inseam: [cart.inseam],
-            outseam: [cart.outseam],
-            sleeve_length: [cart.sleeve_length],
-          });
-        }
-      });
-    });
+  onRemoveItem(id: string) {
+    this.cartService.delete(this.userId, id) ;
+    this.calculateTotals();
   }
 
   onCheckOut() {
@@ -160,6 +109,23 @@ export class CartComponent implements OnInit, OnDestroy {
     }
   }
 
+  onSaveCartToUser(userId: string) {
+    const dDate = new Date();
+    const updateDate = dDate.toISOString().split('T')[0];
+    const cart = {
+      ...this.cartItems,
+      is_completed: false,
+      user_purchased: userId,
+      date_sold: updateDate,
+      date_updated: updateDate,
+      status: 'open',
+      quantity: 1,
+      is_measurement_saved: true,
+    };
+    this.cartService.updateUserPurchases(userId, cart);
+  }
+
+
   onCheckOutPaymentIntent() {
     // this.calculateTotals();
     // this.route.navigate(['shop/coming-soon']);
@@ -172,8 +138,7 @@ export class CartComponent implements OnInit, OnDestroy {
 
     if (this.userId !== undefined && this.cartId !== undefined) {
       this.purchaseStarted = true;
-      this.checkoutService
-        .startProductCheckoutSession(this.cartId)
+      this.checkoutService.startPaymentIntent(this.cartId)
         .subscribe((checkoutSession) => {
           this.checkoutService.redirectToCheckout(checkoutSession);
         });
@@ -186,30 +151,28 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   async getUserCountry() {
-
     return this.profileService.getUserCountry();
-
-    // let collection = this.afs.collection<ProfileModel>( `users/${userId}/profile` );
-
-    // const profiles = collection.valueChanges({ idField: 'id' });
-
-    // await profiles.pipe(first()).subscribe((ref) => {
-    //   if (ref.length > 0) {
-    //     ref.forEach((mr) => {
-    //       userCountry = mr.country
-    //     });
-    //   }
-    // });
-
   }
+
+  round(number: number, precision: number) {
+    if (precision < 0) {
+      let factor = Math.pow(10, precision);
+      return Math.round(number * factor) / factor;
+    } else
+      return +(
+        Math.round(Number(number + 'e+' + precision)) +
+        'e-' +
+        precision
+      );
+  }
+
 
   async calculateTotals() {
     this.cartItemsAvailable = false;
     this.grand_total = 0.0;
     this.total = 0.0;
-    this.cart$.subscribe((result) => {
       let total = 0.0;
-      result.forEach((item) => {
+      this.cartItems.forEach((item) => {
         if (item.quantity === undefined) {
           item.quantity = 1;
         }
@@ -230,29 +193,148 @@ export class CartComponent implements OnInit, OnDestroy {
         this.shipping = Math.trunc(0);
       }
 
-      if (this.userCountry === 'Japan')
-      {
-       this.shipping = Math.trunc(7);
+      if (this.userCountry === 'Japan') {
+        this.shipping = Math.trunc(7);
       }
 
       this.grand_total = this.round(this.total + this.tax + this.shipping, 2);
       if (this.grand_total > 0) {
         this.cartItemsAvailable = true;
       }
+
+  }
+
+
+
+
+
+  onSaveMeasurements()
+  {
+      let validation = true;
+      const measurements = this.fg.getRawValue();
+      this.cartItems.forEach((item) => {
+        item.bust = measurements.bust;
+        item.waist = measurements.waist;
+        item.hip = measurements.hip;
+        item.height = measurements.height;
+        item.inseam = measurements.inseam;
+        item.outseam = measurements.outseam;
+        item.sleeve_length = measurements.sleeve_length;
+
+        if (this.validateMeasurements(item) === false) {
+          validation = false;
+        }
+        else {
+          validation = true;
+          if(item.is_clothing === false) {
+            this.cartService.updateByCartId(item, item.id);
+            this.cartService.updateUserPurchases(this.userId, item);
+          }
+        }
+      });
+      if (!validation) {
+        alert('Please fill in all the measurements');
+      }
+      return validation;
+  }
+
+  createEmptyForm() {
+    this.fg = this.fb.group({
+      bust: ['', Validators.required],
+      waist: ['', Validators.required],
+      hip: ['', Validators.required],
+      height: ['', Validators.required],
+      inseam: ['', Validators.required],
+      outseam: ['', Validators.required],
+      sleeve_length: ['', Validators.required],
     });
   }
 
-  round(number: number, precision: number) {
-    if (precision < 0) {
-      let factor = Math.pow(10, precision);
-      return Math.round(number * factor) / factor;
-    } else
-      return +(
-        Math.round(Number(number + 'e+' + precision)) +
-        'e-' +
-        precision
-      );
+  validateMeasurements(item: any): boolean {
+    let form_completed = true;
+    if (item.is_tailoring === true) {
+      if (item.bust === '' || item.bust === null || item.bust === undefined || item.bust === 0) {
+        form_completed = false;
+      }
+      if (item.waist === '' || item.waist === null || item.waist === undefined || item.waist === 0) {
+        form_completed = false;
+      }
+      if (item.hip === '' || item.hip === null || item.hip === undefined || item.hip === 0) {
+        form_completed = false;
+      }
+      if (item.height === '' || item.height === null || item.height === undefined || item.height === 0) {
+        form_completed = false;
+      }
+      if (item.inseam === '' || item.inseam === null || item.inseam === undefined || item.inseam === 0) {
+        form_completed = false;
+      }
+      if (item.outseam === '' || item.outseam === null || item.outseam === undefined || item.outseam === 0) {
+        form_completed = false;
+      }
+      if (item.sleeve_length === '' || item.sleeve_length === null || item.sleeve_length === undefined || item.sleeve_length === 0) {
+        form_completed = false;
+      }
+    } else if (item.is_coats_tops) {
+
+      if (item.bust === '' || item.bust === null || item.bust === undefined || item.bust === 0) {
+        form_completed = false;
+      }
+      if (item.waist === '' || item.waist === null || item.waist === undefined || item.waist === 0) {
+        form_completed = false;
+      }
+      if (item.height === '' || item.height === null || item.height === undefined || item.height === 0) {
+        form_completed = false;
+      }
+      if (item.sleeve_length === '' || item.sleeve_length === null || item.sleeve_length === undefined || item.sleeve_length === 0) {
+        form_completed = false;
+      }
+
+    } else if (item.is_trousers) {
+      if (item.waist === '' || item.waist === null || item.waist === undefined || item.waist === 0) {
+        form_completed = false;
+      }
+      if (item.hip === '' || item.hip === null || item.hip === undefined || item.hip === 0) {
+        form_completed = false;
+      }
+      if (item.height === '' || item.height === null || item.height === undefined || item.height === 0) {
+        form_completed = false;
+      }
+      if (item.inseam === '' || item.inseam === null || item.inseam === undefined || item.inseam === 0) {
+        form_completed = false;
+      }
+      if (item.outseam === '' || item.outseam === null || item.outseam === undefined || item.outseam === 0) {
+        form_completed = false;
+      }
+    }
+
+    if (form_completed === false) {
+      this.measurmentsVerified = false;
+    } else {
+      this.measurmentsVerified = true;
+    }
+
+    return form_completed;
   }
+
+  createForm() {
+    let cart: Cart;
+      this.cartItems.forEach((item) => {
+        cart = item;
+        if (item.is_clothing === false) {
+          this.fg = this.fb.group({
+            bust: [cart.bust],
+            waist: [cart.waist],
+            hip: [cart.hip],
+            height: [cart.height],
+            inseam: [cart.inseam],
+            outseam: [cart.outseam],
+            sleeve_length: [cart.sleeve_length],
+          });
+        }
+      });
+
+  }
+
 
 
   backToShopping() {
@@ -261,8 +343,5 @@ export class CartComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {}
 
-  onRemoveItem(item: string) {
-    this.cartService.delete(item);
-    this.calculateTotals();
-  }
+
 }

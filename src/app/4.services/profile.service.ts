@@ -49,6 +49,24 @@ export class ProfileService {
     return country;
   }
 
+  getUserFirstName(): string
+  {
+    let rc: string;
+    this.getAll().pipe(first()).subscribe((data) => {
+      rc = data[0].first_name;
+    });
+    return rc;
+  }
+
+  getUserLastName(): string
+  {
+    let rc: string;
+    this.getAll().pipe(first()).subscribe((data) => {
+      rc = data[0].last_name;
+    });
+    return rc;
+  }
+
 
   update(profile: ProfileModel) {
     const ref = doc(this.firestore, 'profile', profile.id ) as DocumentReference<ProfileModel>;

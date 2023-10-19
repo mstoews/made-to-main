@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, Input, AfterViewInit } from '@angular/core';
 //import { AuthService } from 'src/app/services/auth.service';
-import { AngularFireAuthModule } from '@angular/fire/compat/auth';
+
 
 declare var Stripe; // : stripe.StripeStatic;
 
@@ -11,14 +11,17 @@ declare var Stripe; // : stripe.StripeStatic;
 export class ElementsComponent implements OnInit, AfterViewInit {
 
 
-  constructor(private auth: AngularFireAuthModule ) {}
+  constructor() {}
 
   @Input() amount: number;
   @Input() description: string;
   @ViewChild('cardElement') cardElement: ElementRef;
+  @ViewChild('authElement') authElement: ElementRef;
 
-  stripe; // : stripe.Stripe;
-  card;
+
+  stripe: any;  // : stripe.Stripe;
+  card: any;
+  authenication: any;
   cardErrors;
 
   loading = false;
@@ -29,12 +32,18 @@ export class ElementsComponent implements OnInit, AfterViewInit {
     console.log('ElementsComponent ngAfterViewInit');
     this.stripe = Stripe('pk_test_...');
     const elements = this.stripe.elements();
+
     this.card = elements.create('card');
     this.card.mount(this.cardElement.nativeElement);
 
     this.card.addEventListener('change', ({ error }) => {
-        this.cardErrors = error && error.message;
+      this.cardErrors = error && error.message;
     });
+
+    const options = { mode: 'shipping' };
+
+    this.authenication = elements.create('address', options);
+    this.authenication.mount(this.authElement.nativeElement);
 
   }
 

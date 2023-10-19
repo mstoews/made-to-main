@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Router } from '@angular/router';
@@ -15,14 +15,14 @@ import { AuthService } from './auth.service';
     isAdmin$: Observable<boolean> = of(false);
     isLoggedIn$: Observable<boolean> = of(false);
     isLoggedOut$: Observable<boolean> = of(true);
+    auth: Auth = inject(Auth);
 
 
     constructor(
       public authService: AuthService,
-      public Auth: Auth,
       private router: Router
     ) {
-      this.Auth.onIdTokenChanged((user) => {
+      this.auth.onIdTokenChanged((user) => {
         this.isLoggedIn$ = of(true);
         this.isLoggedOut$ = of(false);
         if (user) {
