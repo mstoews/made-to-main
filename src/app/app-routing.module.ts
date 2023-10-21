@@ -14,7 +14,7 @@ const routes: Route[] = [
   {
     path: 'home',
     loadChildren: () =>
-      import('./1.modules/landing-page/landing-page.module').then(
+      import('./modules/landing-page/landing-page.module').then(
         (mod) => mod.LandingPageModule
       ),
     data: { state: 'home' },
@@ -23,7 +23,7 @@ const routes: Route[] = [
   {
     path: 'authentication',
     loadChildren: () =>
-      import('./1.modules/ui/pages/authentication/authentication.module').then(
+      import('./modules/ui/pages/authentication/authentication.module').then(
         (mod) => mod.AuthenticationModule
       ),
     data: { state: 'authenication' },
@@ -32,25 +32,23 @@ const routes: Route[] = [
   {
     path: 'shop',
     loadChildren: () =>
-      import('./1.modules/shop/shop.module').then((mod) => mod.ShopModule),
+      import('./modules/shop/shop.module').then((mod) => mod.ShopModule),
     data: { state: 'shop' },
     title: 'Shop',
   },
   {
     path: 'blog',
     loadChildren: () =>
-      import('./1.modules/blog/blog.module').then(
-        (mod) => mod.MadeToBlogModule
-      ),
+      import('./modules/blog/blog.module').then((mod) => mod.MadeToBlogModule),
     data: { state: 'blog' },
     title: 'Thoughts',
   },
   {
     path: 'image-admin',
     loadChildren: () =>
-      import(
-        './1.modules/admin/image-maintenance/image-maintenance.module'
-      ).then((mod) => mod.ImageMaintenanceModule),
+      import('./modules/admin/image-maintenance/image-maintenance.module').then(
+        (mod) => mod.ImageMaintenanceModule
+      ),
     title: 'Image Maintenance',
     canActivate: [AuthGuard],
     data: { authGuardPipe: adminOnly },
@@ -59,7 +57,7 @@ const routes: Route[] = [
   {
     path: 'blog-admin',
     loadChildren: () =>
-      import('./1.modules/blog/blog-admin/blog-admin.module').then(
+      import('./modules/blog/blog-admin/blog-admin.module').then(
         (mod) => mod.BlogAdminModule
       ),
     title: 'Blog Admin',
@@ -70,7 +68,7 @@ const routes: Route[] = [
   {
     path: 'collections-admin',
     loadChildren: () =>
-      import('./1.modules/collections/collections-admin.module').then(
+      import('./modules/collections/collections-admin.module').then(
         (mod) => mod.CollectionsAdminModule
       ),
     title: 'Collection Admin',
@@ -80,7 +78,7 @@ const routes: Route[] = [
   {
     path: 'admin',
     loadChildren: () =>
-      import('./1.modules/admin/admin.module').then((mod) => mod.AdminModule),
+      import('./modules/admin/admin.module').then((mod) => mod.AdminModule),
     canActivate: [AuthGuard],
     data: { authGuardPipe: redirectLoggedInToHome },
     title: 'Maintenance',
@@ -88,16 +86,16 @@ const routes: Route[] = [
   {
     path: 'collections-admin/collection',
     loadChildren: () =>
-    import('./1.modules/collections/collections-admin.module').then(
-      (mod) => mod.CollectionsAdminModule
-    ),
+      import('./modules/collections/collections-admin.module').then(
+        (mod) => mod.CollectionsAdminModule
+      ),
     data: { state: 'collections' },
     title: 'Featured',
   },
   {
     path: 'profile',
     loadChildren: () =>
-      import('./1.modules/ui/pages/profile/profile.module').then(
+      import('./modules/ui/pages/profile/profile.module').then(
         (mod) => mod.ProfileModule
       ),
     data: { state: 'profile' },
@@ -106,22 +104,18 @@ const routes: Route[] = [
   {
     path: 'policy',
     loadChildren: () =>
-      import('./1.modules/policy/policy.module').then(
-        (mod) => mod.PolicyModule
-      ),
+      import('./modules/policy/policy.module').then((mod) => mod.PolicyModule),
     data: { state: 'policy' },
     title: 'Policy',
   },
   {
     path: 'tos',
     loadChildren: () =>
-      import('./1.modules/policy/policy.module').then(
-        (mod) => mod.PolicyModule
-      ),
+      import('./modules/policy/policy.module').then((mod) => mod.PolicyModule),
     data: { state: 'tos' },
     title: 'Terms of Service',
   },
-  
+
   {
     path: '**',
     redirectTo: '/home',

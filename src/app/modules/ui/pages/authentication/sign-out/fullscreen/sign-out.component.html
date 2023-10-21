@@ -1,0 +1,30 @@
+<div class="flex min-h-full ml-20 mr-20">
+  <div class="flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:px-20 xl:px-24">
+    <div class="mx-auto w-full max-w-sm lg:w-96">
+      <!-- Logo -->
+      <div class="w-12">
+        <img src="/favicon.ico" />
+      </div>
+
+      <form class="mt-8" [formGroup]="signInForm" #signInNgForm="ngForm">
+        <!-- Email field -->
+        <div class="mt-8 text-4xl font-extrabold tracking-tight leading-tight text-gray-400">
+          Sign Out
+        </div>
+
+        <div><br></div>
+        <div class="text-gray-400">Signing out will take you back to the home page. </div>
+         <!-- Submit button -->
+        <button mat-raised-button class="w-full mt-6 bg-gray-800 text-gray-100 hover:text-gray-700 hover:bg-gray-100 hover:border-gray-800"
+          [disabled]="signInForm.disabled" color="primary"  (click)="signOut()">
+          <span *ngIf="!signInForm.disabled"> Complete Sign Out </span>
+          <mat-progress-spinner *ngIf="signInForm.disabled" [diameter]="24" [mode]="'indeterminate'">
+          </mat-progress-spinner>
+        </button>
+
+      </form>
+    </div>
+  </div>
+
+</div>
+
