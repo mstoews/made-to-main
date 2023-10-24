@@ -1,4 +1,4 @@
-<mat-card>
+<mat-card *ngIf="catService.getAll() | async as categories">
 
   <div class="edit-course-form">
 

@@ -23,6 +23,17 @@ import { Router } from '@angular/router';
 })
 export class SignInClassicComponent implements OnInit, OnDestroy {
   signInForm: FormGroup;
+  router = inject(Router);
+  authService = inject(AuthService);
+  fb = inject(FormBuilder);
+
+  constructor() {
+    this.createEmptyForm();
+  }
+
+  signUp() {
+    this.router.navigate(['/authentication/sign-up']);
+  }
 
   signIn() {
     let password = this.signInForm.value.password;
@@ -41,13 +52,6 @@ export class SignInClassicComponent implements OnInit, OnDestroy {
   showAlert: boolean = false;
   redirect = ['/home'];
 
-  constructor(
-    private authService: AuthService,
-    public router: Router,
-    public fb: FormBuilder
-  ) {
-    this.createEmptyForm();
-  }
 
   createEmptyForm() {
     this.signInForm = this.fb.group({

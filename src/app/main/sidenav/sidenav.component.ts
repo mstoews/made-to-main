@@ -42,7 +42,9 @@ export class SideNavComponent implements OnInit {
         user.getIdTokenResult().then((idTokenResult) => {
           if (!!idTokenResult.claims.admin) {
             // Show admin UI.
+            this.userEmail = user.email;
             this.isAdmin$ = of(true);
+            this.userId = user.uid;
           } else {
             // Show regular user UI.
             this.isAdmin$ = of(false);

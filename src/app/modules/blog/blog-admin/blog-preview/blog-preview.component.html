@@ -21,15 +21,15 @@
 
     <section>
 
-        <div class="container m-auto grid grid-cols-3" >
-          <div *ngFor="let image of blogImages">
-            <div class="tile rounded-lg">
-              <img class="rounded-lg m-4" [ngSrc]="image.imageSrc200" width="400" height="400" [alt]="image.caption" />
-            </div>
-
+      <div class="container m-auto grid grid-cols-3">
+        <div *ngFor="let image of blogImages">
+          <div class="tile rounded-lg">
+            <img class="rounded-lg m-4" [src]="image.imageSrc200" width="400" height="400" [alt]="image.caption" />
           </div>
+
         </div>
-  </section>
+      </div>
+    </section>
   </div>
 
   <style>

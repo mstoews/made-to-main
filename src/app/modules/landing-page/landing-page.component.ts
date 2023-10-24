@@ -68,6 +68,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     this.isLoggedIn = false;
 
     onAuthStateChanged(this.auth, (user) => {
+      if (user) {
       this.userId = user.uid;
       this.isLoggedIn = true;
       console.debug(this.userId);
@@ -84,6 +85,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
         .subscribe((wishlist) => {
           this.wishCounter.set(wishlist.length);
         });
+      }
     });
   }
 

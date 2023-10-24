@@ -11,6 +11,7 @@ import { ScrollService } from './services/scroll.service';
 import { ProductResolver } from './services/product.resolver';
 import { BlogResolver, CalendarResolver } from './services/blog.resolver';
 
+
 // Firebase services + environment module
 
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';

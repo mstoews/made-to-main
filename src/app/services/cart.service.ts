@@ -219,9 +219,9 @@ export class CartService implements OnDestroy {
       });
   }
 
-  updateByCartId(cart: Cart, id: string) {
+  updateByCartId(userId: string, cart: Cart, id: string) {
     const ref = doc(
-      collection(this.firestore, `users/${this.userId}/cart`),
+      collection(this.firestore, `users/${userId}/cart`),
       id
     ) as DocumentReference<Cart>;
     updateDoc(ref, cart)

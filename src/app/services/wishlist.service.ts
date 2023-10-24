@@ -44,9 +44,7 @@ export class WishListService {
   constructor(
     private firestore: Firestore,
     private snack: MatSnackBar,
-    private auth: Auth,
-    private menuToggleService: MenuToggleService,
-    private route: Router
+    private auth: Auth
   ) {
     onAuthStateChanged(this.auth, (user) => {
       if (user) {
@@ -70,12 +68,9 @@ export class WishListService {
   }
 
   get(id: string) {
-    const collectionRef = collection(
-      this.firestore,
-      `users/${this.userId}/wishlist`
-    );
-    const wishlist = doc(collectionRef, id);
-    return docData(wishlist) as Observable<WishList>;
+    return docData(
+      doc(collection(this.firestore, `users/${this.userId}/wishlist`), id)
+    ) as Observable<WishList>;
   }
 
   addToWishList(userId: string, productId: string) {
@@ -210,9 +205,7 @@ export class WishListService {
           quantity: quantity,
           status: 'open',
         };
-        // create the cart item from the list item
         this.createCart(product);
-        // delete the wish item from the wish list
         this.deleteWishListItemById(productId);
         this.cartService.cartCounter.set(this.cartService.cartCounter() + 1);
       });
@@ -225,9 +218,6 @@ export class WishListService {
 
       if (prod) {
         prod.subscribe((result) => {
-          // if (result.quantity_required === true) {
-          //   this.route.navigate(['/shop/product', productId]);
-          // } else {
           const dDate = new Date();
           const updateDate = dDate.toISOString().split('T')[0];
           if (prod) {
@@ -250,14 +240,10 @@ export class WishListService {
                 sleeve_length: this.sleeve_length,
                 hip: this.hip,
               };
-              // create the cart item from the list item
               this.create(this.userId, wish);
-              // delete the wish item from the wish list
             });
           }
         });
-
-        // });
       }
     }
     return true;

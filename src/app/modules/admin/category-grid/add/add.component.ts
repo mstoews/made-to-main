@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, inject } from '@angular/core';
 import { Validators, FormBuilder, FormGroup } from '@angular/forms';
 import {
   MAT_DIALOG_DATA,
@@ -6,10 +6,8 @@ import {
   MatDialog,
   MatDialogConfig,
 } from '@angular/material/dialog';
-import { Router } from '@angular/router';
 import { Category } from 'app/models/category';
 import { CategoryService } from 'app/services/category.service';
-
 import { Observable } from 'rxjs';
 
 @Component({
@@ -26,12 +24,13 @@ export class ConfirmCategoryDialog {
   form: FormGroup;
   updated_category: string;
 
+  catService = inject(CategoryService);
+
   constructor(
     private fb: FormBuilder,
     @Inject(MAT_DIALOG_DATA) private category: Category,
     private readonly categoryService: CategoryService,
     private dialogRef: MatDialogRef<ConfirmCategoryDialog>,
-    private route: Router
   ) {
     this.description = category.name;
     this.createForm();
@@ -64,7 +63,7 @@ export function openAddComponentDialog(dialog: MatDialog) {
   config.backdropClass = 'backdrop-modal-panel';
   config.width = '400px';
 
-  const dialogRef = dialog.open(AddCategoryDialog, config);
+  const dialogRef = dialog.open(ConfirmCategoryDialog, config);
 
   return dialogRef.afterClosed();
 }

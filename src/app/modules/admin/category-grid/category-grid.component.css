@@ -6,3 +6,7 @@
     margin-right: auto;
     border-radius: 10px;
   } */
+  ::ng-deep .dx-datagrid .dx-datagrid-rowsview .dx-row-focused.dx-data-row:not(.dx-edit-row) > td:not(.dx-focused) {
+    background-color: rgb(195, 199, 199);
+    border-color: rgb(195, 199, 199);
+  }

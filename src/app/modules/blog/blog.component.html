@@ -11,11 +11,11 @@
   [sub_title]="'Impressions of our life and work, living in Tokyo'"
   (notifyNavBarToggleMenu)="onToggleMenu()"></app-header> -->
 
-  <app-header class="bg-white hidden sm:block" [title]="'Thoughts and Images'" [sub_title]="'Impressions of our life and work, living in Tokyo'"></app-header>
-  <app-header class="bg-white block sm:hidden" [title]="'Thoughts'"></app-header>
+  <app-header class="sticky top-0 z-40 bg-white hidden sm:block" [title]="'Thoughts and Images'" [sub_title]="'Impressions of our life and work, living in Tokyo'"></app-header>
+  <app-header class="bg-white block sticky top-0 z-40 sm:hidden" [title]="'Thoughts'"></app-header>
   <div class="pt-5 sm:bg-white">
     <ng-container *ngIf="allBlogs$ | async as blogs else loading">
-          <div class="grid grid-cols-1 mt-2 ml-2 mr-1  md:mt-4 md:ml-5 md:mr-5 max-w-lg gap-5 lg:max-w-none lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 ">
+          <div class="grid grid-cols-1 mt-2 ml-2 mr-1  md:mt-4 md:ml-5 md:mr-5 max-w-lg gap-5 lg:max-w-none lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 z-0">
             <div *ngFor="let blog of blogs">
                 <blog-card [blog]="blog"></blog-card>
             </div>

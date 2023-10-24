@@ -106,7 +106,7 @@ export class ProductDetailsFiveComponent implements OnInit, OnDestroy {
           this.quantity = this.product.quantity;
           this.total_cost = this.product.price * this.quantity;
         }
-        this.mainImage = this.product.image;
+
 
         this.cartService
           .cartByUserId(this.userId)
@@ -128,6 +128,7 @@ export class ProductDetailsFiveComponent implements OnInit, OnDestroy {
             });
           });
       }
+      this.mainImage = this.product.image;
     });
 
     this.inventoryImages$ = this.imageItemIndexService.getAllImages(

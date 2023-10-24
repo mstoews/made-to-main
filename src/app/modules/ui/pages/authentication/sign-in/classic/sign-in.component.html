@@ -1,4 +1,4 @@
-<div class="flex flex-col sm:flex-row items-center md:items-start sm:justify-center md:justify-start flex-auto min-w-0">
+<div class="flex flex-col h-screen sm:flex-row items-center md:items-start sm:justify-center md:justify-start flex-auto min-w-0 bg-gray-100">
   <div
     class="md:flex md:items-center md:justify-end w-full sm:w-auto md:h-full md:w-1/2 sm:p-12 md:pl-16  sm:rounded-2xl md:rounded-none sm:shadow md:shadow-none sm:bg-card">
     <div class="w-full max-w-80 sm:w-80 mx-auto sm:mx-0">
@@ -13,20 +13,48 @@
         Sign In
       </div>
       <form [formGroup]="signInForm" class="flex flex-col justify-center w-full">
-      <mat-form-field class="m-1 flex-start grow w-full" appearance="outline">
+<!--
+        <mat-form-field class="m-1 flex-start grow w-full" appearance="outline">
         <mat-label class="ml-2 text-base">Email</mat-label>
         <input #myInput matInput placeholder="Email" formControlName="email" />
+      </mat-form-field> -->
+
+      <mat-form-field class="w-full" appearance="outline">
+        <mat-label>Email address</mat-label>
+        <input id="email" matInput [formControlName]="'email'" />
+        <mat-error *ngIf="signInForm.get('email')!.hasError('required')">
+          Email address is required
+        </mat-error>
+        <mat-error *ngIf="signInForm.get('email')!.hasError('email')">
+          Please enter a valid email address
+        </mat-error>
       </mat-form-field>
 
-      <mat-form-field class="m-1 flex-start grow w-full" appearance="outline">
+      <!-- <mat-form-field class="m-1 flex-start grow w-full" appearance="outline">
         <mat-label class="ml-2 text-base">Password</mat-label>
         <input #myInput matInput type="password" placeholder="Password" formControlName="password" />
+      </mat-form-field> -->
+
+      <mat-form-field class="w-full" appearance="outline">
+        <mat-label>Password</mat-label>
+        <input id="password" matInput type="password" [formControlName]="'password'" #passwordField />
+        <button mat-icon-button type="button" (click)="
+          passwordField.type === 'password'
+            ? (passwordField.type = 'text')
+            : (passwordField.type = 'password')
+        " matSuffix>
+          <mat-icon class="icon-size-5 text-gray-500" *ngIf="passwordField.type === 'password'" [svgIcon]="'heroicons_solid:eye'">
+          </mat-icon>
+          <mat-icon class="icon-size-5 text-gray-500" *ngIf="passwordField.type === 'text'" [svgIcon]="'heroicons_solid:eye-off'">
+          </mat-icon>
+        </button>
+        <mat-error> Password is required </mat-error>
       </mat-form-field>
 
-      <button  (click)="signIn()" class="w-full h-50 p-2" mat-raised-button color="primary">Sign In</button>
+      <button  (click)="signIn()" class="w-full h-50 p-2 m-1" mat-raised-button color="primary">Sign In</button>
+      <button  (click)="signUp()" class="w-full h-50 p-2 m-1" mat-raised-button color="primary">Register</button>
       </form>
 
-      <div class="text-gray-400 mt-5">Signing in will register you as a Made To users. </div>
       <br>
     </div>
   </div>

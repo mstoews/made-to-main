@@ -15,6 +15,7 @@ import { AuthService } from 'app/services/auth/auth.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ProfileService } from 'app/services/profile.service';
+import { Auth } from '@angular/fire/auth';
 
 interface profile {
   email: string;
@@ -51,8 +52,10 @@ export class CartComponent implements OnInit, OnDestroy {
   fg: FormGroup;
   cartItems: Cart[] = [];
 
+  auth: Auth = inject(Auth);
+
   constructor(
-    private authService: AuthService,
+
     private route: Router,
     private activateRoute: ActivatedRoute,
     private checkoutService: CheckoutService,
@@ -61,8 +64,10 @@ export class CartComponent implements OnInit, OnDestroy {
     private profileService: ProfileService,
     public fb: FormBuilder
   ) {
-    this.authService.getUserId().then((userId) => {
-      this.userId = userId;
+    this.auth.onAuthStateChanged((user) => {
+      if (user) {
+        this.userId = user.uid;
+      }
     });
   }
 
@@ -71,8 +76,6 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit(): Promise<void> {
-    this.userId = this.activateRoute.snapshot.params.id;
-    console.debug('userId: ', this.userId);
     this.cartService.cartByStatus(this.userId, 'open').subscribe((cart) => {
       this.cartItems = cart;
       this.calculateTotals();
@@ -224,7 +227,7 @@ export class CartComponent implements OnInit, OnDestroy {
       } else {
         validation = true;
         if (item.is_clothing === false) {
-          this.cartService.updateByCartId(item, item.id);
+          this.cartService.updateByCartId(this.userId, item, item.id);
           this.cartService.updateUserPurchases(this.userId, item);
         }
       }

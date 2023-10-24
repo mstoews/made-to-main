@@ -1,28 +1,13 @@
+<app-header class="sticky top-0 left-0 right-0 z-40" [title]="'Repairs'"></app-header>
 
-<app-header [title]="'Repairs'" ></app-header>
-
-<!--
-  This example requires some changes to your config:
-
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/typography'),
-      require('@tailwindcss/aspect-ratio'),
-    ],
-  }
-  ```
--->
-<div class="overflow-hidden bg-white">
+<div class="overflow-hidden bg-white z-0">
   <div class="relative mx-auto max-w-7xl py-16 px-4 sm:px-6 lg:px-8">
     <div class="absolute top-0 bottom-0 left-3/4 hidden w-screen bg-gray-50 lg:block"></div>
     <div class="mx-auto max-w-prose text-base lg:grid lg:max-w-none lg:grid-cols-2 lg:gap-8">
       <div>
         <div class="text-lg font-semibold text-indigo-600"></div>
-        <div class="mt-2 font-garamond text-3xl font-bold leading-8 tracking-tight text-gray-900 sm:text-4xl">Mending and Repairs</div>
+        <div class="mt-2 font-garamond text-3xl font-bold leading-8 tracking-tight text-gray-900 sm:text-4xl">Mending
+          and Repairs</div>
       </div>
     </div>
     <div class="mt-8 lg:grid lg:grid-cols-2 lg:gap-8">
@@ -31,10 +16,10 @@
         <div class="relative mx-auto max-w-prose text-base lg:max-w-none">
           <figure>
             <div class="aspect-w-12 aspect-h-7 lg:aspect-none">
-              <img class="rounded-lg object-cover object-center shadow-lg" 
-               [ngSrc]="repairs" alt="Bespoke Tailoring" width="800" height="800">
+              <img class="rounded-lg object-cover object-center shadow-lg" [src]="repairs" alt="Bespoke Tailoring"
+                width="800" height="800">
             </div>
-          
+
           </figure>
         </div>
       </div>
@@ -42,9 +27,13 @@
         <div class="mx-auto max-w-prose text-base lg:max-w-none">
 
         </div>
-        <div class="font-garamond text-3xl prose prose-indigo mx-auto mt-5 text-gray-800 lg:col-start-1 lg:row-start-1 lg:max-w-none">
+        <div
+          class="font-garamond text-3xl prose prose-indigo mx-auto mt-5 text-gray-800 lg:col-start-1 lg:row-start-1 lg:max-w-none">
           <div>This is quite possibly the most important service at Made To.</div>
-          <div>Our singular mission is to do away with a culture of disposable clothing.  It is our belief that clothing becomes better over time, gaining original character with use, and even more unique qualities when they are mended.   If you have a beloved item that needs some love and care to get it back into wearable shape, please contact us for a consultation. </div>
+          <div>Our singular mission is to do away with a culture of disposable clothing. It is our belief that clothing
+            becomes better over time, gaining original character with use, and even more unique qualities when they are
+            mended. If you have a beloved item that needs some love and care to get it back into wearable shape, please
+            contact us for a consultation. </div>
         </div>
       </div>
     </div>

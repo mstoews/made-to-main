@@ -31,8 +31,10 @@ export class ProfileComponent implements OnInit {
   ) {
     this.loggedIn = false;
     auth.onAuthStateChanged((user) => {
-      this.userId = user.uid;
-      this.loggedIn = true;
+      if(user) {
+        this.userId = user.uid;
+        this.loggedIn = true;
+      }
     });
   }
 

@@ -1,12 +1,6 @@
 <ng-container *ngIf="featuredList$ | async as galleryList">
-  <app-header class="bg-white" [title]="'Follow Us'"></app-header>
-  <div>
-    <!-- <iframe class="embed-responsive-item h-[800px] w-full p-20"
-      src="https://www.youtube.com/embed/vlDzYIIOYmM?enablejsapi=1&amp;origin=https%3A%2F%2Fmdbootstrap.com"
-      allowfullscreen="" data-gtm-yt-inspected-2340190_699="true" id="240632615">
-    </iframe> -->
-  </div>
-  <div class="bg-white">
+  <app-header class="sticky top-0 left-0 right-0 z-40" [title]="'Follow Us'"></app-header>
+  <div class="bg-white z-0">
     <app-tw-lightbox class="hidden" [imageCollection]="galleryList"></app-tw-lightbox>
     <div class="px-6 mx-auto text-gray-900 max-w-7xl md:px-0 h-[1000px]">
       <div class="flex items-center justify-center grow">

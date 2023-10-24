@@ -1,9 +1,8 @@
-
 <!-- <div (click)="openShopByCategory()" class="container mx-auto">
   <div class="h-full w-full md:min-h-full md:w-auto relative ease-in duration-300 hover:cursor-pointer hover:opacity-70">
     <img
       class="w-full rounded-lg"
-      [ngSrc]="category.image" width="200" height="200"
+      [src]="category.image" width="200" height="200"
       alt="category" />
        <div class="text-black relative block mb-20 font-normal text-2xl hover:text-bold">
         {{category.name}}
@@ -14,10 +13,7 @@
 <div (click)="openShopByCategory()"
   class="w-[360px] rounded-lg bg-white shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] dark:bg-neutral-700">
   <div class="relative overflow-hidden bg-cover bg-no-repeat ease-in duration-300 hover:cursor-pointer">
-    <img
-      class="rounded-t-lg w-full h-auto"
-      [src]="category.image"
-      alt="" />
+    <img class="rounded-t-lg w-full h-auto" [src]="category.image" alt="" />
   </div>
   <div class="p-3 h-[100px]">
     <p class="text-base text-center text-neutral-600 dark:text-neutral-200">
@@ -28,4 +24,3 @@
     </p>
   </div>
 </div>
-

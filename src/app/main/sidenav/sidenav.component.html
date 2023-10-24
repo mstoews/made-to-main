@@ -26,7 +26,7 @@
                       [svgIcon]="'heroicons_outline:chevron-down'"></mat-icon>
                   </div>
                 </li>
-              
+
 
             <ul *ngIf="isToggle === 1" class="text-sm mt-3 leading-none w-full">
               <li>
@@ -188,15 +188,15 @@
         </ul>
       </div>
     </div>
-    <div class="flex items-center p-4 border-t mb-14 mt-14 hover:bg-gray-300">
+    <div class="flex items-center p-4 border-t mb-14 mt-14 hover:bg-gray-300 hover:cursor-pointer" (click)="onProfile()">
       <div class="w-10 h-10 bg-cover rounded-md mr-3 ">
         <img class="rounded-full h-full w-full overflow-hidden shadow bg-slate-700"
           src="assets/images/madetologowhite.svg" alt="avatar" role="img" />
       </div>
       <div>
-        <p class="text-sm font-medium leading-none text-gray-600">{{userEmail}}</p>
-        <p class="m-1 text-sm font-medium leading-none text-gray-600 hover:cursor-pointer hover:text-gray-900 "
-          (click)="onProfile()">See Profile</p>
+
+        <div class="mb-2 text-sm font-medium leading-none text-gray-600 hover:cursor-pointer hover:text-gray-900 ">See Profile</div>
+        <div class="text-sm font-medium leading-none text-gray-600">{{userEmail}}</div>
       </div>
     </div>
   </aside>

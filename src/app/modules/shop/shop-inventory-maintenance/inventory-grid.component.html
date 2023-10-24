@@ -36,7 +36,7 @@
           <dxi-column dataField="purchases_allowed" caption="Sell" [width]="100" type="boolean"> </dxi-column>
           <dxi-column dataField="quantity_required" caption="Per Quantity" [width]="100" type="boolean"> </dxi-column>
           <div *dxTemplate="let data of 'imageTemplate'">
-            <img [src]="data.value" class="lg-rounded" alt="cell.value">
+            <img [src]="data.value" class="rounded-lg" alt="cell.value">
           </div>
           <div *dxTemplate="let data of 'dateTemplate'">
             <div> {{data.value | date: 'dd/MM/YYYY' }} </div>

@@ -106,7 +106,7 @@
   <ng-container *ngIf="allCategories$ | async as rows">
     <div class="m-1 h-full">
       <dx-data-grid flex id="categoryGrid" [dataSource]="rows" [showBorders]="true" [focusedRowEnabled]="true"
-        
+
         [focusedRowIndex]="0" (onCellDblClick)="onCellDoublClicked($event)" [repaintChangesOnly]="true" keyExpr="name">
         <dxi-column dataField="name"> </dxi-column>
         <dxi-column dataField="description"> </dxi-column>
@@ -115,7 +115,7 @@
         <dxi-column dataField="updateBy"> </dxi-column>
         <dxi-column dataField="image" [width]="100" cellTemplate="cellTemplate"> </dxi-column>
         <div *dxTemplate="let data of 'cellTemplate'">
-          <img [src]="data.value" class="lg-rounded h-10 block mx-auto" alt="cell.value">
+          <img [src]="data.value" class="rounded-lg h-10 block mx-auto" alt="cell.value">
         </div>
         <div *dxTemplate="let data of 'dateTemplate'">
           <div> {{data.value | date: 'dd/MM/YYYY' }} </div>

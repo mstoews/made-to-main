@@ -1,11 +1,9 @@
-<app-header [title]="header_title"></app-header>
+<app-header class="sticky top-0 left-0 right-0 z-40" [title]="header_title"></app-header>
 
-<div class="relative bg-white">
+<div class="relative bg-white z-0">
   <div class="lg:absolute lg:inset-0 rounded">
     <div class="lg:absolute lg:inset-y-0 lg:left-0 lg:w-1/2 lg-rounded">
-      <img class="w-full object-cover lg:h-full"
-        [ngSrc]="tailoring_image"
-        width="800" height="600" alt="">
+      <img class="w-full object-cover lg:h-full" [src]="tailoring_image" width="800" height="600" alt="">
     </div>
   </div>
 
@@ -17,14 +15,16 @@
         </div>
         <div class="mt-8 text-lg text-gray-800"></div>
         <div class="font-garamond mt-5 text-gray-500 text-2xl">
-          <div>At Made to, we are offering bespoke tailoring services, courtesy of Master Teruo Hirokawa. He has more than
+          <div>At Made to, we are offering bespoke tailoring services, courtesy of Master Teruo Hirokawa. He has more
+            than
             60 years experience in cutting, fitting and constructing beautiful hand made garments. No matter your shape,
             size or desired fit, Master Hirokawa can create a garment to suit your needs. </div>
           <div>The bespoke process requires a bit of patience and commitment.</div>
           <div>Because we want the perfect fit, it includes the following steps: </div>
 
           <div><strong>First consultation: </strong></div>
-          <div>In this meeting, we discuss cloth, desired fit, details, and take a very thorough set of measurements. </div>
+          <div>In this meeting, we discuss cloth, desired fit, details, and take a very thorough set of measurements.
+          </div>
 
           <div><strong>First fitting:</strong></div>
           <div>During this appointment we will ask you to try on a “skeleton baste” of your new suit. This garment will
@@ -38,7 +38,8 @@
           </div>
 
           <div><strong>Final fitting:</strong></div>
-          <div>During this appointment you will arrive to a completed garment that is ready for you to take home. We will
+          <div>During this appointment you will arrive to a completed garment that is ready for you to take home. We
+            will
             ask you to try on your suit one final time to make sure you are pleased with the result and feel good in
             your new clothes. During this time we can also offer information on garment care and maintenance
           </div>

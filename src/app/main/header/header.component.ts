@@ -68,22 +68,24 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.isLoggedIn = false;
 
     onAuthStateChanged(this.auth, (user) => {
-      this.userId = user.uid;
-      this.isLoggedIn = true;
-      console.debug(this.userId);
-      this.cartService
-        .cartByUserId(user.uid)
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe((cart) => {
-          this.cartCounter.set(cart.length);
-        });
+      if (user) {
+        this.userId = user.uid;
+        this.isLoggedIn = true;
+        console.debug(this.userId);
+        this.cartService
+          .cartByUserId(user.uid)
+          .pipe(takeUntil(this._unsubscribeAll))
+          .subscribe((cart) => {
+            this.cartCounter.set(cart.length);
+          });
 
-      this.wishListService
-        .wishListByUserId(user.uid)
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe((wishlist) => {
-          this.wishCounter.set(wishlist.length);
-        });
+        this.wishListService
+          .wishListByUserId(user.uid)
+          .pipe(takeUntil(this._unsubscribeAll))
+          .subscribe((wishlist) => {
+            this.wishCounter.set(wishlist.length);
+          });
+      }
     });
     /*
 

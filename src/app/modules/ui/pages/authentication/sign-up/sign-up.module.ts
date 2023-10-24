@@ -14,7 +14,7 @@ const routes: Routes = [
     path: 'sign-up',
     children: [
       {
-        path: 'classic',
+        path: '',
         component: SignUpClassicComponent,
       },
       {

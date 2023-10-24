@@ -39,7 +39,7 @@ export class ProfileListComponent {
             Id
           </th>
           <td mat-cell *matCellDef="let element">
-            <img class="m-1 w-30 rounded-lg" [ngSrc]="element.id"  priority/>
+            <img class="m-1 w-30 rounded-lg" [src]="element.id"  priority/>
           </td>
 </ng-container>
 
@@ -48,7 +48,7 @@ export class ProfileListComponent {
             Id
           </th>
           <td mat-cell *matCellDef="let element">
-            <img class="m-1 w-30 rounded-lg" [ngSrc]="element.id"  priority/>
+            <img class="m-1 w-30 rounded-lg" [src]="element.id"  priority/>
           </td>
 </ng-container>
 */

@@ -1,10 +1,10 @@
 <div class="sm:bg-white sm:h-screen">
-<app-header class="" [title]="'Services'"></app-header>
-<div class="max-w-8xl md:m-10 text-gray-900 md:px-0">
+<app-header class="sticky top-0 left-0 right-0 z-40" [title]="'Services'"></app-header>
+<div class="max-w-8xl md:m-10 text-gray-900 md:px-0 z-0">
 
   <div class="flex flex-col sm:flex-row sm-flex-wrap gap-3 m-3 text-white items-center">
 
-    <div (click)="onServices('home/tailoring')" 
+    <div (click)="onServices('home/tailoring')"
      class="flex-1 bg-transparent mb-5 hover:cursor-pointer hover:animate-pulse">
       <img [src]="services_one" alt=""
       class="w-[360px] h-auto sm:w-[500px] sm:h-[550px]" />
@@ -12,26 +12,26 @@
       <div class="text-3xl md:text-2xl  font-bold font-garamond -mt-12 ml-2">Bespoke Tailoring</div>
     </div>
 
-    <div (click)="onServices('home/knitting')" 
+    <div (click)="onServices('home/knitting')"
      class="flex-1 bg-transparent mb-5 hover:cursor-pointer hover:animate-pulse">
-      <img [src]="services_two" alt="" 
+      <img [src]="services_two" alt=""
       class="w-[360px] h-auto sm:w-[500px] sm:h-[550px]" />
       <div class="item-gradient"></div>
       <div class="text-3xl md:text-2xl hover:cursor-pointer font-garamond font-bold -mt-12 ml-2">Bespoke Knitwear</div>
     </div>
 
-    <div (click)="onServices('home/repairs')" 
+    <div (click)="onServices('home/repairs')"
       class="flex-1 bg-transparent mb-5 hover:cursor-pointer hover:animate-pulse">
-      <img [src]="services_three" alt="" 
+      <img [src]="services_three" alt=""
       class="w-[360px] h-auto sm:w-[450px] sm:h-[550px]" />
       <div class="item-gradient"></div>
       <div class="text-3xl md:text-2xl hover:cursor-pointer font-garamond font-bold -mt-12 ml-2">Repairs</div>
     </div>
 
-    <div (click)="onServices('home/ready-to-wear')" 
+    <div (click)="onServices('home/ready-to-wear')"
      class="flex-1 bg-transparent mb-5  hover:cursor-pointer hover:animate-pulse">
       <img [src]="services_four"
-        alt="" 
+        alt=""
         class="w-[360px] h-auto sm:w-[500px] sm:h-[550px]" />
       <div class="item-gradient"></div>
       <div class="text-3xl md:text-2xl font-garamond font-bold -mt-12 ml-2 text-gray-100 hover:text-gray-100 ">Ready To Wear</div>

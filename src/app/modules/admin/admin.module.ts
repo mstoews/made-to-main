@@ -34,18 +34,16 @@ import { InventoryImageCardComponent } from '../shop/shop-inventory-maintenance/
 import { ViewImageItemComponent } from '../shop/shop-inventory-maintenance/inventory-image-card/view-image-item/view-image-item.component';
 import { HeadingModule } from 'app/main/header/heading.module';
 import { ImageMaintenanceModule } from './image-maintenance/image-maintenance.module';
+import { ConfirmCategoryDialog } from './category-grid/add/add.component';
 
 @NgModule({
   declarations: [
     AdminComponent,
-
     GridMenubarComponent,
     CategoryGridComponent,
-
     InventoryComponent,
     AdminFormComponent,
     GalleryComponent,
-
     SafePipe,
     InventoryComponent,
     ProductEditComponent,
@@ -55,6 +53,7 @@ import { ImageMaintenanceModule } from './image-maintenance/image-maintenance.mo
     ImageListComponent,
     ContactListComponent,
     InventoryImageCardComponent,
+    ConfirmCategoryDialog,
   ],
   imports: [
     AdminRouteModule,
@@ -64,7 +63,6 @@ import { ImageMaintenanceModule } from './image-maintenance/image-maintenance.mo
     DxBulletModule,
     DxTemplateModule,
     AdminRouteModule,
-
     GalleryLightboxModule,
     DxPopupModule,
     DxHtmlEditorModule,
