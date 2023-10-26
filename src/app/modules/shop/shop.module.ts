@@ -39,6 +39,7 @@ import { LightboxModule } from '../lightbox';
 import { StripHtmlPipe } from './striphtml.pipe';
 import { ElementsComponent } from './shop/cart/elements/elements.component';
 
+
 export const ProductFuncResolver: ResolveFn<Product[]> = (
   route: ActivatedRouteSnapshot,
   state: RouterStateSnapshot
@@ -150,6 +151,7 @@ const routes: Routes = [
     ShopCategoryCardComponent,
     ElementsComponent,
     StripHtmlPipe,
+
   ],
   imports: [
     CommonModule,

@@ -35,6 +35,8 @@ import { ViewImageItemComponent } from '../shop/shop-inventory-maintenance/inven
 import { HeadingModule } from 'app/main/header/heading.module';
 import { ImageMaintenanceModule } from './image-maintenance/image-maintenance.module';
 import { ConfirmCategoryDialog } from './category-grid/add/add.component';
+//import { PurchaseComponent } from './purchases/purchase-grid.component';
+//import { PurchaseDetailComponent } from './purchases/purchase-detail/purchase-detail.component';
 
 @NgModule({
   declarations: [
@@ -54,6 +56,8 @@ import { ConfirmCategoryDialog } from './category-grid/add/add.component';
     ContactListComponent,
     InventoryImageCardComponent,
     ConfirmCategoryDialog,
+  //  PurchaseComponent,
+  //  PurchaseDetailComponent
   ],
   imports: [
     AdminRouteModule,

@@ -1,0 +1,45 @@
+<div class=" bg-white h-screen">
+  <app-header [title]="'Purchases'"></app-header>
+
+  <mat-card class="w-full">
+    <ng-container *ngIf="purchases | async as rows">
+
+      <div class="m-4 h-full">
+        <dx-data-grid flex id="categoryGrid"
+          [wordWrapEnabled]="true"
+          [dataSource]="rows"
+          [showColumnLines]="true"
+          [showRowLines]="true"
+          [showBorders]="true"
+          [focusedRowEnabled]="true"
+          [focusedRowIndex]="0"
+          [repaintChangesOnly]="true"
+          
+          keyExpr="id">
+          <dxo-search-panel [visible]="true" [highlightCaseSensitive]="true"></dxo-search-panel>
+          <dxi-column dataField="user_purchased" caption="User"> </dxi-column>
+          <dxi-column dataField="quantity" [width]="200"> </dxi-column>
+          <dxi-column dataField="date_sold" [width]="200"> </dxi-column>
+          <dxi-column dataField="date_updated" [width]="200"> </dxi-column>
+          <dxi-column dataField="is_completed" [width]="200"> </dxi-column>
+          <dxi-column dataField="is_measurement_saved" [width]="200"> </dxi-column>
+          <dxi-column dataField="status" caption="Status" [width]="200"> </dxi-column>
+          <dxo-master-detail [enabled]="true" template="detail"> </dxo-master-detail>
+            <div *dxTemplate="let purchase of 'detail'">
+              <app-purchase-detail [key]="purchase.key"></app-purchase-detail>
+            </div>
+        </dx-data-grid>
+      </div>
+
+
+      <button (click)="onAdd()"
+        class="fixed bottom-20 right-20 p-1 w-12 h-12 bg-blue-600 rounded-full hover:bg-blue-800 active:shadow-lg mouse shadow transition ease-in duration-200 focus:outline-none">
+        <svg viewBox="0 0 20 20" class="w-6 h-6 inline-block">
+          <path fill="#FFFFFF" d="M16,10c0,0.553-0.048,1-0.601,1H11v4.399C11,15.951,10.553,16,10,16c-0.553,0-1-0.049-1-0.601V11H4.601
+            C4.049,11,4,10.553,4,10c0-0.553,0.049-1,0.601-1H9V4.601C9,4.048,9.447,4,10,4c0.553,0,1,0.048,1,0.601V9h4.399
+            C15.952,9,16,9.447,16,10z" />
+        </svg>
+      </button>
+    </ng-container>
+  </mat-card>
+</div>

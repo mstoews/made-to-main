@@ -19,6 +19,7 @@ import {
   redirectUnauthorizedTo,
 } from '@angular/fire/auth-guard';
 import { ImageMgtEditComponent } from './image-maintenance/image-edit/image-mgt-edit.component';
+// import { PurchaseComponent } from './purchases/purchase-grid.component';
 
 // const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['authentication/split-screen/sign-in']);
 // const redirectLoggedInToHome = () => redirectUnauthorizedTo(['home']);
@@ -45,6 +46,13 @@ const routes: Routes = [
     data: { authGuardPipe: adminOnly },
     component: InventoryComponent,
   },
+  // {
+  //   path: 'purchases',
+  //   title: 'Purchases',
+  //   canActivate: [AuthGuard],
+  //   data: { authGuardPipe: adminOnly },
+  //   component: PurchaseComponent,
+  // },
   {
     path: 'inventory/:id',
     title: 'Product Edit',

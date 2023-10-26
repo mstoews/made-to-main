@@ -239,23 +239,29 @@ export class CartService implements OnDestroy {
       });
   }
 
-  updateUserPurchases(userId: string, cart: any) {
-    const collectionRef = doc(
-      collection(this.firestore, `users/${userId}/purchases/`),
-      cart.id
-    ) as DocumentReference<Cart>;
-    updateDoc(collectionRef, cart)
-      .then((docRef) => {
-        this.snack.open(`Cart has been updated ... `, 'OK', {
+  updateUserPurchases(cart: any) {
+    const Ref = collection(this.firestore, `purchases`);
+    addDoc(Ref, cart)
+      .then((newCart) => {
+        updateDoc(doc(Ref, newCart.id), { id: newCart.id });
+        this.snack.open('Purchases have been added ...', 'OK', {
           verticalPosition: 'top',
           horizontalPosition: 'right',
           panelClass: 'bg-danger',
-          duration: 2000,
+          duration: 1000,
         });
       })
       .catch((error) => {
-        console.error('Error adding document: ', error);
-        throwError(() => new Error(error));
+        this.snack.open(
+          `Purchases have NOT been added ...\n${error} `,
+          'OK',
+          {
+            verticalPosition: 'top',
+            horizontalPosition: 'right',
+            panelClass: 'bg-danger',
+            duration: 1000,
+          }
+        );
       });
   }
 

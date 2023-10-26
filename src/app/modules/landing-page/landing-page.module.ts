@@ -23,6 +23,8 @@ import { LastestBlogComponent } from 'app/components/lastest-blog/lastest-blog.c
 import { ServicesComponent } from './made-to-services/services.component';
 import { FollowingComponent } from './following/following.component';
 import { TwLighthouseComponent } from 'app/components/tw-lighthouse/tw-lighthouse.component';
+import { AboutEntryComponent } from './about-us/about-entry/about-entry.component';
+
 
 const routes: Routes = [
   {
@@ -110,7 +112,8 @@ const routes: Routes = [
     TosComponent,
     ServicesComponent,
     FollowingComponent,
-  ],
+    AboutEntryComponent],
+
   imports: [
     CommonModule,
     GalleryCardComponent,
@@ -123,6 +126,7 @@ const routes: Routes = [
     IconsModule,
     LastestBlogComponent,
     TwLighthouseComponent,
+    AboutEntryComponent,
   ],
 })
 export class LandingPageModule {}

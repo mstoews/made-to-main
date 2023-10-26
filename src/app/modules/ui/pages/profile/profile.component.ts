@@ -19,8 +19,9 @@ import { Auth } from '@angular/fire/auth';
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent {
   private userId: string;
+  private email: string;
   public displayName: string;
   public loggedIn: boolean;
 
@@ -33,6 +34,7 @@ export class ProfileComponent implements OnInit {
     auth.onAuthStateChanged((user) => {
       if(user) {
         this.userId = user.uid;
+        this.email = user.email;
         this.loggedIn = true;
       }
     });
@@ -76,17 +78,6 @@ export class ProfileComponent implements OnInit {
       });
   }
 
-  ngOnInit() {
-    this.loggedIn = false;
-    this.auth.onAuthStateChanged((user) => {
-      if (user !== null) {
-        this.loggedIn = true;
-        // console.debug( `this user : ${this.userId} is registered ? : ${this.loggedIn}`);
-      } else {
-        this.loggedIn = false;
-      }
-    });
-  }
 
   backToHome() {
     this.router.navigate(['home']);

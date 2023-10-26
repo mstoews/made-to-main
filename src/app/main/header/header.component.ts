@@ -17,8 +17,7 @@ import { MenuToggleService } from 'app/services/menu-toggle.service';
 import { AuthService } from 'app/services/auth/auth.service';
 import { CartService } from 'app/services/cart.service';
 import { WishListService } from 'app/services/wishlist.service';
-import { ProfileService } from 'app/services/profile.service';
-import { ProfileModel } from 'app/models/profile';
+
 import { UserService } from 'app/services/auth/user.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, Subject, Subscription, first, takeUntil } from 'rxjs';
@@ -51,7 +50,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   @Input() home: boolean;
   isClicked = false;
   emailName: string;
-  profile$: Observable<ProfileModel[]>;
+  // profile$: Observable<ProfileModel[]>;
   userId: string;
 
   isLoggedIn = true;

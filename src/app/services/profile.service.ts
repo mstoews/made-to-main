@@ -1,12 +1,12 @@
-import { Injectable } from '@angular/core';
-import { first, from, map, Observable } from 'rxjs';
+import { inject, Injectable, OnInit } from '@angular/core';
+import { async, first, from, map, Observable } from 'rxjs';
 import { ProfileModel } from 'app/models/profile';
 import { AuthService } from './auth/auth.service';
 import { convertSnaps } from './db-utils';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Blog } from '../models/blog';
 import { Mainpage } from '../models/mainpage';
-import { Auth } from '@angular/fire/auth';
+import { Auth, updateProfile } from '@angular/fire/auth';
 import {
   addDoc,
   collection,
@@ -18,36 +18,38 @@ import {
   updateDoc,
 } from '@angular/fire/firestore';
 
+
 @Injectable({
   providedIn: 'root',
 })
-export class ProfileService {
+export class ProfileService implements OnInit {
   private profileItems: Observable<ProfileModel[]>;
-  private userId: string;
-  private email: string;
+  private userId: string = '';
+  private email: string = '';
+  private userName: string = '';
 
-  constructor(
-    public firestore: Firestore,
-    public auth: Auth,
-    private snack: MatSnackBar
-  ) {
-    this.userId = this.auth.currentUser.uid;
+  firestore = inject(Firestore);
+  auth = inject(Auth);
+  snack = inject(MatSnackBar);
+
+  ngOnInit(): void {
+
   }
 
-  getAll(): Observable<ProfileModel[]> {
-    // query must be set to order descending
-    const collectionRef = collection(
-      this.firestore,
-      `users/${this.userId}/profile`
-    );
-    return collectionData(collectionRef, { idField: 'id' }) as Observable<
-      ProfileModel[]
-    >;
+  setUserDisplayName(name: string) {
+     this.auth.onAuthStateChanged((user) => {
+        updateProfile(user, { displayName: name });
+     });
   }
 
-  getUserCountry(): string {
+  getUserProfile(userId: string): Observable<ProfileModel[]> {
+    const collectionRef = collection(this.firestore, `users/${userId}/profile`);
+    return collectionData(collectionRef, { idField: 'id' }) as Observable<ProfileModel[] >;
+  }
+
+  getUserCountry(userId: string): string {
     let country: string;
-    this.getAll()
+    this.getUserProfile(userId)
       .pipe(first())
       .subscribe((data) => {
         country = data[0].country;
@@ -55,9 +57,13 @@ export class ProfileService {
     return country;
   }
 
-  getUserFirstName(): string {
+  getUserEmail(): string {
+    return this.email;
+  }
+
+  async getUserFirstName(userId: string): Promise<string> {
     let rc: string;
-    this.getAll()
+    this.getUserProfile(userId)
       .pipe(first())
       .subscribe((data) => {
         rc = data[0].first_name;
@@ -65,9 +71,9 @@ export class ProfileService {
     return rc;
   }
 
-  getUserLastName(): string {
+  async getUserLastName(userId: string): Promise<string> {
     let rc: string;
-    this.getAll()
+    await this.getUserProfile(userId)
       .pipe(first())
       .subscribe((data) => {
         rc = data[0].last_name;
@@ -75,7 +81,14 @@ export class ProfileService {
     return rc;
   }
 
+  async getUserName(userId: string): Promise<string> {
+    return await this.getUserName(userId) + ' ' + await this.getUserLastName(userId);
+  }
+
   update(profile: ProfileModel) {
+
+    // var userName = profile.first_name + ' ' + profile.last_name;
+
     const ref = doc(
       this.firestore,
       'profile',

@@ -14,7 +14,7 @@ import { Cart } from 'app/models/cart';
 import { AuthService } from 'app/services/auth/auth.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ProfileService } from 'app/services/profile.service';
+// import { ProfileService } from 'app/services/profile.service';
 import { Auth } from '@angular/fire/auth';
 
 interface profile {
@@ -61,7 +61,7 @@ export class CartComponent implements OnInit, OnDestroy {
     private checkoutService: CheckoutService,
     private cartService: CartService,
     private ngxSpinner: NgxSpinnerService,
-    private profileService: ProfileService,
+    // private profileService: ProfileService,
     public fb: FormBuilder
   ) {
     this.auth.onAuthStateChanged((user) => {
@@ -72,7 +72,7 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   async ngAfterViewInit() {
-    this.userCountry = await this.getUserCountry();
+    // this.userCountry = await this.getUserCountry();
   }
 
   async ngOnInit(): Promise<void> {
@@ -95,7 +95,13 @@ export class CartComponent implements OnInit, OnDestroy {
   onCheckOut() {
     // this.calculateTotals();
     // this.route.navigate(['shop/coming-soon']);
-    this.onSaveMeasurements();
+
+    if (this.onSaveMeasurements() === false) {
+      return;
+    }
+
+    this.onSaveCartToUser(this.userId);
+
     this.ngxSpinner.show().then(() => {
       setTimeout(() => {
         this.ngxSpinner.hide();
@@ -117,26 +123,30 @@ export class CartComponent implements OnInit, OnDestroy {
     }
   }
 
-  onSaveCartToUser(userId: string) {
+  async onSaveCartToUser(userId: string) {
+    // const email = this.profileService.getUserEmail();
+    // const userName = await this.profileService.getUserName();
     const dDate = new Date();
     const updateDate = dDate.toISOString().split('T')[0];
     const cart = {
       ...this.cartItems,
+      user: 'User Name',
+      // email: email,
       is_completed: false,
       user_purchased: userId,
       date_sold: updateDate,
       date_updated: updateDate,
       status: 'open',
-      quantity: 1,
       is_measurement_saved: true,
     };
-    this.cartService.updateUserPurchases(userId, cart);
+    this.cartService.updateUserPurchases(cart);
   }
 
   onCheckOutPaymentIntent() {
     // this.calculateTotals();
     // this.route.navigate(['shop/coming-soon']);
     this.onSaveMeasurements();
+
     this.ngxSpinner.show().then(() => {
       setTimeout(() => {
         this.ngxSpinner.hide();
@@ -150,7 +160,7 @@ export class CartComponent implements OnInit, OnDestroy {
         .subscribe((checkoutSession) => {
           this.checkoutService.redirectToCheckout(checkoutSession);
         });
-
+      this.onSaveCartToUser(this.userId);
       this.purchaseStarted = false;
     } else {
       this.purchaseStarted = false;
@@ -159,7 +169,11 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   async getUserCountry() {
-    return this.profileService.getUserCountry();
+    //return this.profileService.getUserCountry(this.userId);
+  }
+
+  async getUserName() {
+    //return this.profileService.getUserName(this.userId);
   }
 
   round(number: number, precision: number) {
@@ -228,7 +242,7 @@ export class CartComponent implements OnInit, OnDestroy {
         validation = true;
         if (item.is_clothing === false) {
           this.cartService.updateByCartId(this.userId, item, item.id);
-          this.cartService.updateUserPurchases(this.userId, item);
+          // this.cartService.updateUserPurchases(item);
         }
       }
     });

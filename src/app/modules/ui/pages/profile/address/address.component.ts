@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, FormsModule, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ProfileModel } from 'app/models/profile';
 import { first, from, map, Observable, OperatorFunction } from 'rxjs';
 import { MaterialModule } from 'app/material.module';
@@ -12,7 +13,7 @@ import { UserService } from 'app/services/auth/user.service';
   standalone: true,
   selector: 'app-address',
   templateUrl: './address.component.html',
-  imports: [MaterialModule],
+  imports: [MaterialModule, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class AddressComponent implements OnInit {
   profile: ProfileModel;
@@ -23,6 +24,24 @@ export class AddressComponent implements OnInit {
   userId: string;
   email: string;
   profileId: string;
+
+  address: ProfileModel = {
+    id: '',
+    email: '',
+    first_name: '',
+    middle_name: '',
+    last_name: '',
+    address_line1: '',
+    address_line2: '',
+    city: '',
+    province_state: '',
+    postal_code: '',
+    phone_number: '',
+    country: '',
+    created_date: '',
+    userId: '',
+  };
+
   constructor(
     public fb: FormBuilder,
     public authService: AuthService,
@@ -31,23 +50,7 @@ export class AddressComponent implements OnInit {
     public snack: MatSnackBar
   ) {
     const theDate = new Date();
-    const address: ProfileModel = {
-      id: '',
-      email: '',
-      first_name: '',
-      middle_name: '',
-      last_name: '',
-      address_line1: '',
-      address_line2: '',
-      city: '',
-      province_state: '',
-      postal_code: '',
-      phone_number: '',
-      country: '',
-      created_date: theDate.toDateString(),
-      userId: this.userId,
-    };
-    this.createForm(address);
+    this.createForm(this.address);
     this.updateBtnState = false;
   }
 
@@ -56,27 +59,9 @@ export class AddressComponent implements OnInit {
     this.authService.getUserId().then((userId) => {
       this.userId = userId;
       this.email = this.authService.email;
-    });
-
-    let collection = this.profileService.getAll();
-    let profiles = collection.pipe(
-      map((result) => {
-        return result.filter((mr) => mr.userId === this.userId);
-      })
-    );
-    console.debug('ngOnInit', this.userId);
-
-    // return only the first element of document which constains the only profile for the user ID if it exists.
-
-    profiles.pipe(first()).subscribe((ref) => {
-      if (ref.length > 0) {
-        this.profileExists = true;
-        // console.debug('The profile exists for this user!');
-        ref.forEach((mr) => {
-          this.profileId = mr.id;
-          this.createForm(mr);
-        });
-      }
+      // this.profileService.getUserProfile(this.userId).subscribe((data) => {
+      //   this.createForm(data[0]);
+      // });
     });
   }
 
@@ -84,7 +69,7 @@ export class AddressComponent implements OnInit {
     let data = this.formGroup.getRawValue();
     this.updateBtnState = true;
 
-    if (this.profileExists === false) {
+    if (this.profileExists === true) {
       this.profileService.update(data);
       this.snack.open('Profile has been updated ...', 'OK', {
         duration: 3000,

@@ -1,0 +1,32 @@
+
+<dx-data-grid flex id="id"
+[wordWrapEnabled]="true"
+[dataSource]="purchases"
+[showColumnLines]="true"
+[showRowLines]="true"
+[showBorders]="true"
+[focusedRowEnabled]="true"
+[focusedRowIndex]="0"
+[repaintChangesOnly]="true"
+(onCellDblClick)="onCellDoublClicked($event)"
+keyExpr="image">
+<dxi-column dataField="image" caption="Img" [width]="60" cellTemplate="imageTemplate"> </dxi-column>
+<dxi-column dataField="category" [width]="150"> </dxi-column>
+<dxi-column dataField="price" [width]="100"> </dxi-column>
+<dxi-column dataField="description" [width]="300"> </dxi-column>
+<dxi-column dataField="short_description"> </dxi-column>
+<dxi-column dataField="quantity" [width]="60" caption="Qty"></dxi-column>
+<dxi-column dataField="height" [width]="80" caption="Height"  ></dxi-column>
+<dxi-column dataField="bust" [width]="80"  caption="Bust" ></dxi-column>
+<dxi-column dataField="waist" [width]="80" caption="Waist" ></dxi-column>
+<dxi-column dataField="hip" [width]="80"  caption="Hip" ></dxi-column>
+<dxi-column dataField="inseam" [width]="85" caption="InSeam" ></dxi-column>
+<dxi-column dataField="outseam" [width]="87"  caption="OutSeam"></dxi-column>
+<dxi-column dataField="sleeve_length" [width]="80" caption="Sleeve" ></dxi-column>
+
+<div *dxTemplate="let data of 'imageTemplate'">
+  <img [src]="data.value" class="rounded-lg m-0" alt="cell.value">
+</div>
+
+</dx-data-grid>
+
