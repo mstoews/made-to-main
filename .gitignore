@@ -52,3 +52,6 @@ Thumbs.db
 .firebase
 *-debug.log
 .runtimeconfig.json
+
+# Local Netlify folder
+.netlify
